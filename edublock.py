@@ -12,7 +12,7 @@ btn_selected = (24,47,223)
 btn_unselected = (20,30,53)
 txt_selected = (255,255,255)
 txt_unselected = (76,86,127)
-splashb_theme_color = (15,21,46)
+splashb_theme_color = (8,10,26)
 color_black=(0,0,0)
 color_white=(255,255,255)
 color_red=(238,55,59)
@@ -26,7 +26,7 @@ button=Button()
 firmware_info='v1.0'
 #font
 font1 = ImageFont.truetype("msyh.ttc",15)
-font2 = ImageFont.truetype("msyh.ttc",22)
+font2 = ImageFont.truetype("msyh.ttc",23)
 font3 = ImageFont.truetype("msyh.ttc",30)
 #init splash
 splash = Image.new("RGB", (display.height, display.width ),splash_theme_color)
@@ -57,26 +57,26 @@ def main_program():
     display.ShowImage(splash)
 
 #-------------------------init UI---------------------------------
-wifiy = Image.open("./pics/wifi@2x.png")
-wifin = Image.open("./pics/wifi-un@2x.png")
-cn = Image.open("./pics/wifi@2x.png")
-uncn = Image.open("./pics/wifi-un@2x.png")
+wifiy = Image.open("./pics/wifi@2x.jpg")
+wifin = Image.open("./pics/wifi-un@2x.jpg")
+cn = Image.open("./pics/connect@2x.jpg")
+uncn = Image.open("./pics/connect-un@2x.jpg")
+lcd_rect(0,195,320,240,(48,50,73),thickness=-1)
 
 
 #--------------------------get IP--------------------------
 ipadd=ip()
 if ipadd=='0.0.0.0':
     print('wlan disconnected')
-    draw.bitmap((44,164),wifin)
-    lcd_draw_string(draw,80, 160, 'No net!', color=color_white, scale=font2)
+    draw.bitmap(wifin,(65,200))
+    lcd_draw_string(draw,100, 200, 'No net!', color=color_white, scale=font2)
 else:
     print('wlan connected')
-    draw.bitmap((86,164),wifiy)
-    lcd_draw_string(draw,110, 160, ipadd, color=color_white, scale=font2)
+    splash.paste(wifiy,(65,200))
+    lcd_draw_string(draw,100, 200, ipadd, color=color_white, scale=font2)
     
 
-draw.bitmap((65,65),uncn)
-
+splash.paste(uncn,(60,35))
 display.ShowImage(splash)
 
 
@@ -111,11 +111,11 @@ while 1:
         break
     if cmd[0:6]==b'Launch':
         print('server success')
-        draw.bitmap((80,65),uncn)
+        splash.paste(uncn,(60,35))
         display.ShowImage(splash)
     elif cmd[0:12]==b'Successfully':
         print('linked!')
-        draw.bitmap((160,65),cn)
+        splash.paste(cn,(60,35))
         display.ShowImage(splash)
 
 print('aiblocks over')

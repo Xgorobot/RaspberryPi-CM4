@@ -28,7 +28,7 @@ display.clear()
 #button
 button=Button()
 #const
-firmware_info='v1.0'
+firmware_info='v1.1'
 #font
 font1 = ImageFont.truetype("msyh.ttc",15)
 font2 = ImageFont.truetype("msyh.ttc",22)

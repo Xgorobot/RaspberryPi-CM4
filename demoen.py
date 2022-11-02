@@ -66,7 +66,9 @@ MENU_ITEMS = [
     ("qrcode", "vision","qrcode","qrcode"),
     ("agesex", "vision","agesex","agesex"),
     ("traffic", "vision","traffic","traffic"),
-    ("emotion", "vision","emotion","emotion")
+    ("emotion", "vision","emotion","emotion"),
+    ("ball_trace", "vision","ball_trace","ball")
+    
 ]
 
 SELECT_BOX=[80,68]
@@ -159,21 +161,21 @@ def clear_page():
 
 
 def draw_title_bar(index):
-    lcd_rect(0,0,240,35, color=color_bg, thickness=-1)
+    lcd_rect(0,0,320,35, color=color_bg, thickness=-1)
     draw.line((0, 35, 320, 35), color_unselect)
     display_cjk_string(draw,77,7, "EXAMPLES", font_size=font2, color=color_white, background_color=color_bg)
     display_cjk_string(draw, 203,7, str(index+1) + "/" + str(MENU_TOTAL_ITEMS+1), font_size=font2, color=color_white, background_color=color_bg)
 
 
 def draw_title_open():
-    lcd_rect(0,0,240,35, color=color_bg, thickness=-1)
+    lcd_rect(0,0,320,35, color=color_bg, thickness=-1)
     draw.line((0, 35, 320, 35), color_unselect)
     display_cjk_string(draw,85,7, "OPEN...", font_size=font2, color=color_white, background_color=color_bg)
     #display_cjk_string(draw, 203,12, str(index+1) + "/" + str(MENU_TOTAL_ITEMS+1), font_size=font2, color=color_white, background_color=color_bg)
 
 
 def draw_title_error():
-    lcd_rect(0,0,240,35, color=color_bg, thickness=-1)
+    lcd_rect(0,0,320,35, color=color_bg, thickness=-1)
     draw.line((0, 35, 320, 35), color_unselect)
     display_cjk_string(draw,85,7, "FAIL", font_size=font2, color=color_white, background_color=color_bg)
     #display_cjk_string(draw, 203,12, str(index+1) + "/" + str(MENU_TOTAL_ITEMS+1), font_size=font2, color=color_white, background_color=color_bg)
@@ -270,31 +272,33 @@ while True:
             if MENU_ITEMS[MENU_CURRENT_SELECT][2]=="dog_show":
                 import dog_show
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="face_mask":
-                import face_mask
+                os.system('sudo python3 face_mask.py')
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="hands":
-                import hands
+                os.system('sudo python3 hands.py')
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="vision":
-                import dog_vision_show
+                os.system('sudo python3 dog_vision_show.py')
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="segmentation":
-                import segmentation
+                os.system('sudo python3 segmentation.py')
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="objectron":
-                import objectron
+                os.system('sudo python3 objectron.py')
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="face_decetion":
-                import face_decetion
+                os.system('sudo python3 face_decetion.py')
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="pose":
-                import pose
+                os.system('sudo python3 pose.py')
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="image_class":
-                import image_class
+                os.system('sudo python3 image_class.py')
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="image_dete":
-                import image_dete
+                os.system('sudo python3 image_dete.py')
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="qrcode":
-                import qrcode
+                os.system('sudo python3 qrcode.py')
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="agesex":
-                import agesex
+                os.system('sudo python3 agesex.py')
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="traffic":
-                import traffic
+                os.system('sudo python3 traffic.py')
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="emotion":
-                import emotion
+                os.system('sudo python3 emotion.py')
+            elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="ball_trace":
+                os.system('sudo python3 ball_trace.py')
             print('program done')
             draw_title_bar(MENU_CURRENT_SELECT)
             

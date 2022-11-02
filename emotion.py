@@ -46,14 +46,19 @@ while True:
             preds=classifier.predict(roi)[0]
             label=class_labels[preds.argmax()]
             label_position=(x,y)
-            cv2.putText(frame,label,label_position,cv2.FONT_HERSHEY_SIMPLEX,2,(0,255,0),3)
+            #cv2.putText(frame,label,label_position,cv2.FONT_HERSHEY_SIMPLEX,2,(0,255,0),3)
         else:
-            cv2.putText(frame,'No Face Found',(20,20),cv2.FONT_HERSHEY_SIMPLEX,2,(0,255,0),3)
+            pass
+            #cv2.putText(frame,'No Face Found',(20,20),cv2.FONT_HERSHEY_SIMPLEX,2,(0,255,0),3)
     
     #cv2.imshow('Emotion Detector',frame)
     b,g,r = cv2.split(frame)
     frame = cv2.merge((r,g,b))
     frame = cv2.flip(frame, 1)
+    try:
+        cv2.putText(frame,label,label_position,cv2.FONT_HERSHEY_SIMPLEX,2,(0,255,0),3)
+    except:
+        pass
     imgok = Image.fromarray(frame)
     display.ShowImage(imgok)
     if cv2.waitKey(1) & 0xFF == ord('q'):

@@ -53,21 +53,20 @@ display.ShowImage(splash)
 MENU_ITEM_PARENT_PATH = "./pics/"
 
 MENU_ITEMS = [
-    ("dog_show", "movement","dog_show","show"),
-    ("face_mask", "vision", "face_mask" ,"fmask"),
-    ("hands", "vision", "hands","hands"),
-    ("vision", "vision","vision","visio"),
-    ("segmentation", "vision","segmentation","segme"),
-    ("objectron", "vision","objectron","object"),
-    ("face_decetion", "vision", "face_decetion" ,"fdete"),
-    ("pose", "vision", "pose","pose"),
-    ("image_class", "vision","image_class","iclass"),
-    ("image_dete", "vision","image_dete","idete"),
-    ("qrcode", "vision","qrcode","qrcode"),
-    ("agesex", "vision","agesex","agesex"),
-    ("traffic", "vision","traffic","traffic"),
-    ("emotion", "vision","emotion","emotion"),
-    ("ball_trace", "vision","ball_trace","ball")
+    ("dog_show", "movement","dog_show","Show"),
+    ("face_mask", "vision", "face_mask" ,"Mask"),
+    ("hands", "vision", "hands","Hands"),
+    ("vision", "vision","vision","Teach"),
+    ("segmentation", "vision","segmentation","Segment"),
+    ("objectron", "vision","objectron","Shones"),
+    ("face_decetion", "vision", "face_decetion" ,"FaceTrack"),
+    ("pose", "vision", "pose","Pose"),
+    ("image_class", "vision","image_class","Classify"),
+    ("qrcode", "vision","qrcode","QRCode"),
+    ("agesex", "vision","agesex","AgeSex"),
+    ("traffic", "vision","traffic","Traffic"),
+    ("emotion", "vision","emotion","Emotion"),
+    ("ball_trace", "vision","ball_trace","Ball")
     
 ]
 

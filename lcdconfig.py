@@ -35,7 +35,7 @@ import logging
 import numpy as np
 
 class RaspberryPi:
-    def __init__(self,spi=spidev.SpiDev(0,0),spi_freq=40000000,rst = 27,dc = 25,bl = 20,bl_freq=1000,i2c=None,i2c_freq=100000):
+    def __init__(self,spi=spidev.SpiDev(0,0),spi_freq=40000000,rst = 27,dc = 25,bl = 0,bl_freq=1000,i2c=None,i2c_freq=100000):
         import RPi.GPIO      
         self.np=np
         self.RST_PIN= rst

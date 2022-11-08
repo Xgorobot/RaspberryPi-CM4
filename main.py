@@ -3,9 +3,12 @@ import spidev as SPI
 import LCD_2inch
 from PIL import Image,ImageDraw,ImageFont
 from key import Button
+from xgolib import XGO
+
+
+ 
 
 path=os.getcwd()
-
 # Raspberry Pi pin configuration:
 RST = 27
 DC = 25
@@ -38,6 +41,25 @@ splash = Image.new("RGB", (display.height, display.width ),splash_theme_color)
 draw = ImageDraw.Draw(splash)
 #splash=splash.rotate(180)
 display.ShowImage(splash)
+#dog
+dog = XGO(port='/dev/ttyAMA0',version="xgolite")
+
+def show_battery():
+    lcd_rect(270,0,320,5,color=splash_theme_color,thickness=-1)
+    draw.bitmap((270,4),bat)
+    try:
+        battery=dog.read_battery()
+        print(battery)
+        if len(str(battery))==3:
+            lcd_draw_string(draw, 274, 4,str(battery), color=color_white, scale=font1)
+        elif len(str(battery))==2:
+            lcd_draw_string(draw, 280, 4,str(battery), color=color_white, scale=font1)
+        elif len(str(battery))==1:
+            lcd_draw_string(draw, 286, 4,str(battery), color=color_white, scale=font1)
+        else:
+            pass
+    except:
+        print('uart error!')
 
 #draw methods
 def lcd_draw_string(splash,x, y, text, color=(255,255,255), font_size=1, scale=1, mono_space=False, auto_wrap=True, background_color=(0,0,0)):
@@ -70,6 +92,7 @@ def main_program():
     #print(key_state_down,key_state_left,key_state_right)
 
     if key_state_left == 1 :
+        show_battery()
         current_selection = 1
         lcd_rect(0,188,160,240,color=btn_selected,thickness=-1)
         lcd_draw_string(draw, 25, 195, "Program", color=color_white, scale=font2)
@@ -77,6 +100,7 @@ def main_program():
         lcd_draw_string(draw, 181, 195, "Try demos", color=color_white, scale=font2)
 
     if key_state_right == 1 :
+        show_battery()
         current_selection = 2
         lcd_rect(0,188,160,240,color=btn_unselected,thickness=-1)
         lcd_draw_string(draw, 25, 195, "Program", color=color_white, scale=font2)
@@ -84,6 +108,7 @@ def main_program():
         lcd_draw_string(draw, 181, 195, "Try demos", color=color_white, scale=font2)
 
     if key_state_down == 1:
+        show_battery()
         if current_selection == 1: 
             print("edublock")
             lcd_rect(0,188,160,240,color=btn_selected,thickness=-1)
@@ -107,7 +132,6 @@ def main_program():
 
 
         print(str(current_selection) + " select")
-
     display.ShowImage(splash)
 
 #-------------------------init UI---------------------------------
@@ -116,13 +140,14 @@ draw.bitmap((74,49),logo)
 lcd_draw_string(draw,217, 133, firmware_info, color=color_white, scale=font1)
 wifiy = Image.open("./pics/wifi@2x.png")
 wifin = Image.open("./pics/wifi-un@2x.png")
+bat = Image.open("./pics/battery.png")
 
 
 lcd_rect(0,188,320,240,color=btn_unselected,thickness=1)
 lcd_rect(0,188,160,240,color=btn_selected,thickness=1)
 lcd_draw_string(draw, 30,195, "Program", color=color_white, scale=font2)
 lcd_draw_string(draw, 181, 195, "Try demos", color=color_white,scale=font2) 
-
+show_battery()
 display.ShowImage(splash)
 
 

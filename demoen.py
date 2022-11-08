@@ -56,7 +56,7 @@ MENU_ITEMS = [
     ("dog_show", "movement","dog_show","Show"),
     ("face_mask", "vision", "face_mask" ,"Mask"),
     ("hands", "vision", "hands","Hands"),
-    ("vision", "vision","vision","Teach"),
+    ("vision", "movement","vision","Teach"),
     ("segmentation", "vision","segmentation","Segment"),
     ("objectron", "vision","objectron","Shones"),
     ("face_decetion", "vision", "face_decetion" ,"FaceTrack"),
@@ -66,7 +66,8 @@ MENU_ITEMS = [
     ("agesex", "vision","agesex","AgeSex"),
     ("traffic", "vision","traffic","Traffic"),
     ("emotion", "vision","emotion","Emotion"),
-    ("ball_trace", "vision","ball_trace","Ball")
+    ("ball_trace", "vision","ball_trace","Ball"),
+    ("speech", "voice","speech","Obay"),
     
 ]
 
@@ -298,6 +299,8 @@ while True:
                 os.system('sudo python3 emotion.py')
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="ball_trace":
                 os.system('sudo python3 ball_trace.py')
+            elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="speech":
+                os.system('sudo python3 speech.py')
             print('program done')
             draw_title_bar(MENU_CURRENT_SELECT)
             

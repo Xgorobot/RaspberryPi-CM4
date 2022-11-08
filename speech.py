@@ -48,14 +48,29 @@ lcd_draw_string(draw,30,60, "WAITING FOR COMMAND", color=(255,255,255), scale=fo
 display.ShowImage(splash)
 
 # Demo code for listening to two hotwords at the same time
-
 interrupted = False
+quitp=False
+
+def button_check(a,b):
+    global interrupted,quitp
+    while 1:
+        time.sleep(0.1)
+        if button.press_b():
+            detector.terminate()
+            break
+    sys.exit()
+
+
+x=threading.Thread(target=button_check,args=(0,0))
+x.start()
+	
+
+
 
 
 def signal_handler(signal, frame):
-    global interrupted
+    global interrupted,quitp
     interrupted = True
-
 
 def interrupt_callback():
     global interrupted
@@ -111,7 +126,8 @@ def callback8():
     time.sleep(5)
 
 
-models = sys.argv[1:]
+models = ['1.pmdl', '2.pmdl', '3.pmdl', '4.pmdl', '11.pmdl', '12.pmdl', '18.pmdl', '19.pmdl']
+
 
 # capture SIGINT signal, e.g., Ctrl+C
 signal.signal(signal.SIGINT, signal_handler)
@@ -138,5 +154,5 @@ detector.start(detected_callback=callbacks,
 
 detector.terminate()
 
-print('end?')
+print('end')
 

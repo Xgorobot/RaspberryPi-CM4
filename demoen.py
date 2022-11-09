@@ -53,21 +53,23 @@ display.ShowImage(splash)
 MENU_ITEM_PARENT_PATH = "./pics/"
 
 MENU_ITEMS = [
-    ("dog_show", "movement","dog_show","Show"),
-    ("face_mask", "vision", "face_mask" ,"Mask"),
-    ("hands", "vision", "hands","Hands"),
-    ("vision", "movement","vision","Teach"),
-    ("segmentation", "vision","segmentation","Segment"),
-    ("objectron", "vision","objectron","Shones"),
-    ("face_decetion", "vision", "face_decetion" ,"FaceTrack"),
-    ("pose", "vision", "pose","Pose"),
-    ("image_class", "vision","image_class","Classify"),
-    ("qrcode", "vision","qrcode","QRCode"),
-    ("agesex", "vision","agesex","AgeSex"),
-    ("traffic", "vision","traffic","Traffic"),
-    ("emotion", "vision","emotion","Emotion"),
-    ("ball_trace", "vision","ball_trace","Ball"),
-    ("speech", "voice","speech","Obay"),
+    ("dog_show", "1movement","dog_show","Show"),
+    ("face_mask", "2vision", "face_mask" ,"Mask"),
+    ("hands", "3vision", "hands","Hands"),
+    ("vision", "4movement","vision","Teach"),
+    ("segmentation", "5vision","segmentation","Segment"),
+    ("objectron", "6vision","objectron","Shones"),
+    ("face_decetion", "7vision", "face_decetion" ,"FaceTrack"),
+    ("pose", "8vision", "pose","Pose"),
+    ("image_class", "9vision","image_class","Classify"),
+    ("qrcode", "10vision","qrcode","QRCode"),
+    ("agesex", "11vision","agesex","AgeSex"),
+    ("traffic", "12vision","traffic","Traffic"),
+    ("emotion", "13vision","emotion","Emotion"),
+    ("ball_trace", "14vision","ball_trace","Ball"),
+    ("speech", "15voice","speech","Obay"),
+    ("line", "15vision","line","Line"),
+    ("color", "16vision","color","Color"),
     
 ]
 

@@ -4,6 +4,8 @@ import spidev as SPI
 import LCD_2inch
 from PIL import Image,ImageDraw,ImageFont
 from key import Button
+from xgolib import XGO
+dog = XGO(port='/dev/ttyAMA0',version="xgolite")
 
 display = LCD_2inch.LCD_2inch()
 display.clear()
@@ -95,8 +97,12 @@ with mp_face_mesh.FaceMesh(
         print(p1.x)
         if p1.x>0.65:
           direction=1
+          dog.attitude('y',10)
         elif p1.x<0.45:
           direction=2
+          dog.attitude('y',-10)
+        else:
+          dog.attitude('y',0)
         mp_drawing.draw_landmarks(
             image=image,
             landmark_list=face_landmarks,

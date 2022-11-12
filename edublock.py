@@ -105,18 +105,26 @@ def checks():
 t = threading.Thread(target=checks)
 t.start()
 print('---------------')
+launch=0
+linked=0
 while 1:
     if button.press_b():
         exitcode=True
         break
     if cmd[0:6]==b'Launch':
-        print('server success')
-        splash.paste(uncn,(60,35))
-        display.ShowImage(splash)
+        if launch==0:
+            print('server success')
+            splash.paste(uncn,(60,35))
+            display.ShowImage(splash)
+        launch=1
+        linked=0
     elif cmd[0:12]==b'Successfully':
-        print('linked!')
-        splash.paste(cn,(60,35))
-        display.ShowImage(splash)
+        if linked==0:
+            print('linked!')
+            splash.paste(cn,(60,35))
+            display.ShowImage(splash)
+        linked=1
+        splash=0
 
 print('aiblocks over')
 os.system('sudo fuser -k -n tcp 8081')

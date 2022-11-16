@@ -41,7 +41,7 @@ while(True):
         text = "{} ({})".format(barcodeData, barcodeType)
 
         # 打印字符在图片上
-        cv2.putText(img, text , (20,100),font,1,(0,255,0),4) 
+        cv2.putText(img, text , (10,30),font,0.7,(0,255,0),3) 
         # 向终端打印条形码数据和条形码类型
         print("[INFO] Found {} barcode: {}".format(barcodeType, barcodeData))
 

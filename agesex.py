@@ -4,6 +4,7 @@ import spidev as SPI
 import LCD_2inch
 from PIL import Image,ImageDraw,ImageFont
 from key import Button
+from subprocess import Popen
 
 display = LCD_2inch.LCD_2inch()
 display.clear()
@@ -14,6 +15,21 @@ button=Button()
 #-*- coding: utf-8 -*-
 import cv2 as cv
 import time
+
+pic_path = "./expression/"
+_canvas_x, _canvas_y = 0, 0
+
+def show(expression_name_cs, pic_num):
+    global canvas
+    for i in range(0, pic_num):
+        filename=pic_path + expression_name_cs + "/" + str(i+1) + ".png"
+        exp = Image.open(pic_path + expression_name_cs + "/" + str(i+1) + ".png")
+        splash.paste(exp,(40,0))
+        #canvas.draw_image(image.Image().open(pic_path + expression_name_cs + "/" + str(i+1) + ".png"), _canvas_x, _canvas_y)
+        display.ShowImage(splash)
+        time.sleep(0.05)
+        if button.press_b():
+          sys.exit()
 
 
 # 检测人脸并绘制人脸bounding box
@@ -65,6 +81,8 @@ cap=cv2.VideoCapture(0)
 cap.set(3,320)
 cap.set(4,240)
 padding = 20
+man=0
+women=0
 while 1:
     # Read frame
     t = time.time()
@@ -77,29 +95,30 @@ while 1:
     frameFace, bboxes = getFaceBox(faceNet, frame)
     if not bboxes:
         print("No face Detected, Checking next frame")
-
+    gender=''
+    age=''
     for bbox in bboxes:
         # print(bbox)   # 取出box框住的脸部进行检测,返回的是脸部图片
         face = frame[max(0, bbox[1] - padding):min(bbox[3] + padding, frame.shape[0] - 1),
                max(0, bbox[0] - padding):min(bbox[2] + padding, frame.shape[1] - 1)]
-        print("=======", type(face), face.shape)  #  <class 'numpy.ndarray'> (166, 154, 3)
+        #print("=======", type(face), face.shape)  #  <class 'numpy.ndarray'> (166, 154, 3)
         #
         blob = cv.dnn.blobFromImage(face, 1.0, (227, 227), MODEL_MEAN_VALUES, swapRB=False)
-        print("======", type(blob), blob.shape)  # <class 'numpy.ndarray'> (1, 3, 227, 227)
+        #print("======", type(blob), blob.shape)  # <class 'numpy.ndarray'> (1, 3, 227, 227)
         genderNet.setInput(blob)   # blob输入网络进行性别的检测
         genderPreds = genderNet.forward()   # 性别检测进行前向传播
-        print("++++++", type(genderPreds), genderPreds.shape, genderPreds)   # <class 'numpy.ndarray'> (1, 2)  [[9.9999917e-01 8.6268375e-07]]  变化的值
+        #print("++++++", type(genderPreds), genderPreds.shape, genderPreds)   # <class 'numpy.ndarray'> (1, 2)  [[9.9999917e-01 8.6268375e-07]]  变化
         gender = genderList[genderPreds[0].argmax()]   # 分类  返回性别类型
         # print("Gender Output : {}".format(genderPreds))
-        print("Gender : {}, conf = {:.3f}".format(gender, genderPreds[0].max()))
+        #print("Gender : {}, conf = {:.3f}".format(gender, genderPreds[0].max()))
 
         ageNet.setInput(blob)
         agePreds = ageNet.forward()
         age = ageList[agePreds[0].argmax()]
-        print(agePreds[0].argmax())  # 3
-        print("*********", agePreds[0])   #  [4.5557402e-07 1.9009208e-06 2.8783199e-04 9.9841607e-01 1.5261240e-04 1.0924522e-03 1.3928890e-05 3.4708322e-05]
-        print("Age Output : {}".format(agePreds))
-        print("Age : {}, conf = {:.3f}".format(age, agePreds[0].max()))
+        #print(agePreds[0].argmax())  # 3
+        #print("*********", agePreds[0])   #  [4.5557402e-07 1.9009208e-06 2.8783199e-04 9.9841607e-01 1.5261240e-04 1.0924522e-03 1.3928890e-05 3.4708322e-05]
+        #print("Age Output : {}".format(agePreds))
+        #print("Age : {}, conf = {:.3f}".format(age, agePreds[0].max()))
 
         label = "{},{}".format(gender, age)
         
@@ -110,6 +129,23 @@ while 1:
     frameFace = cv2.merge((r,g,b))
     imgok = Image.fromarray(frameFace)
     display.ShowImage(imgok)
+    if gender!='':
+      if gender=='Male':
+        man+=1
+        women=0
+        if man>3:
+          proc=Popen(['mplayer','hate.mp3'])
+          show("angry", 8)
+          man=0
+      if gender=='Female':
+        women+=1
+        man=0
+        if women>3:
+          proc=Popen(['mplayer','happy.wav'])
+          show("happy", 6)
+          women=0
+      hasFrame, frame = cap.read()
+      frame = cv.flip(frame, 1)
     if button.press_b():
         break
     #print("time : {:.3f} ms".format(time.time() - t))

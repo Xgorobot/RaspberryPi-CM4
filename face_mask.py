@@ -97,10 +97,10 @@ with mp_face_mesh.FaceMesh(
         print(p1.x)
         if p1.x>0.65:
           direction=1
-          dog.attitude('y',10)
+          dog.attitude('y',-9)
         elif p1.x<0.45:
           direction=2
-          dog.attitude('y',-10)
+          dog.attitude('y',9)
         else:
           dog.attitude('y',0)
         mp_drawing.draw_landmarks(

@@ -56,6 +56,7 @@ def button_check(a,b):
     while 1:
         time.sleep(0.1)
         if button.press_b():
+            dog.reset()
             detector.terminate()
             break
     sys.exit()

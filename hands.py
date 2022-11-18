@@ -7,6 +7,8 @@ from key import Button
 import numpy as np
 import mediapipe as mp
 from numpy import linalg
+from xgolib import XGO
+dog = XGO(port='/dev/ttyAMA0',version="xgolite")
 
 
 display = LCD_2inch.LCD_2inch()
@@ -130,7 +132,7 @@ with mp_hands.Hands(
     result = hands.process(frame_RGB)
     frame_height = frame.shape[0]
     frame_width  = frame.shape[1]
-
+    gesture_result=[]
     if result.multi_hand_landmarks:
         for i, handLms in enumerate(result.multi_hand_landmarks):
             mpDraw.draw_landmarks(frame, 
@@ -161,10 +163,30 @@ with mp_hands.Hands(
     frame = cv2.flip(frame, 1)
     if result.multi_hand_landmarks:
       cv2.putText(frame, f"{gesture_result}", (10,30), cv2.FONT_HERSHEY_COMPLEX, 1, (255 ,255, 0), 5)
+    if gesture_result=="good":
+      dog.action(16)
+    elif gesture_result=="one":
+      dog.action(7)
+    elif gesture_result=="two":
+      dog.action(8)
+    elif gesture_result=="three":
+      dog.action(9)
+    elif gesture_result=="four":
+      dog.action(10)
+    elif gesture_result=="five":
+      dog.action(6)
+    elif gesture_result=="six":
+      dog.action(16)
+    elif gesture_result=="OK":
+      dog.action(19)
+    elif gesture_result=="stone":
+      dog.action(12)
+    
     imgok = Image.fromarray(frame)
     display.ShowImage(imgok)
     if cv2.waitKey(5) & 0xFF == 27:
       break
     if button.press_b():
+      dog.reset()
       break
 cap.release()

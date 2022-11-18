@@ -96,6 +96,7 @@ with mp_pose.Pose(
     if cv2.waitKey(5) & 0xFF == 27:
       break
     if button.press_b():
+      dog.reset()
       break
     
 cap.release()

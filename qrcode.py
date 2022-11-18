@@ -4,6 +4,7 @@ import spidev as SPI
 import LCD_2inch
 from PIL import Image,ImageDraw,ImageFont
 from key import Button
+import numpy as np
 
 display = LCD_2inch.LCD_2inch()
 display.clear()
@@ -12,6 +13,20 @@ display.ShowImage(splash)
 button=Button()
 #-----------------------COMMON INIT-----------------------
 import pyzbar.pyzbar as pyzbar
+
+def cv2AddChineseText(img, text, position, textColor=(0, 255, 0), textSize=30):
+    if (isinstance(img, np.ndarray)):  # 判断是否OpenCV图片类型
+        img = Image.fromarray(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
+    # 创建一个可以在给定图像上绘图的对象
+    draw = ImageDraw.Draw(img)
+    # 字体的格式
+    fontStyle = ImageFont.truetype(
+        "msyh.ttc", textSize, encoding="utf-8")
+    # 绘制文本
+    draw.text(position, text, textColor, font=fontStyle)
+    # 转换回OpenCV格式
+    return cv2.cvtColor(np.asarray(img), cv2.COLOR_RGB2BGR)
+
  
 # main函数
 # openCV 字体
@@ -41,7 +56,8 @@ while(True):
         text = "{} ({})".format(barcodeData, barcodeType)
 
         # 打印字符在图片上
-        cv2.putText(img, text , (20,100),font,1,(0,255,0),4) 
+        img=cv2AddChineseText(img,text, (10, 30),(0, 255, 0), 30)
+        #cv2.putText(img, text , (10,30),font,0.7,(0,255,0),3) 
         # 向终端打印条形码数据和条形码类型
         print("[INFO] Found {} barcode: {}".format(barcodeType, barcodeData))
 

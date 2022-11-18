@@ -61,7 +61,7 @@ MENU_ITEMS = [
     ("objectron", "6vision","objectron","Shones"),
     ("face_decetion", "7vision", "face_decetion" ,"FaceTrack"),
     ("pose", "8vision", "pose","Pose"),
-    ("image_class", "9vision","image_class","Classify"),
+    #("image_class", "9vision","image_class","Classify"),
     ("qrcode", "10vision","qrcode","QRCode"),
     ("agesex", "11vision","agesex","AgeSex"),
     ("traffic", "12vision","traffic","Traffic"),

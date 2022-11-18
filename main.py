@@ -50,14 +50,19 @@ def show_battery():
     try:
         battery=dog.read_battery()
         print(battery)
-        if len(str(battery))==3:
-            lcd_draw_string(draw, 274, 4,str(battery), color=color_white, scale=font1)
-        elif len(str(battery))==2:
-            lcd_draw_string(draw, 280, 4,str(battery), color=color_white, scale=font1)
-        elif len(str(battery))==1:
-            lcd_draw_string(draw, 286, 4,str(battery), color=color_white, scale=font1)
+        if str(battery)=='0':
+            print('uart error')
+            lcd_rect(270,0,320,5,color=splash_theme_color,thickness=-1)
+            draw.bitmap((270,4),bat)
         else:
-            pass
+            if len(str(battery))==3:
+                lcd_draw_string(draw, 274, 4,str(battery), color=color_white, scale=font1)
+            elif len(str(battery))==2:
+                lcd_draw_string(draw, 280, 4,str(battery), color=color_white, scale=font1)
+            elif len(str(battery))==1:
+                lcd_draw_string(draw, 286, 4,str(battery), color=color_white, scale=font1)
+            else:
+                pass
     except:
         print('uart error!')
 

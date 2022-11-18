@@ -80,7 +80,7 @@ while True:
         display.ShowImage(splash)
         time.sleep(0.02)
         lcd_rect(0,0,320,240,color=color_black,thickness=-1)
-    if button.press_b():
+    if button.press_a():
         lcd_draw_string(draw,40,100, "ACTIONS SHOW", color=(255,255,255), scale=font2, mono_space=False)
         display.ShowImage(splash)
         time.sleep(0.02)
@@ -92,7 +92,8 @@ while True:
         print('action done!')
         lcd_draw_string(draw,40,100, "ACTIONS DONE", color=(255,255,255), scale=font2, mono_space=False)
         display.ShowImage(splash)
-    if button.press_a():
+    if button.press_b():
+        dog.reset()
         break
 
 

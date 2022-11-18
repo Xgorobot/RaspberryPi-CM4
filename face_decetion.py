@@ -4,6 +4,8 @@ import spidev as SPI
 import LCD_2inch
 from PIL import Image,ImageDraw,ImageFont
 from key import Button
+from xgolib import XGO
+dog = XGO(port='/dev/ttyAMA0',version="xgolite")
 
 display = LCD_2inch.LCD_2inch()
 display.clear()
@@ -60,7 +62,23 @@ with mp_face_detection.FaceDetection(
     image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
     if results.detections:
       for detection in results.detections:
-        mp_drawing.draw_detection(image, detection)
+         mp_drawing.draw_detection(image, detection)
+         xy=(mp_face_detection.get_key_point(detection, mp_face_detection.FaceKeyPoint.NOSE_TIP))
+         if xy.x>0.6:
+           dog.move_y(-2)
+         elif xy.x<0.4:
+           dog.move_y(2)
+         else:
+           dog.move_y(0)
+         if xy.y>0.6:
+           dog.translation('z', 90)
+         elif xy.x<0.4:
+           dog.translation('z', 100)
+         else:
+           dog.translation('z', 0)
+    else:
+      dog.move_y(0)
+      dog.translation('z', 0)
     b,g,r = cv2.split(image)
     image = cv2.merge((r,g,b))
     image = cv2.flip(image, 1)
@@ -71,5 +89,6 @@ with mp_face_detection.FaceDetection(
     if cv2.waitKey(5) & 0xFF == 27:
       break
     if button.press_b():
+      dog.reset()
       break
 cap.release()

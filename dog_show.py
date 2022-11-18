@@ -6,8 +6,9 @@ import spidev as SPI
 import LCD_2inch
 from PIL import Image,ImageDraw,ImageFont
 from key import Button
-
-
+from xgolib import XGO
+dog = XGO(port='/dev/ttyAMA0',version="xgolite")
+import os
 
 
 display = LCD_2inch.LCD_2inch()
@@ -32,9 +33,11 @@ def show(expression_name_cs, pic_num):
         display.ShowImage(splash)
         time.sleep(0.05)
         if button.press_b():
-          sys.exit()
-        
-proc=Popen(['mplayer','dog.mp3'])
+            dog.perform(0)  
+            sys.exit()
+dog.perform(1)        
+#Popen(['mplayer','dog.mp3','-loop 0'])
+proc=Popen("mplayer dog.mp3 -loop 0", shell=True)
 while 1:
     show("sad", 8)
     show("naughty", 8)
@@ -48,5 +51,6 @@ while 1:
     show("pray", 8)
     show("hate", 10)
     show("love", 9)
-
+    
+dog.perform(0)  
 proc.kill()

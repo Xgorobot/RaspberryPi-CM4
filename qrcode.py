@@ -56,8 +56,12 @@ while(True):
         text = "{} ({})".format(barcodeData, barcodeType)
 
         # 打印字符在图片上
+<<<<<<< HEAD
         img=cv2AddChineseText(img,text, (10, 30),(0, 255, 0), 30)
         #cv2.putText(img, text , (10,30),font,0.7,(0,255,0),3) 
+=======
+        cv2.putText(img, text , (10,30),font,0.7,(0,255,0),3) 
+>>>>>>> 7754f99b7d5c3348c178b224e6df1064220a513d
         # 向终端打印条形码数据和条形码类型
         print("[INFO] Found {} barcode: {}".format(barcodeType, barcodeData))
 

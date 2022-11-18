@@ -91,41 +91,69 @@ while True:
         happy=0
         sad=0
         surprise=0
+<<<<<<< HEAD
         if angry>2:
           proc=Popen(['mplayer','hate.mp3'])
           show("angry", 8)
           angry=0
           time.sleep(2)
+=======
+        if angry>3:
+          proc=Popen(['mplayer','hate.mp3'])
+          show("angry", 8)
+          angry=0
+>>>>>>> 7754f99b7d5c3348c178b224e6df1064220a513d
       if label=='Happy':
         angry=0
         happy+=1
         sad=0
         surprise=0
+<<<<<<< HEAD
         if happy>2:
           proc=Popen(['mplayer','happy.wav'])
           show("happy", 6)
           happy=0
           time.sleep(2)
+=======
+        if happy>3:
+          proc=Popen(['mplayer','happy.wav'])
+          show("happy", 6)
+          happy=0
+>>>>>>> 7754f99b7d5c3348c178b224e6df1064220a513d
       if label=='Sad':
         angry=0
         happy=0
         sad+=1
         surprise=0
+<<<<<<< HEAD
         if sad>2:
           proc=Popen(['mplayer','sad.wav'])
           show("sad", 8)
           sad=0
           time.sleep(2)
+=======
+        if sad>3:
+          proc=Popen(['mplayer','sad.wav'])
+          show("sad", 8)
+          sad=0
+>>>>>>> 7754f99b7d5c3348c178b224e6df1064220a513d
       if label=='Surprise':
         angry==0
         happy=0
         sad=0
         surprise+=1
+<<<<<<< HEAD
         if surprise>2:
           proc=Popen(['mplayer','surprise.wav'])
           show("surprise", 8)
           surprise=0
           time.sleep(2)
+=======
+        if surprise>3:
+          proc=Popen(['mplayer','surprise.wav'])
+          show("surprise", 8)
+          surprise=0
+>>>>>>> 7754f99b7d5c3348c178b224e6df1064220a513d
 
 
     if cv2.waitKey(1) & 0xFF == ord('q'):

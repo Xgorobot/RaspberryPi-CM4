@@ -137,10 +137,7 @@ while 1:
     display.ShowImage(imgok)
     cv2.waitKey(40)
     if button.press_b():
-<<<<<<< HEAD
         dog.reset()
-=======
->>>>>>> 7754f99b7d5c3348c178b224e6df1064220a513d
         break
 cv2.destroyAllWindows()
 cap.release()

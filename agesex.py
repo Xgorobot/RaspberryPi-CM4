@@ -138,10 +138,7 @@ while 1:
           proc=Popen(['mplayer','hate.mp3'])
           show("angry", 8)
           man=0
-<<<<<<< HEAD
           time.sleep(2)
-=======
->>>>>>> 7754f99b7d5c3348c178b224e6df1064220a513d
       if gender=='Female':
         women+=1
         man=0
@@ -149,10 +146,7 @@ while 1:
           proc=Popen(['mplayer','happy.wav'])
           show("happy", 6)
           women=0
-<<<<<<< HEAD
           time.sleep(2)
-=======
->>>>>>> 7754f99b7d5c3348c178b224e6df1064220a513d
       hasFrame, frame = cap.read()
       frame = cv.flip(frame, 1)
     if button.press_b():

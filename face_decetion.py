@@ -62,23 +62,29 @@ with mp_face_detection.FaceDetection(
     image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
     if results.detections:
       for detection in results.detections:
-         mp_drawing.draw_detection(image, detection)
-         xy=(mp_face_detection.get_key_point(detection, mp_face_detection.FaceKeyPoint.NOSE_TIP))
-         if xy.x>0.6:
-           dog.move_y(-2)
-         elif xy.x<0.4:
-           dog.move_y(2)
-         else:
-           dog.move_y(0)
-         if xy.y>0.6:
-           dog.translation('z', 90)
-         elif xy.x<0.4:
-           dog.translation('z', 100)
-         else:
-           dog.translation('z', 0)
+        value_x=0
+        value_y=0
+        mp_drawing.draw_detection(image, detection)
+        xy=(mp_face_detection.get_key_point(detection, mp_face_detection.FaceKeyPoint.NOSE_TIP))
+        face_x=320-xy.x*320
+        face_y=xy.y*240
+        value_x = face_x - 160
+        value_y = face_y - 120
+        print(face_x,face_y)
+        if value_x > 55:
+          value_x = 55
+        elif value_x < -55:
+          value_x = -55
+        if value_y > 75:
+          value_y = 75
+        elif value_y < -75:
+          value_y = -75
+          
     else:
-      dog.move_y(0)
-      dog.translation('z', 0)
+      value_x=0
+      value_y=0
+    print(['y','p'],[value_x/6, value_y/10])
+    dog.attitude(['y','p'],[value_x/6, value_y/10])
     b,g,r = cv2.split(image)
     image = cv2.merge((r,g,b))
     image = cv2.flip(image, 1)

@@ -53,6 +53,7 @@ display.ShowImage(splash)
 MENU_ITEM_PARENT_PATH = "./pics/"
 
 MENU_ITEMS = [
+    #pic kinds program show
     ("dog_show", "1movement","dog_show","Show"),
     ("face_mask", "2vision", "face_mask" ,"Mask"),
     ("hands", "3vision", "hands","Hands"),
@@ -60,7 +61,7 @@ MENU_ITEMS = [
     ("segmentation", "5vision","segmentation","Segment"),
     ("objectron", "6vision","objectron","Shones"),
     ("face_decetion", "7vision", "face_decetion" ,"FaceTrack"),
-    ("pose", "8vision", "pose","Pose"),
+    ("pose", "8vision", "8pose","Pose"),
     #("image_class", "9vision","image_class","Classify"),
     ("qrcode", "10vision","qrcode","QRCode"),
     ("agesex", "11vision","agesex","AgeSex"),
@@ -70,6 +71,7 @@ MENU_ITEMS = [
     ("speech", "15voice","speech","Obay"),
     ("line", "15vision","line","Line"),
     ("color", "16vision","color","Color"),
+    ("color", "17vision","sound","Sound"),
     
 ]
 
@@ -303,6 +305,8 @@ while True:
                 os.system('sudo python3 ball_trace.py')
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="speech":
                 os.system('sudo python3 speech.py')
+            elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="sound":
+                os.system('sudo python3 sound.py')
             print('program done')
             draw_title_bar(MENU_CURRENT_SELECT)
             

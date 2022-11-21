@@ -47,6 +47,12 @@ faces,ids = getImagesAndLabels(path)
 recognizer.train(faces, np.array(ids))
 
 # Save the model into trainer/trainer.yml
+try:
+    os.remove('trainer/trainer.yml')
+    print('del old model')
+except:
+    print('no to del')
+
 recognizer.write('trainer/trainer.yml') # recognizer.save() worked on Mac, but not on Pi
 
 # Print the numer of faces trained and end program

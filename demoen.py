@@ -72,6 +72,7 @@ MENU_ITEMS = [
     ("line", "15vision","line","Line"),
     ("color", "16vision","color","Color"),
     ("color", "17vision","sound","Sound"),
+    ("face_r", "17vision","facer","Recog"),
     
 ]
 
@@ -307,6 +308,8 @@ while True:
                 os.system('sudo python3 speech.py')
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="sound":
                 os.system('sudo python3 sound.py')
+            elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="facer":
+                os.system('sudo python3 fr1.py')
             print('program done')
             draw_title_bar(MENU_CURRENT_SELECT)
             

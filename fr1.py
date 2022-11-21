@@ -90,10 +90,15 @@ def record():
     del faces
 
     
-        
+filepath='/home/pi/cm4/dataset'      
 while 1:
     if button.press_c():
         print('a')
+        del_list = os.listdir(filepath)
+        for f in del_list:
+            file_path = os.path.join(filepath, f)
+            if os.path.isfile(file_path):
+                os.remove(file_path)
         lcd_rect(0,0,320,240,color=color_black,thickness=-1)
         lcd_draw_string(draw, 30, 90,'FACE TO CAM', color=color_white, scale=font2)
         display.ShowImage(splash)
@@ -116,6 +121,7 @@ while 1:
         break
     if button.press_a():
         print('d')
+        cap.release()
         os.system('sudo python fr3.py')
     main_part()
 

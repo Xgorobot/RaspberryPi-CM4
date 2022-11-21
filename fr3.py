@@ -73,5 +73,4 @@ while True:
 
 # Do a bit of cleanup
 print("\n [INFO] Exiting Program and cleanup stuff")
-cam.release()
-cv2.destroyAllWindows()
+

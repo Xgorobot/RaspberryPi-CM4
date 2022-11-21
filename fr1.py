@@ -47,8 +47,9 @@ def lcd_rect(x,y,w,h,color,thickness):
 def main_part():
     lcd_rect(0,0,320,240,color=color_black,thickness=-1)
     lcd_draw_string(draw, 10, 10,'Record', color=color_white, scale=font)
-    lcd_draw_string(draw, 270, 10,'Train', color=color_white, scale=font)
+    lcd_draw_string(draw, 250, 10,'Train', color=color_white, scale=font)
     lcd_draw_string(draw, 10, 210,'Quit', color=color_white, scale=font)
+    lcd_draw_string(draw, 250, 210,'Recog', color=color_white, scale=font)
     lcd_draw_string(draw, 105, 100,'USER'+str(user), color=color_white, scale=font2)
     display.ShowImage(splash)
 
@@ -69,6 +70,7 @@ def record():
     
                 # Save the captured image into the datasets folder
                 cv2.imwrite("dataset/User." + str(user) + '.' + str(count) + ".jpg", gray[y:y+h,x:x+w])
+                time.sleep(0.1)
                 b,g,r = cv2.split(img)
                 img = cv2.merge((r,g,b))
                 imgok = Image.fromarray(img)
@@ -84,6 +86,8 @@ def record():
             break
         if button.press_b():
             break
+    #cap.release()
+    del faces
 
     
         
@@ -98,8 +102,15 @@ while 1:
         user+=1
     if button.press_d():
         print('c')
+        lcd_rect(0,0,320,240,color=color_black,thickness=-1)
+        lcd_draw_string(draw, 30, 90,'Training...', color=color_white, scale=font2)
+        display.ShowImage(splash)
         os.system('sudo python fr2.py')
+        lcd_rect(0,0,320,240,color=color_black,thickness=-1)
+        lcd_draw_string(draw, 30, 90,'Done！', color=color_white, scale=font2)
+        display.ShowImage(splash)
         print('model train complete')
+        time.sleep(2)
     if button.press_b():
         print('c')
         break

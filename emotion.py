@@ -132,6 +132,5 @@ while True:
         break
     if button.press_b():
         dog.reset()
-        break
 cap.release()
 cv2.destroyAllWindows()

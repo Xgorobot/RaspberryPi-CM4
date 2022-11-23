@@ -28,10 +28,7 @@ def cv2AddChineseText(img, text, position, textColor=(0, 255, 0), textSize=30):
     return cv2.cvtColor(np.asarray(img), cv2.COLOR_RGB2BGR)
 
  
-# main函数
-# openCV 字体
 font = cv2.FONT_HERSHEY_SIMPLEX 
-#定义图像源
 cap=cv2.VideoCapture(0)
 cap.set(3,320)
 cap.set(4,240)

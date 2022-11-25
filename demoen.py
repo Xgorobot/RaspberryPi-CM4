@@ -313,6 +313,8 @@ while True:
                 os.system('sudo python3 fr1.py')
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="handh":
                 os.system('sudo python3 hp.py')
+            elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="line":
+                os.system('sudo python3 line.py')
             print('program done')
             draw_title_bar(MENU_CURRENT_SELECT)
             

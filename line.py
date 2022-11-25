@@ -32,6 +32,7 @@ class LineDetect:
         self.hsv_text=((int(list[0]), int(list[1]), int(list[2])), (int(list[3]), int(list[4]), int(list[5])))
         self.hsv_range = self.hsv_text
         self.dyn_update = True
+
         self.select_flags = False
         self.Track_state = 'identify'
         self.windows_name = 'frame'

@@ -50,8 +50,8 @@ def lcd_rect(x,y,w,h,color,thickness):
 
 lcd_draw_string(draw,70,20, "BUTTON A:RECORD", color=(255,255,255), scale=font2, mono_space=False)
 lcd_draw_string(draw,70,80, "BUTTON B: STOP", color=(255,255,255), scale=font2, mono_space=False)
-lcd_draw_string(draw,70,140, "BUTTON C:SHOW", color=(255,255,255), scale=font2, mono_space=False)
-lcd_draw_string(draw,70,200, "BUTTON D:QUIT", color=(255,255,255), scale=font2, mono_space=False)
+lcd_draw_string(draw,70,140, "BUTTON C: QUIT", color=(255,255,255), scale=font2, mono_space=False)
+lcd_draw_string(draw,70,200, "BUTTON D: SHOW", color=(255,255,255), scale=font2, mono_space=False)
 display.ShowImage(splash)
 
 lcd_rect(0,0,320,240,color=color_black,thickness=-1)

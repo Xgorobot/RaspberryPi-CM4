@@ -164,7 +164,7 @@ with mp_hands.Hands(
     if result.multi_hand_landmarks:
       cv2.putText(frame, f"{gesture_result}", (10,30), cv2.FONT_HERSHEY_COMPLEX, 1, (255 ,255, 0), 5)
     if gesture_result=="good":
-      dog.action(16)
+      dog.action(14)
     elif gesture_result=="one":
       dog.action(7)
     elif gesture_result=="two":
@@ -174,7 +174,7 @@ with mp_hands.Hands(
     elif gesture_result=="four":
       dog.action(10)
     elif gesture_result=="five":
-      dog.action(6)
+      dog.action(1)
     elif gesture_result=="six":
       dog.action(16)
     elif gesture_result=="OK":

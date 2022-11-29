@@ -124,6 +124,8 @@ with mp_face_mesh.FaceMesh(
             landmark_drawing_spec=None,
             connection_drawing_spec=mp_drawing_styles
             .get_default_face_mesh_iris_connections_style())
+    else:
+      dog.attitude('y',0)
     # Flip the image horizontally for a selfie-view display.
     b,g,r = cv2.split(image)
     image = cv2.merge((r,g,b))

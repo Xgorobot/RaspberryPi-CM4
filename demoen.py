@@ -71,7 +71,7 @@ MENU_ITEMS = [
     ("speech", "15voice","speech","Obay"),
     ("line", "15vision","line","Line"),
     ("color", "16vision","color","Color"),
-    ("color", "17vision","sound","Sound"),
+    ("sound", "17vision","sound","Sound"),
     ("face_r", "18vision","facer","Recog"),
     ("height", "19vision","handh","Height"),
     
@@ -140,27 +140,35 @@ def draw_item(row, type, realindex):
         picpath="./pics/"+MENU_ITEMS[realindex][0]+".png"
         nav_up = Image.open(picpath)
         draw.bitmap((MENU_PIC_COORD[row][0], MENU_PIC_COORD[row][1]),nav_up)
-        display_cjk_string(draw, MENU_TEXT_COORD[row][0], MENU_TEXT_COORD[row][1], MENU_ITEMS[realindex][3], font_size=font1,color=color_unselect, background_color=color_bg)
+        l=len(MENU_ITEMS[realindex][3])
+        im=(10-l)*2-2
+        display_cjk_string(draw, MENU_TEXT_COORD[row][0]+im, MENU_TEXT_COORD[row][1], MENU_ITEMS[realindex][3], font_size=font1,color=color_unselect, background_color=color_bg)
     elif type == "selected":
         lcd_rect(MENU_ITEM_COORD[row][0], MENU_ITEM_COORD[row][1], MENU_ITEM_COORD[row][2]+MENU_ITEM_COORD[row][0],MENU_ITEM_COORD[row][3]+MENU_ITEM_COORD[row][1], color=color_select, thickness=1)
         picpath="./pics/"+MENU_ITEMS[realindex][0]+".png"
         nav_up = Image.open(picpath)
         draw.bitmap((MENU_PIC_COORD[row][0], MENU_PIC_COORD[row][1]),nav_up)
-        display_cjk_string(draw, MENU_TEXT_COORD[row][0], MENU_TEXT_COORD[row][1], MENU_ITEMS[realindex][3], font_size=font1,color=color_white, background_color=color_select)
+        l=len(MENU_ITEMS[realindex][3])
+        im=(10-l)*2-2
+        display_cjk_string(draw, MENU_TEXT_COORD[row][0]+im, MENU_TEXT_COORD[row][1], MENU_ITEMS[realindex][3], font_size=font1,color=color_white, background_color=color_select)
     elif type == "clearup":
         row = row - 1 
         lcd_rect(MENU_ITEM_COORD[row][0], MENU_ITEM_COORD[row][1], MENU_ITEM_COORD[row][2]+MENU_ITEM_COORD[row][0],MENU_ITEM_COORD[row][3]+MENU_ITEM_COORD[row][1],color=color_bg, thickness=-1)
         picpath="./pics/"+MENU_ITEMS[realindex][0]+".png"
         nav_up = Image.open(picpath)
         draw.bitmap((MENU_PIC_COORD[row][0], MENU_PIC_COORD[row][1]),nav_up)
-        display_cjk_string(draw, MENU_TEXT_COORD[row][0], MENU_TEXT_COORD[row][1], MENU_ITEMS[realindex][3], font_size=font1,color=color_unselect, background_color=color_bg)
+        l=len(MENU_ITEMS[realindex][3])
+        im=(10-l)*2-2
+        display_cjk_string(draw, MENU_TEXT_COORD[row][0]+im, MENU_TEXT_COORD[row][1], MENU_ITEMS[realindex][3], font_size=font1,color=color_unselect, background_color=color_bg)
     elif type == "cleardown":
         row = row + 1 
         lcd_rect(MENU_ITEM_COORD[row][0], MENU_ITEM_COORD[row][1], MENU_ITEM_COORD[row][2]+MENU_ITEM_COORD[row][0],MENU_ITEM_COORD[row][3]+MENU_ITEM_COORD[row][1],color=color_bg, thickness=-1)
         picpath="./pics/"+MENU_ITEMS[realindex][0]+".png"
         nav_up = Image.open(picpath)
         draw.bitmap((MENU_PIC_COORD[row][0], MENU_PIC_COORD[row][1]),nav_up)
-        display_cjk_string(draw, MENU_TEXT_COORD[row][0], MENU_TEXT_COORD[row][1], MENU_ITEMS[realindex][3], font_size=font1,color=color_unselect, background_color=color_bg)
+        l=len(MENU_ITEMS[realindex][3])
+        im=(10-l)*2-2
+        display_cjk_string(draw, MENU_TEXT_COORD[row][0]+im, MENU_TEXT_COORD[row][1], MENU_ITEMS[realindex][3], font_size=font1,color=color_unselect, background_color=color_bg)
 
 def clear_page():
     lcd_rect(0,36,320,240, color=color_bg, thickness=-1)

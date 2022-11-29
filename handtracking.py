@@ -5,7 +5,7 @@ import cv2
 mpHands = mp.solutions.hands  #接收方法
 hands = mpHands.Hands(static_image_mode=False, #静态追踪，低于0.5置信度会再一次跟踪
                       max_num_hands=1, # 最多有2只手
-                      min_detection_confidence=0.6, # 最小检测置信度
+                      min_detection_confidence=0.5, # 最小检测置信度
                       min_tracking_confidence=0.5)  # 最小跟踪置信度 
  
 # 创建检测手部关键点和关键点之间连线的方法
@@ -62,6 +62,10 @@ def handDetector(img):
                     cv2.circle(img, (cx,cy), 6, (255,0,0), cv2.FILLED)
                     
                     length=(x1-x2)*(x1-x2)+(y1-y2)*(y1-y2)**0.5
+                    try:
+                        length=int(length)
+                    except:
+                        length=0
                   
     # 返回处理后的图像，及关键点坐标
     return img, lmList,length

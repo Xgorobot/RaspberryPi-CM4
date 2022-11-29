@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import argparse
 from src.stream_analyzer import Stream_Analyzer
 import time
@@ -57,7 +56,6 @@ def run_FFT_analyzer():
 
 if __name__ == '__main__':
     run_FFT_analyzer()
-=======
 import argparse
 from src.stream_analyzer import Stream_Analyzer
 import time
@@ -116,4 +114,3 @@ def run_FFT_analyzer():
 
 if __name__ == '__main__':
     run_FFT_analyzer()
->>>>>>> 29164ed829807dc44930e94e556ca6b84b01f1e2

@@ -6,8 +6,6 @@ from key import Button
 from xgolib import XGO
 
 
- 
-
 path=os.getcwd()
 # Raspberry Pi pin configuration:
 RST = 27
@@ -45,14 +43,14 @@ display.ShowImage(splash)
 dog = XGO(port='/dev/ttyAMA0',version="xgolite")
 
 def show_battery():
-    lcd_rect(270,0,320,5,color=splash_theme_color,thickness=-1)
+    lcd_rect(200,0,320,15,color=splash_theme_color,thickness=-1)
     draw.bitmap((270,4),bat)
     try:
         battery=dog.read_battery()
         print(battery)
         if str(battery)=='0':
             print('uart error')
-            lcd_rect(270,0,320,5,color=splash_theme_color,thickness=-1)
+            lcd_rect(200,0,320,15,color=splash_theme_color,thickness=-1)
             draw.bitmap((270,4),bat)
         else:
             if len(str(battery))==3:

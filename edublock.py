@@ -3,6 +3,7 @@ import spidev as SPI
 import LCD_2inch
 from PIL import Image,ImageDraw,ImageFont
 from key import Button
+from subprocess import check_output
 
 path=os.getcwd()
 
@@ -33,6 +34,15 @@ splash = Image.new("RGB", (display.height, display.width ),splash_theme_color)
 draw = ImageDraw.Draw(splash)
 #splash=splash.rotate(180)
 display.ShowImage(splash)
+def get_ssid():
+    try:
+        scanoutput = check_output(["iwlist", "wlan0", "scan"])
+        for line in scanoutput.split():
+            if line.startswith(b"ESSID"):
+                ssid = line.split(b'"')[1]
+        return ssid
+    except:
+        return None
 
 def get_ip(ifname):
     import socket,struct,fcntl
@@ -64,8 +74,11 @@ uncn = Image.open("./pics/connect-un@2x.jpg")
 lcd_rect(0,195,320,240,(48,50,73),thickness=-1)
 
 
-#--------------------------get IP--------------------------
+#--------------------------get IP&SSID--------------------------
 ipadd=ip()
+ssid=get_ssid()
+if ssid!=None:
+    lcd_draw_string(draw,60, 0,'SSID:'+ssid.decode(), color=color_white, scale=font2)
 if ipadd=='0.0.0.0':
     print('wlan disconnected')
     draw.bitmap(wifin,(65,200))

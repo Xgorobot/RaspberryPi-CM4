@@ -5,7 +5,9 @@ import LCD_2inch
 from PIL import Image,ImageDraw,ImageFont
 from key import Button
 import numpy as np
+from xgolib import XGO
 
+dog = XGO(port='/dev/ttyAMA0',version="xgolite")
 display = LCD_2inch.LCD_2inch()
 display.clear()
 splash = Image.new("RGB", (display.height, display.width ),"black")
@@ -17,19 +19,19 @@ camera.set(3,width)
 camera.set(4,height) 
   
 def Front(speed):
-    pass
+    dog.move('x',speed)
     
 def Back(speed):
-    pass
+    dog.move('x',0-speed)
  
 def Left(speed):
-    pass
+    dog.move('y',speed)
  
 def Right(speed):
-    pass
+    dog.move('y',0-speed)
  
 def Stop():
-    pass
+    dog.reset()
    
 def nothing(*arg):
     pass
@@ -47,10 +49,6 @@ def Get_HSV(image):
     s_binary = cv2.inRange(np.array(s), np.array(smin), np.array(smax))
     v_binary = cv2.inRange(np.array(v), np.array(vmin), np.array(vmax))
     binary = cv2.bitwise_and(h_binary, cv2.bitwise_and(s_binary, v_binary))
-    #cv2.imshow('h_binary', h_binary)
-    #cv2.imshow('s_binary', s_binary)
-    #cv2.imshow('v_binary', v_binary)
-    #cv2.imshow('binary', binary)
     return binary
  
 def Image_Processing():
@@ -103,20 +101,20 @@ def Move(t, r):
         Stop()
     # 检测到在图片0.75以上的区域（距离正常）
     elif x>low_xlimit and x<high_xlimit and y<ylimit:
-        Front(60)
+        Front(15)
     # 检测到在图片0.75以下的区域（距离过近，后退）
     elif x>low_xlimit and x<high_xlimit and y>=ylimit:
-        Back(60)
+        Back(15)
     # 在左0.25区域，向左跟踪
     elif x<low_xlimit:
-        Left(60)
+        Left(10)
     # 在右0.25区域，向右跟踪
     elif x>high_xlimit:
-        Right(60)
+        Right(10)
  
     
 while 1:
     (x,y), r = Image_Processing()
-    #Move((x,y), r)
+    Move((x,y), r)
     if button.press_b():
         break  

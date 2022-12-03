@@ -74,6 +74,7 @@ MENU_ITEMS = [
     ("sound", "17vision","sound","Sound"),
     ("face_r", "18vision","facer","Recog"),
     ("height", "19vision","handh","Height"),
+    ("yolo", "20vision","yolofast","Yolo"),
     
 ]
 
@@ -323,6 +324,8 @@ while True:
                 os.system('sudo python3 hp.py')
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="line":
                 os.system('sudo python3 line.py')
+            elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="yolofast":
+                os.system('sudo python3 yolofast.py')
             print('program done')
             draw_title_bar(MENU_CURRENT_SELECT)
             

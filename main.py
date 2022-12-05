@@ -45,7 +45,7 @@ dog = XGO(port='/dev/ttyAMA0',version="xgolite")
 current_selection=1
 
 def show_battery():
-    lcd_rect(200,0,320,15,color=splash_theme_color,thickness=-1)
+    lcd_rect(200,0,320,25,color=splash_theme_color,thickness=-1)
     draw.bitmap((270,4),bat)
     try:
         battery=dog.read_battery()
@@ -97,38 +97,46 @@ def main_program():
     #print(key_state_down,key_state_left,key_state_right)
 
     if key_state_left == 1 :
+        show_battery()
         if current_selection==1:
             current_selection=3
         else:
             current_selection-=1
 
     if key_state_right == 1 :
+        show_battery()
         if current_selection==3:
             current_selection=1
         else:
             current_selection+=1
 
     if current_selection==1:
-        show_battery()
         lcd_rect(0,188,320,240,color=btn_unselected,thickness=-1)
         lcd_rect(0,188,110,240,color=btn_selected,thickness=-1)
         lcd_draw_string(draw, 7, 195, "Program", color=color_white, scale=font2)
-        lcd_draw_string(draw, 140, 195, "App", color=color_white, scale=font2)
+        lcd_draw_string(draw, 142, 195, "R.C.", color=color_white, scale=font2)
         lcd_draw_string(draw, 215, 195, "Try demo", color=color_white, scale=font2)
+        draw.line((110,188,110,240),fill=txt_unselected,width=1,joint=None)
+        draw.line((210,188,210,240),fill=txt_unselected,width=1,joint=None)
+        draw.rectangle((0,188,320,240),outline=txt_unselected,width=1)
     elif current_selection==2:
-        show_battery()
         lcd_rect(0,188,320,240,color=btn_unselected,thickness=-1)
         lcd_rect(110,188,210,240,color=btn_selected,thickness=-1)
         lcd_draw_string(draw, 7, 195, "Program", color=color_white, scale=font2)
-        lcd_draw_string(draw, 140, 195, "App", color=color_white, scale=font2)
+        lcd_draw_string(draw, 142, 195, "R.C.", color=color_white, scale=font2)
         lcd_draw_string(draw, 215, 195, "Try demo", color=color_white, scale=font2)
+        draw.line((110,188,110,240),fill=txt_unselected,width=1,joint=None)
+        draw.line((210,188,210,240),fill=txt_unselected,width=1,joint=None)
+        draw.rectangle((0,188,320,240),outline=txt_unselected,width=1)
     elif current_selection==3:
-        show_battery()
         lcd_rect(0,188,320,240,color=btn_unselected,thickness=-1)
         lcd_rect(210,188,320,240,color=btn_selected,thickness=-1)
         lcd_draw_string(draw, 7, 195, "Program", color=color_white, scale=font2)
-        lcd_draw_string(draw, 140, 195, "App", color=color_white, scale=font2)
+        lcd_draw_string(draw, 142, 195, "R.C.", color=color_white, scale=font2)
         lcd_draw_string(draw, 215, 195, "Try demo", color=color_white, scale=font2)
+        draw.line((110,188,110,240),fill=txt_unselected,width=1,joint=None)
+        draw.line((210,188,210,240),fill=txt_unselected,width=1,joint=None)
+        draw.rectangle((0,188,320,240),outline=txt_unselected,width=1)
 
     if key_state_down == 1:
         show_battery()
@@ -172,15 +180,7 @@ wifiy = Image.open("./pics/wifi@2x.png")
 wifin = Image.open("./pics/wifi-un@2x.png")
 bat = Image.open("./pics/battery.png")
 
-
-lcd_rect(0,188,320,240,color=btn_unselected,thickness=1)
-lcd_rect(0,188,160,240,color=btn_selected,thickness=1)
-lcd_draw_string(draw, 30,195, "Program", color=color_white, scale=font2)
-lcd_draw_string(draw, 181, 195, "Try demos", color=color_white,scale=font2) 
 show_battery()
-display.ShowImage(splash)
-
-
 current_selection = 1
 
 while True:

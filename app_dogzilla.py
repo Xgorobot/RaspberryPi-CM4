@@ -654,34 +654,21 @@ def init():
     return render_template('init.html')
 
 
-if __name__ == '__main__':
-    task_1 = threading.Thread(target=task_press_up_handle, name="task_press_up")
-    task_1.setDaemon(True)
-    task_1.start()
 
-    # task_2 = threading.Thread(target=task_joystick_handle, name="task_joystick")
-    # task_2.setDaemon(True)
-    # task_2.start()
+task_1 = threading.Thread(target=task_press_up_handle, name="task_press_up")
+task_1.setDaemon(True)
+task_1.start()
 
-    status = os.popen(
-        "sudo systemctl status yahboom_oled.service | grep 'Active' | awk '{print $2}'").read()
-    if g_debug:
-        print("System OLED Service Status:", status)
-    if status.strip() != 'active':
-        pass
-        #task_3 = threading.Thread(target=task_oled_handle, name="task_oled")
-        #task_3.setDaemon(True)
-        #task_3.start()
-    
-    init_tcp_socket()
 
-    g_dog.action(14) # 开机展示伸懒腰动作
-    print("Waiting for connect to the APP!")
+init_tcp_socket()
 
-    try:
-        server = pywsgi.WSGIServer(('0.0.0.0', 6500), app)
-        server.serve_forever()
-    except KeyboardInterrupt:
-        #g_oled.clear(True)
-        del g_dog
-        print("-----program end-----")
+#g_dog.action(14) # 开机展示伸懒腰动作
+print("Waiting for connect to the APP!")
+
+try:
+    server = pywsgi.WSGIServer(('0.0.0.0', 6500), app)
+    server.serve_forever()
+except KeyboardInterrupt:
+    #g_oled.clear(True)
+    del g_dog
+    print("-----program end-----")

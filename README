@@ -1,0 +1,40 @@
+﻿README for Linux_aitalk
+-----------------------
+
+bin：
+|-- msc
+    |-- msc.cfg（作用：msc调试、生成msc日志）
+	|-- res
+		|-- asr（资源文件）
+	|-- wav
+		|-- ddhghlj.pcm
+		|-- ddhgdw.pcm
+	|-- call.bnf
+		
+doc：
+|-- readme.txt
+
+include：调用SDK所需头文件
+
+libs：
+|-- x86
+	|-- libmsc.so（32位动态库）
+|-- x64
+	|-- libmsc.so（64位动态库）
+
+samples：
+|-- asr_sample
+	|-- asr_sample.c
+	|-- Makefile
+	|-- 32bit_make.sh
+	|-- 64bit_make.sh
+|-- asr_record_sample
+	|-- formats.h
+	|-- linuxrec.h
+	|-- linuxrec.c
+	|-- speech_recognizer.h
+	|-- speech_recognizer.c
+	|-- asr_record_sample.c
+	|-- Makefile
+	|-- 32bit_make.sh
+	|-- 64bit_make.sh	

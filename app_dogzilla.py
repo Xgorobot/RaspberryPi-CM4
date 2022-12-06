@@ -627,6 +627,7 @@ def start_tcp_server(ip, port):
                     times = 1
                 tcp_state = 2
                 cmd = g_socket.recv(1024).decode(encoding="utf-8")
+                print(cmd)
                 if not cmd:
                     break
                 tcp_state = 3
@@ -741,6 +742,18 @@ task_1 = threading.Thread(target=task_press_up_handle, name="task_press_up")
 task_1.setDaemon(True)
 task_1.start()
 
+def check_button():
+    while 1:
+        time.sleep(0.1)
+        if button.press_b():
+            break
+    print('try to kill')
+    os.system('sudo fuser -k -n tcp 6500')
+    print('6500 killed!')
+
+task_2=threading.Thread(target=check_button, name="task_press_up")
+task_2.start()
+
 
 init_tcp_socket()
 
@@ -752,7 +765,7 @@ while 1:
         break
     try:
         server = pywsgi.WSGIServer(('0.0.0.0', 6500), app)
-        #server.serve_forever()
+        server.serve_forever()
     except KeyboardInterrupt:
         #g_oled.clear(True)
         del g_dog

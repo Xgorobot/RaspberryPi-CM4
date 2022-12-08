@@ -1,4 +1,17 @@
-import snowboydecoder
+import websocket
+import datetime
+import hashlib
+import base64
+import hmac
+import json
+from urllib.parse import urlencode
+import time
+import ssl
+from wsgiref.handlers import format_date_time
+from datetime import datetime
+from time import mktime
+import _thread as thread
+
 import sys
 import signal
 from xgolib import XGO
@@ -9,9 +22,190 @@ import spidev as SPI
 import LCD_2inch
 from PIL import Image,ImageDraw,ImageFont
 from key import Button
-import threading
 
-# sudo python3 speech.py 1.pmdl 2.pmdl 3.pmdl 4.pmdl 11.pmdl 12.pmdl 18.pmdl 19.pmdl
+import pyaudio
+import wave
+
+STATUS_FIRST_FRAME = 0  
+STATUS_CONTINUE_FRAME = 1  
+STATUS_LAST_FRAME = 2
+xunfei=''  
+
+class Ws_Param(object):
+    # 初始化
+    def __init__(self, APPID, APIKey, APISecret, AudioFile):
+        self.APPID = APPID
+        self.APIKey = APIKey
+        self.APISecret = APISecret
+        self.AudioFile = AudioFile
+
+        # 公共参数(common)
+        self.CommonArgs = {"app_id": self.APPID}
+        # 业务参数(business)，更多个性化参数可在官网查看
+        self.BusinessArgs = {"domain": "iat", "language": "zh_cn", "accent": "mandarin", "vinfo":1,"vad_eos":10000}
+
+    # 生成url
+    def create_url(self):
+        url = 'wss://ws-api.xfyun.cn/v2/iat'
+        # 生成RFC1123格式的时间戳
+        now = datetime.now()
+        date = format_date_time(mktime(now.timetuple()))
+
+        # 拼接字符串
+        signature_origin = "host: " + "ws-api.xfyun.cn" + "\n"
+        signature_origin += "date: " + date + "\n"
+        signature_origin += "GET " + "/v2/iat " + "HTTP/1.1"
+        # 进行hmac-sha256进行加密
+        signature_sha = hmac.new(self.APISecret.encode('utf-8'), signature_origin.encode('utf-8'),
+                                 digestmod=hashlib.sha256).digest()
+        signature_sha = base64.b64encode(signature_sha).decode(encoding='utf-8')
+
+        authorization_origin = "api_key=\"%s\", algorithm=\"%s\", headers=\"%s\", signature=\"%s\"" % (
+            self.APIKey, "hmac-sha256", "host date request-line", signature_sha)
+        authorization = base64.b64encode(authorization_origin.encode('utf-8')).decode(encoding='utf-8')
+        # 将请求的鉴权参数组合为字典
+        v = {
+            "authorization": authorization,
+            "date": date,
+            "host": "ws-api.xfyun.cn"
+        }
+        # 拼接鉴权参数，生成url
+        url = url + '?' + urlencode(v)
+        # print("date: ",date)
+        # print("v: ",v)
+        # 此处打印出建立连接时候的url,参考本demo的时候可取消上方打印的注释，比对相同参数时生成的url与自己代码生成的url是否一致
+        # print('websocket url :', url)
+        return url
+
+
+# 收到websocket消息的处理
+def on_message(ws, message):
+    global xunfei
+    try:
+        code = json.loads(message)["code"]
+        sid = json.loads(message)["sid"]
+        if code != 0:
+            errMsg = json.loads(message)["message"]
+            print("sid:%s call error:%s code is:%s" % (sid, errMsg, code))
+
+        else:
+            data = json.loads(message)["data"]["result"]["ws"]
+            # print(json.loads(message))
+            result = ""
+            for i in data:
+                for w in i["cw"]:
+                    result += w["w"]
+            result=json.dumps(data, ensure_ascii=False)
+            tx=''
+            for r in data:
+                tx+=r['cw'][0]['w']
+            xunfei+=tx
+            #textshow=sid.split(" ")[1]
+
+
+    except Exception as e:
+        print("receive msg,but parse exception:", e)
+
+
+
+# 收到websocket错误的处理
+def on_error(ws, error):
+    print("### error:", error)
+
+
+# 收到websocket关闭的处理
+def on_close(ws,t,x):
+    print("### closed ###")
+
+
+# 收到websocket连接建立的处理
+def on_open(ws):
+    def run(*args):
+        frameSize = 8000  # 每一帧的音频大小
+        intervel = 0.04  # 发送音频间隔(单位:s)
+        status = STATUS_FIRST_FRAME  # 音频的状态信息，标识音频是第一帧，还是中间帧、最后一帧
+
+        with open(wsParam.AudioFile, "rb") as fp:
+            while True:
+                buf = fp.read(frameSize)
+                # 文件结束
+                if not buf:
+                    status = STATUS_LAST_FRAME
+                # 第一帧处理
+                # 发送第一帧音频，带business 参数
+                # appid 必须带上，只需第一帧发送
+                if status == STATUS_FIRST_FRAME:
+
+                    d = {"common": wsParam.CommonArgs,
+                         "business": wsParam.BusinessArgs,
+                         "data": {"status": 0, "format": "audio/L16;rate=16000",
+                                  "audio": str(base64.b64encode(buf), 'utf-8'),
+                                  "encoding": "raw"}}
+                    d = json.dumps(d)
+                    ws.send(d)
+                    status = STATUS_CONTINUE_FRAME
+                # 中间帧处理
+                elif status == STATUS_CONTINUE_FRAME:
+                    d = {"data": {"status": 1, "format": "audio/L16;rate=16000",
+                                  "audio": str(base64.b64encode(buf), 'utf-8'),
+                                  "encoding": "raw"}}
+                    ws.send(json.dumps(d))
+                # 最后一帧处理
+                elif status == STATUS_LAST_FRAME:
+                    d = {"data": {"status": 2, "format": "audio/L16;rate=16000",
+                                  "audio": str(base64.b64encode(buf), 'utf-8'),
+                                  "encoding": "raw"}}
+                    ws.send(json.dumps(d))
+                    time.sleep(1)
+                    break
+                # 模拟音频采样间隔
+                time.sleep(intervel)
+        ws.close()
+
+    thread.start_new_thread(run, ())
+
+def start_audio(time = 3,save_file="test.wav"):
+    CHUNK = 1024
+    FORMAT = pyaudio.paInt16
+    CHANNELS = 2
+    RATE = 8000
+    RECORD_SECONDS = time  
+    WAVE_OUTPUT_FILENAME = save_file   
+
+    p = pyaudio.PyAudio()   
+    print("start")
+    lcd_rect(0,40,320,97,splash_theme_color,-1)
+    lcd_draw_string(draw,15,45, "START RECORDING", color=(255,0,0), scale=font3, mono_space=False)
+    display.ShowImage(splash)
+    
+
+    stream = p.open(format=FORMAT,
+                    channels=CHANNELS,
+                    rate=RATE,
+                    input=True,
+                    frames_per_buffer=CHUNK)
+    frames = []
+
+    for i in range(0, int(RATE / CHUNK * RECORD_SECONDS)):
+        data = stream.read(CHUNK)
+        frames.append(data)
+
+    print("end")
+    lcd_rect(0,40,320,97,splash_theme_color,-1)
+    lcd_draw_string(draw,15,45, "RECORDING DONE!", color=(255,0,0), scale=font3, mono_space=False)
+    display.ShowImage(splash)
+
+    stream.stop_stream()
+    stream.close()
+    p.terminate()
+
+    wf = wave.open(WAVE_OUTPUT_FILENAME, 'wb')  
+    wf.setnchannels(CHANNELS)
+    wf.setsampwidth(p.get_sample_size(FORMAT))
+    wf.setframerate(RATE)
+    wf.writeframes(b''.join(frames))
+    wf.close()
+    
 
 #define colors
 btn_selected = (24,47,223)
@@ -44,116 +238,47 @@ def lcd_rect(x,y,w,h,color,thickness):
     draw.rectangle([(x,y),(w,h)],fill=color,width=thickness)
     
 dog = XGO(port='/dev/ttyAMA0',version="xgolite")
-lcd_draw_string(draw,30,60, "WAITING FOR COMMAND", color=(255,255,255), scale=font2, mono_space=False)
+draw.line((2,98,318,98), fill=(255,255,255), width=2)
+lcd_draw_string(draw,33,10, "Mandarin to Text Demo", color=(255,255,255), scale=font2, mono_space=False)
+lcd_draw_string(draw,27,100, "Please say the following:", color=(255,255,255), scale=font2, mono_space=False)
+lcd_draw_string(draw,35,125, "觅食、握手、转圈、爬行", color=(0,255,255), scale=font2, mono_space=False)
+lcd_draw_string(draw,35,150, "摇摆、吃饭、握手、撒尿", color=(0,255,255), scale=font2, mono_space=False)
+lcd_draw_string(draw,35,175, "坐下、站立、趴下、蹲起", color=(0,255,255), scale=font2, mono_space=False)
+lcd_draw_string(draw,90,200, "伸懒腰、波浪", color=(0,255,255), scale=font2, mono_space=False)
 display.ShowImage(splash)
-
-# Demo code for listening to two hotwords at the same time
-interrupted = False
-quitp=False
-
-def button_check(a,b):
-    global interrupted,quitp
-    while 1:
-        time.sleep(0.1)
-        if button.press_b():
-            dog.reset()
-            detector.terminate()
-            break
-    sys.exit()
-
-
-x=threading.Thread(target=button_check,args=(0,0))
-x.start()
-	
-
-
-
-
-def signal_handler(signal, frame):
-    global interrupted,quitp
-    interrupted = True
-
-def interrupt_callback():
-    global interrupted
-    return interrupted
-
-def callback1():
-    dog.action(1)
-    lcd_rect(30,160,320,240,color=splash_theme_color,thickness=-1)
-    lcd_draw_string(draw,30,160, "LIE DOWN", color=(255,255,255), scale=font2, mono_space=False)
-    display.ShowImage(splash)
-    time.sleep(5)
-def callback2():
-    dog.action(2)
-    lcd_rect(30,160,320,240,color=splash_theme_color,thickness=-1)
-    lcd_draw_string(draw,30,160, "STAND UP", color=(255,255,255), scale=font2, mono_space=False)
-    display.ShowImage(splash)
-    time.sleep(5)
-def callback3():
-    dog.action(3)
-    lcd_rect(30,160,320,240,color=splash_theme_color,thickness=-1)
-    lcd_draw_string(draw,30,160, "CRAWING", color=(255,255,255), scale=font2, mono_space=False)
-    display.ShowImage(splash)
-    time.sleep(5)
-def callback4():
-    dog.action(4)
-    lcd_rect(30,160,320,240,color=splash_theme_color,thickness=-1)
-    lcd_draw_string(draw,30,160, "TURAN AROUND", color=(255,255,255), scale=font2, mono_space=False)
-    display.ShowImage(splash)
-    time.sleep(5)
-def callback5():
-    dog.action(11)
-    lcd_rect(30,160,320,240,color=splash_theme_color,thickness=-1)
-    lcd_draw_string(draw,30,160, "PISS", color=(255,255,255), scale=font2, mono_space=False)
-    display.ShowImage(splash)
-    time.sleep(5)
-def callback6():
-    dog.action(12)
-    lcd_rect(30,160,320,240,color=splash_theme_color,thickness=-1)
-    lcd_draw_string(draw,30,160, "SITDOWN", color=(255,255,255), scale=font2, mono_space=False)
-    display.ShowImage(splash)
-    time.sleep(5)
-def callback7():
-    dog.action(18)
-    lcd_rect(30,160,320,240,color=splash_theme_color,thickness=-1)
-    lcd_draw_string(draw,30,160, "BEG FOR FOOD", color=(255,255,255), scale=font2, mono_space=False)
-    display.ShowImage(splash)
-    time.sleep(5)    
-def callback8():
-    dog.action(19)
-    lcd_rect(30,160,320,240,color=splash_theme_color,thickness=-1)
-    lcd_draw_string(draw,30,160, "HANDSHAKE", color=(255,255,255), scale=font2, mono_space=False)
-    display.ShowImage(splash)
-    time.sleep(5)
+    
+    
+while 1:
+    if button.press_c():
+        lcd_rect(0,40,320,97,splash_theme_color,-1)
+        lcd_draw_string(draw,15,45,'Ready for Recording', color=(255,0,0), scale=font3, mono_space=False)
+        display.ShowImage(splash)
+        start_audio()
+        xunfei=''
+        time1 = datetime.now()
+        wsParam = Ws_Param(APPID='7582fa81', APISecret='NzIyYzFkY2NiMzBiMTY1ZjUwYTg4MTFm',
+                           APIKey='924c1939fdffc06651a49289e2fc17f4',
+                           AudioFile='test.wav')
+        lcd_rect(0,40,320,97,splash_theme_color,-1)
+        lcd_draw_string(draw,15,45, "Identifying...", color=(255,0,0), scale=font3, mono_space=False)
+        display.ShowImage(splash)
+        websocket.enableTrace(False)
+        wsUrl = wsParam.create_url()
+        ws = websocket.WebSocketApp(wsUrl, on_message=on_message, on_error=on_error, on_close=on_close)
+        ws.on_open = on_open
+        ws.run_forever(sslopt={"cert_reqs": ssl.CERT_NONE})
+        time2 = datetime.now()
+        print(time2-time1)
+        lcd_rect(0,40,320,97,splash_theme_color,-1)
+        lcd_draw_string(draw,15,45,xunfei, color=(255,0,0), scale=font3, mono_space=False)
+        display.ShowImage(splash)
+    if button.press_b():
+        break
 
 
-models = ['1.pmdl', '2.pmdl', '3.pmdl', '4.pmdl', '11.pmdl', '12.pmdl', '18.pmdl', '19.pmdl']
 
 
-# capture SIGINT signal, e.g., Ctrl+C
-signal.signal(signal.SIGINT, signal_handler)
-
-sensitivity = [0.45]*len(models)
-detector = snowboydecoder.HotwordDetector(models, sensitivity=sensitivity)
-callbacks = [callback1,
-             callback2,
-             callback3,
-             callback4,
-             callback5,
-             callback6,
-             callback7,
-             callback8]
 
 
-print('Listening... Press Ctrl+C to exit')
 
-# main loop
-# make sure you have the same numbers of callbacks and models
-detector.start(detected_callback=callbacks,
-               interrupt_check=interrupt_callback,
-               sleep_time=0.03)
-
-detector.terminate()
-
-print('end')
 

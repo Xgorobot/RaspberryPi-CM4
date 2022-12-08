@@ -64,6 +64,7 @@ time.sleep(2)
 while True:    
     
     if button.press_c():
+        lcd_rect(0,0,320,240,color=color_black,thickness=-1)
         dog.unload_allmotor()
         data[n] = dog.read_motor()
         print('-----------------')
@@ -74,6 +75,7 @@ while True:
         lcd_rect(0,0,320,240,color=color_black,thickness=-1)
         n = n + 1  
     if button.press_d():
+        lcd_rect(0,0,320,240,color=color_black,thickness=-1)
         data[n] = dog.read_motor()
         dog.load_allmotor()
         lcd_draw_string(draw,40,100, "ACTIONS READY", color=(255,255,255), scale=font2, mono_space=False)
@@ -81,6 +83,7 @@ while True:
         time.sleep(0.02)
         lcd_rect(0,0,320,240,color=color_black,thickness=-1)
     if button.press_a():
+        lcd_rect(0,0,320,240,color=color_black,thickness=-1)
         lcd_draw_string(draw,40,100, "ACTIONS SHOW", color=(255,255,255), scale=font2, mono_space=False)
         display.ShowImage(splash)
         time.sleep(0.02)

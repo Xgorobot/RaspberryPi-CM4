@@ -124,7 +124,7 @@ with mp_face_mesh.FaceMesh(
         pitch=result[0]
         yaw=result[1]
         roll=result[2]
-        dog.attitude(['p','y','r'],[int(-pitch/40*20),int(-yaw/60*15),int(-roll/40*15)])
+        dog.attitude(['p','y','r'],[int(-pitch/80*20),int(-yaw/80*15),int(-roll/80*15)])
         
     else:
       dog.reset()

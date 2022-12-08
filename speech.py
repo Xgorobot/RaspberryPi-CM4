@@ -26,6 +26,9 @@ from key import Button
 import pyaudio
 import wave
 
+from xgolib import XGO
+dog = XGO(port='/dev/ttyAMA0',version="xgolite")
+
 STATUS_FIRST_FRAME = 0  
 STATUS_CONTINUE_FRAME = 1  
 STATUS_LAST_FRAME = 2
@@ -237,12 +240,31 @@ def lcd_draw_string(splash,x, y, text, color=(255,255,255), font_size=1, scale=1
 def lcd_rect(x,y,w,h,color,thickness):
     draw.rectangle([(x,y),(w,h)],fill=color,width=thickness)
     
+def action(act):
+    commandlist=['觅食','握手','转圈','爬行','摇摆','吃饭','招手','撒尿','坐下','站立','趴下','蹲起','伸懒腰','波浪']
+    actionlist=[17,19,4,3,16,18,13,11,12,2,1,6,14,15]
+    mincmd=0
+    minindex=len(commandlist)
+    mark=False
+    for i,cmd in enumerate(commandlist):
+        ix=act.find(cmd)
+        if ix>-1 and ix<=minindex:
+            mincmd=i
+            minindex=ix
+            mark=True
+    if mark:
+        print(commandlist[mincmd])
+        dog.action(actionlist[mincmd])
+    else:
+        print('command not find')
+        dog.reset()
+    
 dog = XGO(port='/dev/ttyAMA0',version="xgolite")
 draw.line((2,98,318,98), fill=(255,255,255), width=2)
 lcd_draw_string(draw,33,10, "Mandarin to Text Demo", color=(255,255,255), scale=font2, mono_space=False)
 lcd_draw_string(draw,27,100, "Please say the following:", color=(255,255,255), scale=font2, mono_space=False)
 lcd_draw_string(draw,35,125, "觅食、握手、转圈、爬行", color=(0,255,255), scale=font2, mono_space=False)
-lcd_draw_string(draw,35,150, "摇摆、吃饭、握手、撒尿", color=(0,255,255), scale=font2, mono_space=False)
+lcd_draw_string(draw,35,150, "摇摆、吃饭、招手、撒尿", color=(0,255,255), scale=font2, mono_space=False)
 lcd_draw_string(draw,35,175, "坐下、站立、趴下、蹲起", color=(0,255,255), scale=font2, mono_space=False)
 lcd_draw_string(draw,90,200, "伸懒腰、波浪", color=(0,255,255), scale=font2, mono_space=False)
 display.ShowImage(splash)
@@ -272,6 +294,7 @@ while 1:
         lcd_rect(0,40,320,97,splash_theme_color,-1)
         lcd_draw_string(draw,15,45,xunfei, color=(255,0,0), scale=font3, mono_space=False)
         display.ShowImage(splash)
+        action(xunfei)
     if button.press_b():
         break
 

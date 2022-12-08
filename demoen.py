@@ -315,9 +315,10 @@ while True:
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="ball_trace":
                 os.system('sudo python3 ball_trace.py')
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="speech":
-                os.system('sudo python3 speech.py')
+                print('no sudo!!!!!!!!!!!')
+                os.system('python speech.py')
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="sound":
-                os.system('sudo python3 sound.py')
+                os.system('python sound.py')
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="facer":
                 os.system('sudo python3 fr1.py')
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="handh":
@@ -328,6 +329,7 @@ while True:
                 os.system('sudo python3 yolofast.py')
             print('program done')
             draw_title_bar(MENU_CURRENT_SELECT)
+            
             
                 
         except BaseException as e:

@@ -166,7 +166,7 @@ def main_program():
             lcd_draw_string(draw, 181, 195, "Try demos", color=color_white, scale=font2)
             #__import__("try_demo-cs.py")
             print('turn demos')
-            os.system("sudo python demoen.py")
+            os.system("python demoen.py")
 
 
         print(str(current_selection) + " select")

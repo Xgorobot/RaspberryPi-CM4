@@ -67,7 +67,7 @@ ipadd=ip()
 if ipadd=='0.0.0.0':
     print('wlan disconnected')
     lcd_rect(0,195,320,240,(48,50,73),thickness=-1)
-    draw.bitmap(wifin,(65,200))
+    splash.paste(wifin,(65,200))
     lcd_draw_string(draw,100, 200, 'No net!', color=color_white, scale=font2)
 else:
     print('wlan connected')

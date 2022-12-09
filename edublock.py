@@ -81,7 +81,7 @@ if ssid!=None:
     lcd_draw_string(draw,60, 0,'SSID:'+ssid.decode(), color=color_white, scale=font2)
 if ipadd=='0.0.0.0':
     print('wlan disconnected')
-    draw.bitmap(wifin,(65,200))
+    splash.paste(wifin,(65,200))
     lcd_draw_string(draw,100, 200, 'No net!', color=color_white, scale=font2)
 else:
     print('wlan connected')

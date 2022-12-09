@@ -25,10 +25,10 @@ def Back(speed):
     dog.move('x',0-speed)
  
 def Left(speed):
-    dog.move('y',speed)
+    dog.turn(speed)
  
 def Right(speed):
-    dog.move('y',0-speed)
+    dog.turn(0-speed)
  
 def Stop():
     dog.reset()
@@ -91,26 +91,26 @@ def Image_Processing():
 # 运动控制（这里可以做到跟踪小球，前景和后退相配合，“敌进我退，敌退我进”）
 def Move(t, r):
     (x,y)=t
-    low_xlimit = width/4
-    high_xlimit = 0.75 * width
+    low_xlimit = 0.4*width
+    high_xlimit = 0.6 * width
     #low_ylimit = 3/4 * height
-    ylimit = 0.75 * height
+    ylimit = 0.5 * height
     print(high_xlimit, ylimit)
     # 没检测到，停止不动
     if x==0:
         Stop()
     # 检测到在图片0.75以上的区域（距离正常）
     elif x>low_xlimit and x<high_xlimit and y<ylimit:
-        Front(15)
+        Front(5)
     # 检测到在图片0.75以下的区域（距离过近，后退）
     elif x>low_xlimit and x<high_xlimit and y>=ylimit:
-        Back(15)
+        Back(5)
     # 在左0.25区域，向左跟踪
     elif x<low_xlimit:
-        Left(10)
+        Left(5)
     # 在右0.25区域，向右跟踪
     elif x>high_xlimit:
-        Right(10)
+        Right(5)
  
     
 while 1:

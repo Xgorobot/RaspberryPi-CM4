@@ -5,6 +5,8 @@ import LCD_2inch
 from PIL import Image,ImageDraw,ImageFont
 from key import Button
 from subprocess import Popen
+from xgolib import XGO
+dog = XGO(port='/dev/ttyAMA0',version="xgolite")
 
 display = LCD_2inch.LCD_2inch()
 display.clear()
@@ -86,6 +88,7 @@ while True:
     imgok = Image.fromarray(frame)
     display.ShowImage(imgok)
     if label!='':
+      time.sleep(1)
       if label=='Angry':
         angry+=1
         happy=0
@@ -132,5 +135,6 @@ while True:
         break
     if button.press_b():
         dog.reset()
+        break
 cap.release()
 cv2.destroyAllWindows()

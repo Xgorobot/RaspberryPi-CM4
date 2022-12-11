@@ -665,11 +665,14 @@ def init_tcp_socket():
     if g_init:
         return
     while True:
+        if button.press_b():
+            break
         ip = get_ip_address()
         if ip == "x.x.x.x":
             g_tcp_ip = ip
             print("get ip address fail!")
             time.sleep(.5)
+            
             continue
         if ip != "x.x.x.x":
             g_tcp_ip = ip

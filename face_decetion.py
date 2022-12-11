@@ -83,8 +83,8 @@ with mp_face_detection.FaceDetection(
     else:
       value_x=0
       value_y=0
-    print(['y','p'],[value_x/6, value_y/10])
-    dog.attitude(['y','p'],[value_x/6, value_y/10])
+    print(['y','p'],[value_x/9, value_y/15])
+    dog.attitude(['y','p'],[value_x/9, value_y/15])
     b,g,r = cv2.split(image)
     image = cv2.merge((r,g,b))
     image = cv2.flip(image, 1)

@@ -133,7 +133,7 @@ with mp_face_mesh.FaceMesh(
     image = cv2.merge((r,g,b))
     image = cv2.flip(image, 1)
     try:
-      for i, info in enumerate(zip(('pitch', 'yaw', 'roll'), result)):
+      for i, info in enumerate(zip(('Pitch', 'Roll', 'Yaw'), result)):
         k, v = info
         text = f'{k}: {int(v)}'
         cv2.putText(image, text, (20, i*30 + 20),cv2.FONT_HERSHEY_SIMPLEX, 0.7, (200, 0, 200), 2)

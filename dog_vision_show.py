@@ -48,10 +48,10 @@ def lcd_draw_string(splash,x, y, text, color=(255,255,255), font_size=1, scale=1
 def lcd_rect(x,y,w,h,color,thickness):
     draw.rectangle([(x,y),(w,h)],fill=color,width=thickness)
 
-lcd_draw_string(draw,70,20, "BUTTON A:RECORD", color=(255,255,255), scale=font2, mono_space=False)
-lcd_draw_string(draw,70,80, "BUTTON B: STOP", color=(255,255,255), scale=font2, mono_space=False)
-lcd_draw_string(draw,70,140, "BUTTON C: QUIT", color=(255,255,255), scale=font2, mono_space=False)
-lcd_draw_string(draw,70,200, "BUTTON D: SHOW", color=(255,255,255), scale=font2, mono_space=False)
+lcd_draw_string(draw,70,20, "Press A:Record", color=(255,255,255), scale=font2, mono_space=False)
+lcd_draw_string(draw,70,80, "Press B: End Record", color=(255,255,255), scale=font2, mono_space=False)
+lcd_draw_string(draw,70,140, "Press C: Quit", color=(255,255,255), scale=font2, mono_space=False)
+lcd_draw_string(draw,70,200, "Press D: Execute", color=(255,255,255), scale=font2, mono_space=False)
 display.ShowImage(splash)
 
 lcd_rect(0,0,320,240,color=color_black,thickness=-1)
@@ -69,7 +69,7 @@ while True:
         data[n] = dog.read_motor()
         print('-----------------')
         print(data)
-        lcd_draw_string(draw,70,100, "ACTION"+(str(n+1)), color=(255,255,255), scale=font2, mono_space=False)
+        lcd_draw_string(draw,110,100, "ACTION"+(str(n+1)), color=(255,255,255), scale=font2, mono_space=False)
         display.ShowImage(splash)
         time.sleep(0.02)
         lcd_rect(0,0,320,240,color=color_black,thickness=-1)
@@ -78,13 +78,13 @@ while True:
         lcd_rect(0,0,320,240,color=color_black,thickness=-1)
         data[n] = dog.read_motor()
         dog.load_allmotor()
-        lcd_draw_string(draw,40,100, "ACTIONS READY", color=(255,255,255), scale=font2, mono_space=False)
+        lcd_draw_string(draw,40,100, "Action Group is Ready", color=(255,255,255), scale=font2, mono_space=False)
         display.ShowImage(splash)
         time.sleep(0.02)
         lcd_rect(0,0,320,240,color=color_black,thickness=-1)
     if button.press_a():
         lcd_rect(0,0,320,240,color=color_black,thickness=-1)
-        lcd_draw_string(draw,40,100, "ACTIONS SHOW", color=(255,255,255), scale=font2, mono_space=False)
+        lcd_draw_string(draw,66,100, "Action Executing", color=(255,255,255), scale=font2, mono_space=False)
         display.ShowImage(splash)
         time.sleep(0.02)
         lcd_rect(0,0,320,240,color=color_black,thickness=-1)  
@@ -93,7 +93,7 @@ while True:
                 dog.motor(servo,d)
                 time.sleep(0.8)
         print('action done!')
-        lcd_draw_string(draw,40,100, "ACTIONS DONE", color=(255,255,255), scale=font2, mono_space=False)
+        lcd_draw_string(draw,100,100, "Action Done", color=(255,255,255), scale=font2, mono_space=False)
         display.ShowImage(splash)
     if button.press_b():
         dog.reset()

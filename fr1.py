@@ -46,11 +46,11 @@ def lcd_rect(x,y,w,h,color,thickness):
 
 def main_part():
     lcd_rect(0,0,320,240,color=color_black,thickness=-1)
-    lcd_draw_string(draw, 10, 10,'Record', color=color_white, scale=font)
-    lcd_draw_string(draw, 250, 10,'Train', color=color_white, scale=font)
-    lcd_draw_string(draw, 10, 210,'Quit', color=color_white, scale=font)
-    lcd_draw_string(draw, 250, 210,'Recog', color=color_white, scale=font)
-    lcd_draw_string(draw, 105, 100,'USER'+str(user), color=color_white, scale=font2)
+    lcd_draw_string(draw, 70, 50,'Press A:Record', color=color_white, scale=font)
+    lcd_draw_string(draw, 70, 100,'Press B:Train', color=color_white, scale=font)
+    lcd_draw_string(draw, 70, 150,'Press C:Quit', color=color_white, scale=font)
+    lcd_draw_string(draw, 70, 200,'Press D:Recognize', color=color_white, scale=font)
+    lcd_draw_string(draw, 120, 5,'User'+str(user), color=color_white, scale=font)
     display.ShowImage(splash)
 
 main_part()
@@ -100,7 +100,7 @@ while 1:
             if os.path.isfile(file_path):
                 os.remove(file_path)
         lcd_rect(0,0,320,240,color=color_black,thickness=-1)
-        lcd_draw_string(draw, 30, 90,'FACE TO CAM', color=color_white, scale=font2)
+        lcd_draw_string(draw, 30, 90,'Face to CAM', color=color_white, scale=font2)
         display.ShowImage(splash)
         record()
         count=0

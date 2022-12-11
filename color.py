@@ -85,7 +85,7 @@ while 1:
                     value_y = 75
                 elif value_y < -75:
                     value_y = -75
-                g_dog.attitude(['y','p'],[-value_x/10, value_y/10])
+                g_dog.attitude(['y','p'],[-value_x/15, value_y/15])
         else:
             color_x = 0
             color_y = 0

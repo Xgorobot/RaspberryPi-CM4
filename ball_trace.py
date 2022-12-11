@@ -67,7 +67,7 @@ def change_color():
         color_upper = np.array([77, 255, 255])
  
 def Get_HSV(image):
-    hmin = 1
+    hmin = 0
     hmax = 200
     smin = 110
     smax = 255
@@ -100,14 +100,6 @@ def Image_Processing():
     b,g,r = cv2.split(image)
     image = cv2.merge((r,g,b))
     image = cv2.flip(image, 1)
-    if mode==1:
-        cv2.rectangle(image, (290, 10), (320, 40), red, -1)
-    elif mode==2:
-        cv2.rectangle(image, (290, 10), (320, 40), green, -1)
-    elif mode==3:
-        cv2.rectangle(image, (290, 10), (320, 40), blue, -1)
-    elif mode==4:
-        cv2.rectangle(image, (290, 10), (320, 40), yellow, -1)
     imgok = Image.fromarray(image)
     display.ShowImage(imgok)
     return (x,y), r
@@ -133,7 +125,5 @@ def Move(t, r):
 while 1:
     (x,y), r = Image_Processing()
     Move((x,y), r)
-    if button.press_d():
-        change_color()
     if button.press_b():
         break  

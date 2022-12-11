@@ -5,8 +5,7 @@ import base64
 import hmac
 import json
 from urllib.parse import urlencode
-import time 
-import time as tttime
+import time
 import ssl
 from wsgiref.handlers import format_date_time
 from datetime import datetime
@@ -27,9 +26,6 @@ from key import Button
 import pyaudio
 import wave
 
-import numpy as np
-from scipy import fftpack
-
 from xgolib import XGO
 dog = XGO(port='/dev/ttyAMA0',version="xgolite")
 
@@ -39,23 +35,30 @@ STATUS_LAST_FRAME = 2
 xunfei=''  
 
 class Ws_Param(object):
+    # 初始化
     def __init__(self, APPID, APIKey, APISecret, AudioFile):
         self.APPID = APPID
         self.APIKey = APIKey
         self.APISecret = APISecret
         self.AudioFile = AudioFile
 
+        # 公共参数(common)
         self.CommonArgs = {"app_id": self.APPID}
+        # 业务参数(business)，更多个性化参数可在官网查看
         self.BusinessArgs = {"domain": "iat", "language": "zh_cn", "accent": "mandarin", "vinfo":1,"vad_eos":10000}
 
+    # 生成url
     def create_url(self):
         url = 'wss://ws-api.xfyun.cn/v2/iat'
+        # 生成RFC1123格式的时间戳
         now = datetime.now()
         date = format_date_time(mktime(now.timetuple()))
 
+        # 拼接字符串
         signature_origin = "host: " + "ws-api.xfyun.cn" + "\n"
         signature_origin += "date: " + date + "\n"
         signature_origin += "GET " + "/v2/iat " + "HTTP/1.1"
+        # 进行hmac-sha256进行加密
         signature_sha = hmac.new(self.APISecret.encode('utf-8'), signature_origin.encode('utf-8'),
                                  digestmod=hashlib.sha256).digest()
         signature_sha = base64.b64encode(signature_sha).decode(encoding='utf-8')
@@ -63,16 +66,22 @@ class Ws_Param(object):
         authorization_origin = "api_key=\"%s\", algorithm=\"%s\", headers=\"%s\", signature=\"%s\"" % (
             self.APIKey, "hmac-sha256", "host date request-line", signature_sha)
         authorization = base64.b64encode(authorization_origin.encode('utf-8')).decode(encoding='utf-8')
-
+        # 将请求的鉴权参数组合为字典
         v = {
             "authorization": authorization,
             "date": date,
             "host": "ws-api.xfyun.cn"
         }
-
+        # 拼接鉴权参数，生成url
         url = url + '?' + urlencode(v)
+        # print("date: ",date)
+        # print("v: ",v)
+        # 此处打印出建立连接时候的url,参考本demo的时候可取消上方打印的注释，比对相同参数时生成的url与自己代码生成的url是否一致
+        # print('websocket url :', url)
         return url
 
+
+# 收到websocket消息的处理
 def on_message(ws, message):
     global xunfei
     try:
@@ -84,6 +93,7 @@ def on_message(ws, message):
 
         else:
             data = json.loads(message)["data"]["result"]["ws"]
+            # print(json.loads(message))
             result = ""
             for i in data:
                 for w in i["cw"]:
@@ -100,24 +110,33 @@ def on_message(ws, message):
         print("receive msg,but parse exception:", e)
 
 
+
+# 收到websocket错误的处理
 def on_error(ws, error):
     print("### error:", error)
 
+
+# 收到websocket关闭的处理
 def on_close(ws,t,x):
     print("### closed ###")
 
+
+# 收到websocket连接建立的处理
 def on_open(ws):
     def run(*args):
-        frameSize = 8000  
-        intervel = 0.04  
-        status = STATUS_FIRST_FRAME  
+        frameSize = 8000  # 每一帧的音频大小
+        intervel = 0.04  # 发送音频间隔(单位:s)
+        status = STATUS_FIRST_FRAME  # 音频的状态信息，标识音频是第一帧，还是中间帧、最后一帧
 
         with open(wsParam.AudioFile, "rb") as fp:
             while True:
                 buf = fp.read(frameSize)
+                # 文件结束
                 if not buf:
                     status = STATUS_LAST_FRAME
-
+                # 第一帧处理
+                # 发送第一帧音频，带business 参数
+                # appid 必须带上，只需第一帧发送
                 if status == STATUS_FIRST_FRAME:
 
                     d = {"common": wsParam.CommonArgs,
@@ -128,11 +147,13 @@ def on_open(ws):
                     d = json.dumps(d)
                     ws.send(d)
                     status = STATUS_CONTINUE_FRAME
+                # 中间帧处理
                 elif status == STATUS_CONTINUE_FRAME:
                     d = {"data": {"status": 1, "format": "audio/L16;rate=16000",
                                   "audio": str(base64.b64encode(buf), 'utf-8'),
                                   "encoding": "raw"}}
                     ws.send(json.dumps(d))
+                # 最后一帧处理
                 elif status == STATUS_LAST_FRAME:
                     d = {"data": {"status": 2, "format": "audio/L16;rate=16000",
                                   "audio": str(base64.b64encode(buf), 'utf-8'),
@@ -140,60 +161,39 @@ def on_open(ws):
                     ws.send(json.dumps(d))
                     time.sleep(1)
                     break
+                # 模拟音频采样间隔
                 time.sleep(intervel)
         ws.close()
 
     thread.start_new_thread(run, ())
 
 def start_audio(time = 3,save_file="test.wav"):
-    start_threshold=30000
-    end_threshold=8000
-    endlast=10     
     CHUNK = 1024
     FORMAT = pyaudio.paInt16
     CHANNELS = 2
     RATE = 8000
-    RECORD_SECONDS = time 
-    WAVE_OUTPUT_FILENAME = save_file  
+    RECORD_SECONDS = time  
+    WAVE_OUTPUT_FILENAME = save_file   
 
     p = pyaudio.PyAudio()   
-    print("recording...")
+    print("start")
     lcd_rect(0,40,320,97,splash_theme_color,-1)
-    lcd_draw_string(draw,15,45, "Ready for Recording", color=(255,0,0), scale=font3, mono_space=False)
+    lcd_draw_string(draw,15,45, "START RECORDING", color=(255,0,0), scale=font3, mono_space=False)
     display.ShowImage(splash)
     
-    
+
     stream = p.open(format=FORMAT,
                     channels=CHANNELS,
                     rate=RATE,
                     input=True,
                     frames_per_buffer=CHUNK)
     frames = []
-    start_luyin = False
-    break_luyin = False
-    data_list =[0]*endlast
 
-    while not break_luyin:
+    for i in range(0, int(RATE / CHUNK * RECORD_SECONDS)):
         data = stream.read(CHUNK)
-        rt_data = np.frombuffer(data,dtype=np.int16)
-        fft_temp_data = fftpack.fft(rt_data, rt_data.size, overwrite_x=True)
-        fft_data = np.abs(fft_temp_data)[0:fft_temp_data.size // 2 + 1]
-        vol=sum(fft_data) // len(fft_data)
-        data_list.pop(0)
-        data_list.append(vol)
-        if vol>start_threshold:
-            print('start recording')
-            start_luyin=True
-        if start_luyin :
-            kkk= lambda x:float(x)<start_threshold
-            if all([kkk(i) for i in data_list]):
-                break_luyin =True
-                frames=frames[:-5]
-        if start_luyin:
-            frames.append(data)
-    
-    print('auto end')
+        frames.append(data)
 
+    print("end")
     lcd_rect(0,40,320,97,splash_theme_color,-1)
     lcd_draw_string(draw,15,45, "RECORDING DONE!", color=(255,0,0), scale=font3, mono_space=False)
     display.ShowImage(splash)
@@ -242,38 +242,19 @@ def lcd_rect(x,y,w,h,color,thickness):
     
 def action(act):
     commandlist=['觅食','握手','转圈','爬行','摇摆','吃饭','招手','撒尿','坐下','站立','趴下','蹲起','伸懒腰','波浪']
-    commandlist2=['Looking for food','Hand shake','Turn around','Crawl','Wave body','Eating food','Wave hand','Take a pee','Sit down','Stand up','Lie down','Up and down','Squat','Wave make']
     actionlist=[17,19,4,3,16,18,13,11,12,2,1,6,14,15]
     mincmd=0
     minindex=len(commandlist)
     mark=False
-    acts=0
     for i,cmd in enumerate(commandlist):
         ix=act.find(cmd)
         if ix>-1 and ix<=minindex:
             mincmd=i
             minindex=ix
             mark=True
-            acts=1
-    for i,cmd in enumerate(commandlist2):
-        ix=act.find(cmd)
-        if ix>-1 and ix<=minindex:
-            mincmd=i
-            minindex=ix
-            mark=True
-            acts=2
     if mark:
-        if acts==1:
-            print(commandlist[mincmd])
-            dog.action(actionlist[mincmd])
-        elif acts==2:
-            print(commandlist2[mincmd])
-            dog.action(actionlist[mincmd])
-        time.sleep(2)
-        lcd_rect(0,40,320,97,splash_theme_color,-1)
-        lcd_draw_string(draw,15,45, "Action...", color=(255,0,0), scale=font3, mono_space=False)
-        display.ShowImage(splash)
-        tttime.sleep(5)
+        print(commandlist[mincmd])
+        dog.action(actionlist[mincmd])
     else:
         print('command not find')
         dog.reset()
@@ -288,28 +269,32 @@ lcd_draw_string(draw,35,175, "坐下、站立、趴下、蹲起", color=(0,255,2
 lcd_draw_string(draw,90,200, "伸懒腰、波浪", color=(0,255,255), scale=font2, mono_space=False)
 display.ShowImage(splash)
     
-time.sleep(2)
+    
 while 1:
-    start_audio()
-    xunfei=''
-    time1 = datetime.now()
-    wsParam = Ws_Param(APPID='7582fa81', APISecret='NzIyYzFkY2NiMzBiMTY1ZjUwYTg4MTFm',
-                       APIKey='924c1939fdffc06651a49289e2fc17f4',
-                       AudioFile='test.wav')
-    lcd_rect(0,40,320,97,splash_theme_color,-1)
-    lcd_draw_string(draw,15,45, "Identifying...", color=(255,0,0), scale=font3, mono_space=False)
-    display.ShowImage(splash)
-    websocket.enableTrace(False)
-    wsUrl = wsParam.create_url()
-    ws = websocket.WebSocketApp(wsUrl, on_message=on_message, on_error=on_error, on_close=on_close)
-    ws.on_open = on_open
-    ws.run_forever(sslopt={"cert_reqs": ssl.CERT_NONE})
-    time2 = datetime.now()
-    print(time2-time1)
-    lcd_rect(0,40,320,97,splash_theme_color,-1)
-    lcd_draw_string(draw,15,45,xunfei, color=(255,0,0), scale=font3, mono_space=False)
-    display.ShowImage(splash)
-    action(xunfei)
+    if button.press_c():
+        lcd_rect(0,40,320,97,splash_theme_color,-1)
+        lcd_draw_string(draw,15,45,'Ready for Recording', color=(255,0,0), scale=font3, mono_space=False)
+        display.ShowImage(splash)
+        start_audio()
+        xunfei=''
+        time1 = datetime.now()
+        wsParam = Ws_Param(APPID='7582fa81', APISecret='NzIyYzFkY2NiMzBiMTY1ZjUwYTg4MTFm',
+                           APIKey='924c1939fdffc06651a49289e2fc17f4',
+                           AudioFile='test.wav')
+        lcd_rect(0,40,320,97,splash_theme_color,-1)
+        lcd_draw_string(draw,15,45, "Identifying...", color=(255,0,0), scale=font3, mono_space=False)
+        display.ShowImage(splash)
+        websocket.enableTrace(False)
+        wsUrl = wsParam.create_url()
+        ws = websocket.WebSocketApp(wsUrl, on_message=on_message, on_error=on_error, on_close=on_close)
+        ws.on_open = on_open
+        ws.run_forever(sslopt={"cert_reqs": ssl.CERT_NONE})
+        time2 = datetime.now()
+        print(time2-time1)
+        lcd_rect(0,40,320,97,splash_theme_color,-1)
+        lcd_draw_string(draw,15,45,xunfei, color=(255,0,0), scale=font3, mono_space=False)
+        display.ShowImage(splash)
+        action(xunfei)
     if button.press_b():
         break
 

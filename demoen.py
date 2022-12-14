@@ -68,7 +68,7 @@ MENU_ITEMS = [
     ("traffic", "12vision","traffic","Traffic"),
     ("emotion", "13vision","emotion","Emotion"),
     ("ball_trace", "14vision","ball_trace","Ball"),
-    ("speech", "15voice","speech","Obay"),
+    ("speech", "15voice","speech","Speech"),
     ("line", "15vision","line","Line"),
     ("color", "16vision","color","Color"),
     ("sound", "17vision","sound","Sound"),

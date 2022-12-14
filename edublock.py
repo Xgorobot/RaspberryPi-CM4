@@ -32,8 +32,7 @@ font3 = ImageFont.truetype("msyh.ttc",30)
 #init splash
 splash = Image.new("RGB", (display.height, display.width ),splash_theme_color)
 draw = ImageDraw.Draw(splash)
-#splash=splash.rotate(180)
-display.ShowImage(splash)
+
 def get_ssid():
     try:
         scanoutput = check_output(["iwlist", "wlan0", "scan"])
@@ -63,22 +62,19 @@ def lcd_draw_string(splash,x, y, text, color=(255,255,255), font_size=1, scale=1
 def lcd_rect(x,y,w,h,color,thickness):
     draw.rectangle([(x,y),(w,h)],fill=color,width=thickness)
 
-def main_program():
-    display.ShowImage(splash)
-
 #-------------------------init UI---------------------------------
 wifiy = Image.open("./pics/wifi@2x.jpg")
 wifin = Image.open("./pics/wifi-un@2x.jpg")
-cn = Image.open("./pics/connect@2x.jpg")
-uncn = Image.open("./pics/connect-un@2x.jpg")
+cn = Image.open("./pics/edu.png")
+uncn = Image.open("./pics/unedu.png")
 lcd_rect(0,195,320,240,(48,50,73),thickness=-1)
 
 
 #--------------------------get IP&SSID--------------------------
 ipadd=ip()
 ssid=get_ssid()
-if ssid!=None:
-    lcd_draw_string(draw,60, 0,'SSID:'+ssid.decode(), color=color_white, scale=font2)
+#if ssid!=None:
+#    lcd_draw_string(draw,60, 0,'SSID:'+ssid.decode(), color=color_white, scale=font2)
 if ipadd=='0.0.0.0':
     print('wlan disconnected')
     splash.paste(wifin,(65,200))
@@ -87,12 +83,9 @@ else:
     print('wlan connected')
     splash.paste(wifiy,(65,200))
     lcd_draw_string(draw,100, 200, ipadd, color=color_white, scale=font2)
-    
 
-splash.paste(uncn,(60,35))
+
 display.ShowImage(splash)
-
-
 
 import subprocess
 import threading
@@ -127,17 +120,23 @@ while 1:
     if cmd[0:6]==b'Launch':
         if launch==0:
             print('server success')
-            splash.paste(uncn,(60,35))
+            splash.paste(uncn,(0,0))
             display.ShowImage(splash)
+        launch=1
+        linked=0
+    elif cmd[0:6]==b'Device':
+        print('disconnect')
+        splash.paste(uncn,(0,0))
+        display.ShowImage(splash)
         launch=1
         linked=0
     elif cmd[0:12]==b'Successfully':
         if linked==0:
             print('linked!')
-            splash.paste(cn,(60,35))
+            splash.paste(cn,(0,0))
             display.ShowImage(splash)
         linked=1
-        splash=0
+        launch=1
 
 print('aiblocks over')
 os.system('sudo fuser -k -n tcp 8081')

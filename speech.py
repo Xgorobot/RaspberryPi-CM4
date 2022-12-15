@@ -158,8 +158,8 @@ def start_audio(time = 3,save_file="test.wav"):
 
     p = pyaudio.PyAudio()   
     print("recording...")
-    lcd_rect(0,40,320,97,splash_theme_color,-1)
-    lcd_draw_string(draw,15,45, "Ready for Recording", color=(255,0,0), scale=font3, mono_space=False)
+    lcd_rect(30,40,290,90,splash_theme_color,-1)
+    lcd_draw_string(draw,35,48, "Ready for Recording", color=(255,0,0), scale=font3, mono_space=False)
     display.ShowImage(splash)
     
     
@@ -194,8 +194,8 @@ def start_audio(time = 3,save_file="test.wav"):
     
     print('auto end')
 
-    lcd_rect(0,40,320,97,splash_theme_color,-1)
-    lcd_draw_string(draw,15,45, "RECORDING DONE!", color=(255,0,0), scale=font3, mono_space=False)
+    lcd_rect(30,40,290,90,splash_theme_color,-1)
+    lcd_draw_string(draw,35,48, "RECORDING DONE!", color=(255,0,0), scale=font3, mono_space=False)
     display.ShowImage(splash)
 
     stream.stop_stream()
@@ -227,12 +227,11 @@ display.clear()
 button=Button()
 #font
 font1 = ImageFont.truetype("msyh.ttc",15)
-font2 = ImageFont.truetype("msyh.ttc",22)
-font3 = ImageFont.truetype("msyh.ttc",30)
+font2 = ImageFont.truetype("msyh.ttc",16)
+font3 = ImageFont.truetype("msyh.ttc",24)
 splash = Image.new("RGB", (display.height, display.width ),splash_theme_color)
 draw = ImageDraw.Draw(splash)
 display.ShowImage(splash)
-button=Button()
 
 def lcd_draw_string(splash,x, y, text, color=(255,255,255), font_size=1, scale=1, mono_space=False, auto_wrap=True, background_color=(0,0,0)):
     splash.text((x,y),text,fill =color,font = scale) 
@@ -241,9 +240,7 @@ def lcd_rect(x,y,w,h,color,thickness):
     draw.rectangle([(x,y),(w,h)],fill=color,width=thickness)
     
 def action(act):
-    commandlist=['觅食','握手','转圈','爬行','摇摆','吃饭','招手','撒尿','坐下','站立','趴下','蹲起','伸懒腰','波浪']
-    commandlist2=['Looking for food','Hand shake','Turn around','Crawl','Wave body','Eating food','Wave hand','Take a pee','Sit down','Stand up','Lie down','Up and down','Squat','Wave make']
-    actionlist=[17,19,4,3,16,18,13,11,12,2,1,6,14,15]
+    commandlist=['Go forward','Go back','Turn left','Turn right','Left translation','Right translation','Crawl','Squat','Take a pee','Sit down','Wave hand','Stretch','Hand shake','Pray','Looking for food']
     mincmd=0
     minindex=len(commandlist)
     mark=False
@@ -251,41 +248,76 @@ def action(act):
     for i,cmd in enumerate(commandlist):
         ix=act.find(cmd)
         if ix>-1 and ix<=minindex:
-            mincmd=i
+            mincmd=i+1
             minindex=ix
             mark=True
             acts=1
-    for i,cmd in enumerate(commandlist2):
-        ix=act.find(cmd)
-        if ix>-1 and ix<=minindex:
-            mincmd=i
-            minindex=ix
-            mark=True
-            acts=2
     if mark:
-        if acts==1:
-            print(commandlist[mincmd])
-            dog.action(actionlist[mincmd])
-        elif acts==2:
-            print(commandlist2[mincmd])
-            dog.action(actionlist[mincmd])
-        time.sleep(2)
-        lcd_rect(0,40,320,97,splash_theme_color,-1)
-        lcd_draw_string(draw,15,45, "Action...", color=(255,0,0), scale=font3, mono_space=False)
-        display.ShowImage(splash)
-        tttime.sleep(5)
+        if mincmd==1:
+            dog.move_x(12)
+            time.sleep(3)
+            dog.reset()
+        elif mincmd==2:
+            dog.move_x(-12)
+            time.sleep(3)
+            dog.reset()
+        elif mincmd==3:
+            dog.turn(60)
+            time.sleep(1.5)
+            dog.reset()
+        elif mincmd==4:
+            dog.turn(-60)
+            time.sleep(1.5)
+            dog.reset()
+        elif mincmd==5:
+            dog.move_y(6)
+            time.sleep(3)
+            dog.reset()
+        elif mincmd==6:
+            dog.move_y(-6)
+            time.sleep(3)
+            dog.reset()
+        elif mincmd==7:
+            dog.action(3)
+            time.sleep(3)
+        elif mincmd==8:
+            dog.action(6)
+            time.sleep(3)
+        elif mincmd==9:
+            dog.action(11)
+            time.sleep(3)
+        elif mincmd==10:
+            dog.action(12)
+            time.sleep(3)
+        elif mincmd==11:
+            dog.action(13)
+            time.sleep(3)
+        elif mincmd==12:
+            dog.action(14)
+            time.sleep(3)
+        elif mincmd==13:
+            dog.action(19)
+            time.sleep(3)
+        elif mincmd==14:
+            dog.action(17)
+            time.sleep(3)
+        elif mincmd==15:
+            dog.action(18)
+            time.sleep(3)
+        tttime.sleep(3)
     else:
         print('command not find')
         dog.reset()
     
 dog = XGO(port='/dev/ttyAMA0',version="xgolite")
-draw.line((2,98,318,98), fill=(255,255,255), width=2)
-lcd_draw_string(draw,33,10, "Mandarin to Text Demo", color=(255,255,255), scale=font2, mono_space=False)
-lcd_draw_string(draw,27,100, "Please say the following:", color=(255,255,255), scale=font2, mono_space=False)
-lcd_draw_string(draw,35,125, "觅食、握手、转圈、爬行", color=(0,255,255), scale=font2, mono_space=False)
-lcd_draw_string(draw,35,150, "摇摆、吃饭、招手、撒尿", color=(0,255,255), scale=font2, mono_space=False)
-lcd_draw_string(draw,35,175, "坐下、站立、趴下、蹲起", color=(0,255,255), scale=font2, mono_space=False)
-lcd_draw_string(draw,90,200, "伸懒腰、波浪", color=(0,255,255), scale=font2, mono_space=False)
+#draw.line((2,98,318,98), fill=(255,255,255), width=2)
+draw.rectangle((20,30,300,100), splash_theme_color, 'white',width=3)
+lcd_draw_string(draw,57,100, "Please say the following:", color=(255,255,255), scale=font2, mono_space=False)
+lcd_draw_string(draw,10,130, "Go forward|Go back,Turn left|Turn right", color=(0,255,255), scale=font2, mono_space=False)
+lcd_draw_string(draw,10,150, "Left translation|Right translation|Crawl", color=(0,255,255), scale=font2, mono_space=False)
+lcd_draw_string(draw,10,170, "Squat|Take a pee|Sit dow|Wave hand", color=(0,255,255), scale=font2, mono_space=False)
+lcd_draw_string(draw,10,190, "Stretch|Hand shake,Pray", color=(0,255,255), scale=font2, mono_space=False)
+lcd_draw_string(draw,10,210, "Looking for food", color=(0,255,255), scale=font2, mono_space=False)
 display.ShowImage(splash)
     
 time.sleep(2)
@@ -296,8 +328,8 @@ while 1:
     wsParam = Ws_Param(APPID='7582fa81', APISecret='NzIyYzFkY2NiMzBiMTY1ZjUwYTg4MTFm',
                        APIKey='924c1939fdffc06651a49289e2fc17f4',
                        AudioFile='test.wav')
-    lcd_rect(0,40,320,97,splash_theme_color,-1)
-    lcd_draw_string(draw,15,45, "Identifying...", color=(255,0,0), scale=font3, mono_space=False)
+    lcd_rect(30,40,290,90,splash_theme_color,-1)
+    lcd_draw_string(draw,35,48, "Identifying...", color=(255,0,0), scale=font3, mono_space=False)
     display.ShowImage(splash)
     websocket.enableTrace(False)
     wsUrl = wsParam.create_url()
@@ -306,8 +338,8 @@ while 1:
     ws.run_forever(sslopt={"cert_reqs": ssl.CERT_NONE})
     time2 = datetime.now()
     print(time2-time1)
-    lcd_rect(0,40,320,97,splash_theme_color,-1)
-    lcd_draw_string(draw,15,45,xunfei, color=(255,0,0), scale=font3, mono_space=False)
+    lcd_rect(30,40,290,90,splash_theme_color,-1)
+    lcd_draw_string(draw,35,48,xunfei, color=(255,0,0), scale=font3, mono_space=False)
     display.ShowImage(splash)
     action(xunfei)
     if button.press_b():

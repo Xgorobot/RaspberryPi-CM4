@@ -227,11 +227,7 @@ display.clear()
 button=Button()
 #font
 font1 = ImageFont.truetype("msyh.ttc",15)
-<<<<<<< HEAD
 font2 = ImageFont.truetype("msyh.ttc",16)
-=======
-font2 = ImageFont.truetype("msyh.ttc",18)
->>>>>>> 7451ab554703c4c27f8ec0ebe66b121b0c3cfa27
 font3 = ImageFont.truetype("msyh.ttc",24)
 splash = Image.new("RGB", (display.height, display.width ),splash_theme_color)
 draw = ImageDraw.Draw(splash)
@@ -257,7 +253,6 @@ def action(act):
             mark=True
             acts=1
     if mark:
-<<<<<<< HEAD
         if mincmd==1:
             dog.move_x(12)
             time.sleep(3)
@@ -310,19 +305,6 @@ def action(act):
             dog.action(18)
             time.sleep(3)
         tttime.sleep(3)
-=======
-        if acts==1:
-            print(commandlist[mincmd])
-            dog.action(actionlist[mincmd])
-        elif acts==2:
-            print(commandlist2[mincmd])
-            dog.action(actionlist[mincmd])
-        time.sleep(2)
-        lcd_rect(30,40,290,90,splash_theme_color,-1)
-        lcd_draw_string(draw,35,48, "Action...", color=(255,0,0), scale=font3, mono_space=False)
-        display.ShowImage(splash)
-        tttime.sleep(5)
->>>>>>> 7451ab554703c4c27f8ec0ebe66b121b0c3cfa27
     else:
         print('command not find')
         dog.reset()
@@ -331,18 +313,11 @@ dog = XGO(port='/dev/ttyAMA0',version="xgolite")
 #draw.line((2,98,318,98), fill=(255,255,255), width=2)
 draw.rectangle((20,30,300,100), splash_theme_color, 'white',width=3)
 lcd_draw_string(draw,57,100, "Please say the following:", color=(255,255,255), scale=font2, mono_space=False)
-<<<<<<< HEAD
 lcd_draw_string(draw,10,130, "Go forward|Go back,Turn left|Turn right", color=(0,255,255), scale=font2, mono_space=False)
 lcd_draw_string(draw,10,150, "Left translation|Right translation|Crawl", color=(0,255,255), scale=font2, mono_space=False)
 lcd_draw_string(draw,10,170, "Squat|Take a pee|Sit dow|Wave hand", color=(0,255,255), scale=font2, mono_space=False)
 lcd_draw_string(draw,10,190, "Stretch|Hand shake,Pray", color=(0,255,255), scale=font2, mono_space=False)
 lcd_draw_string(draw,10,210, "Looking for food", color=(0,255,255), scale=font2, mono_space=False)
-=======
-lcd_draw_string(draw,5,125, "Go forward,Go back,Turn left,Turn right", color=(0,255,255), scale=font2, mono_space=False)
-lcd_draw_string(draw,5,150, "Left translation,Right translation,Crawl,Squat", color=(0,255,255), scale=font2, mono_space=False)
-lcd_draw_string(draw,5,175, "Take a pee, Sit down , Wave hand, Stretch", color=(0,255,255), scale=font2, mono_space=False)
-lcd_draw_string(draw,5,200, "Hand shake,Pray,Looking for food", color=(0,255,255), scale=font2, mono_space=False)
->>>>>>> 7451ab554703c4c27f8ec0ebe66b121b0c3cfa27
 display.ShowImage(splash)
     
 time.sleep(2)

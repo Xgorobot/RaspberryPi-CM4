@@ -240,7 +240,7 @@ def lcd_rect(x,y,w,h,color,thickness):
     draw.rectangle([(x,y),(w,h)],fill=color,width=thickness)
     
 def action(act):
-    commandlist=['Go forward','Go back','Turn left','Turn right','Left translation','Right translation','Crawl','Squat','Take a pee','Sit down','Wave hand','Stretch','Hand shake','Pray','Looking for food']
+    commandlist=['Go forward','Go back','Turn left','Turn, right','Left translation','Right translation','Crawl','Squat','Take a pee','Sit down','Wave hand','Stretch','Hand shake','Pray','Looking for food']
     mincmd=0
     minindex=len(commandlist)
     mark=False

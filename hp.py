@@ -27,7 +27,6 @@ while True:
     img = cv2.merge((r,g,b))
     imgok = Image.fromarray(img)
     display.ShowImage(imgok)
-    #print(length)
     if length!=0:
         if length>1000:
             length=1000

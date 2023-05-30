@@ -35,7 +35,7 @@ draw = ImageDraw.Draw(splash)
 
 def get_ssid():
     try:
-        scanoutput = check_output(["iwlist", "wlan0", "scan"])
+        scanoutput = check_output(["sudo", "iwconfig", "wlan0"])
         for line in scanoutput.split():
             if line.startswith(b"ESSID"):
                 ssid = line.split(b'"')[1]
@@ -55,7 +55,6 @@ def ip():
         ipchr='0.0.0.0'
     return ipchr
 
-#draw methods
 def lcd_draw_string(splash,x, y, text, color=(255,255,255), font_size=1, scale=1, mono_space=False, auto_wrap=True, background_color=(0,0,0)):
     splash.text((x,y),text,fill =color,font = scale) 
 
@@ -73,8 +72,6 @@ lcd_rect(0,195,320,240,(48,50,73),thickness=-1)
 #--------------------------get IP&SSID--------------------------
 ipadd=ip()
 ssid=get_ssid()
-#if ssid!=None:
-#    lcd_draw_string(draw,60, 0,'SSID:'+ssid.decode(), color=color_white, scale=font2)
 if ipadd=='0.0.0.0':
     print('wlan disconnected')
     splash.paste(wifin,(65,200))

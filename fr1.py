@@ -90,7 +90,7 @@ def record():
     del faces
 
     
-filepath='/home/pi/cm4/dataset'      
+filepath='/home/pi/cm4-main/dataset'      
 while 1:
     if button.press_c():
         print('a')

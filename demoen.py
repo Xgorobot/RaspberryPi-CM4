@@ -33,7 +33,6 @@ font3 = ImageFont.truetype("msyh.ttc",30)
 #splash
 splash = Image.new("RGB", (display.height, display.width ),splash_theme_color)
 draw = ImageDraw.Draw(splash)
-#splash=splash.rotate(180)
 display.ShowImage(splash)
 
 #draw methods
@@ -56,26 +55,29 @@ MENU_ITEMS = [
     #pic kinds program show
     ("dog_show", "1movement","dog_show","Show"),
     ("face_mask", "2vision", "face_mask" ,"Mask"),
-    ("hands", "3vision", "hands","Hands"),
-    ("vision", "4movement","vision","Teach"),
-    ("segmentation", "5vision","segmentation","Segment"),
-    ("objectron", "6vision","objectron","Shones"),
+    ("group", "3vision","group","Group"),
+    ("hands", "4vision", "hands","Hands"),
+    ("vision", "5movement","vision","Teach"),
+    ("segmentation", "6vision","segmentation","Segment"),
     ("face_decetion", "7vision", "face_decetion" ,"FaceTrack"),
-    ("pose", "8vision", "8pose","Pose"),
-    #("image_class", "9vision","image_class","Classify"),
-    ("qrcode", "10vision","qrcode","QRCode"),
-    ("agesex", "11vision","agesex","AgeSex"),
-    ("traffic", "12vision","traffic","Traffic"),
-    ("emotion", "13vision","emotion","Emotion"),
-    ("ball_trace", "14vision","ball_trace","Ball"),
-    ("speech", "15voice","speech","Speech"),
+    ("pose", "8vision", "pose","Pose"),
+    ("qrcode", "9vision","qrcode","QRCode"),
+    ("agesex", "10vision","agesex","AgeSex"),
+    ("traffic", "11vision","traffic","Traffic"),
+    ("emotion", "12vision","emotion","Emotion"),
+    ("ball_trace", "13vision","ball","Ball"),
+    ("speech", "14voice","speech","Speech"),
     ("line", "15vision","line","Line"),
     ("color", "16vision","color","Color"),
     ("sound", "17vision","sound","Sound"),
-    ("face_r", "18vision","facer","Recog"),
-    ("height", "19vision","handh","Height"),
-    ("yolo", "20vision","yolofast","Yolo"),
-    
+    ("height", "18vision","handh","Height"),
+    ("yolo", "19vision","yolofast","Yolo"),
+    ("wifi_set", "20vision","wifi_set","Wifiset"),
+    ("wpa_set", "21vision","wpa_set","Wpaset"),
+    ("burn", "22vision","burn","Burn"),
+    ("standard", "23vision","standard","Standard"),
+    ("network", "24vision","network","Network"),
+    ("device", "25vision","device","Device"),
 ]
 
 SELECT_BOX=[80,68]
@@ -121,6 +123,7 @@ MENU_PIC_COORD = [
     [26+160,183],
     [26+240,183]
 ] 
+
 
 MENU_TOTAL_ITEMS = len(MENU_ITEMS) - 1
 MENU_CURRENT_SELECT = 0
@@ -186,18 +189,13 @@ def draw_title_open():
     lcd_rect(0,0,320,35, color=color_bg, thickness=-1)
     draw.line((0, 35, 320, 35), color_unselect)
     display_cjk_string(draw,85,7, "OPEN...", font_size=font2, color=color_white, background_color=color_bg)
-    #display_cjk_string(draw, 203,12, str(index+1) + "/" + str(MENU_TOTAL_ITEMS+1), font_size=font2, color=color_white, background_color=color_bg)
 
 
 def draw_title_error():
     lcd_rect(0,0,320,35, color=color_bg, thickness=-1)
     draw.line((0, 35, 320, 35), color_unselect)
     display_cjk_string(draw,85,7, "FAIL", font_size=font2, color=color_white, background_color=color_bg)
-    #display_cjk_string(draw, 203,12, str(index+1) + "/" + str(MENU_TOTAL_ITEMS+1), font_size=font2, color=color_white, background_color=color_bg)
    
-
-
-
 draw_title_bar(0)
 
 for i in range(0,12):
@@ -248,7 +246,6 @@ while True:
             clear_page()
             MENU_PAGE_SWAP_COUNT -= 1 
             for i in range(MENU_CURRENT_SELECT-11,MENU_CURRENT_SELECT+1,1):
-                # print(str(MENU_CURRENT_SELECT-5)+","+str(MENU_CURRENT_SELECT))
                 draw_item(i % 12, 'unselected', i)
             draw_item(MENU_CURRENT_SELECT % 12, 'selected', MENU_CURRENT_SELECT)
 
@@ -271,7 +268,7 @@ while True:
             clear_page()
             MENU_PAGE_SWAP_COUNT += 1 
             print(MENU_CURRENT_SELECT,MENU_TOTAL_ITEMS+1,1)
-            for i in range(MENU_CURRENT_SELECT,MENU_TOTAL_ITEMS+1,1):            #TEMP 2PAGES!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            for i in range(MENU_CURRENT_SELECT,MENU_TOTAL_ITEMS+1,1):
                 draw_item(i % 12, 'unselected', i)
             draw_item(MENU_CURRENT_SELECT % 12, 'selected', MENU_CURRENT_SELECT)
 
@@ -282,56 +279,62 @@ while True:
             display.ShowImage(splash)
             print("Running: " + MENU_ITEMS[MENU_CURRENT_SELECT][2])
             draw_title_open()
-            #exec(open(MENU_ITEMS[MENU_CURRENT_SELECT][2]).read())
-            #os.system("\root\find_line.py")
             if MENU_ITEMS[MENU_CURRENT_SELECT][2]=="dog_show":
                 import dog_show
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="face_mask":
-                os.system('sudo python3 face_mask.py')
+                os.system('python3 face_mask.py')
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="hands":
-                os.system('sudo python3 hands.py')
+                os.system(' python3 hands.py')
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="vision":
-                os.system('sudo python3 dog_vision_show.py')
+                os.system('python3 dog_vision_show.py')
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="segmentation":
-                os.system('sudo python3 segmentation.py')
-            elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="objectron":
-                os.system('sudo python3 objectron.py')
+                os.system('python3 segmentation.py')
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="face_decetion":
-                os.system('sudo python3 face_decetion.py')
+                os.system('python3 face_decetion.py')
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="pose":
-                os.system('sudo python3 pose.py')
+                os.system('python3 pose.py')
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="image_class":
-                os.system('sudo python3 image_class.py')
+                os.system('python3 image_class.py')
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="image_dete":
-                os.system('sudo python3 image_dete.py')
+                os.system('python3 image_dete.py')
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="qrcode":
-                os.system('sudo python3 qrcode.py')
+                os.system('python3 qrcode.py')
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="agesex":
-                os.system('sudo python3 agesex.py')
+                os.system('python3 agesex.py')
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="traffic":
                 os.system('sudo python3 traffic.py')
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="emotion":
-                os.system('sudo python3 emotion.py')
-            elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="ball_trace":
-                os.system('sudo python3 ball_trace.py')
+                os.system('python3 emotion.py')
+            elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="ball":
+                os.system('sudo python3 ball.py')
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="speech":
-                print('no sudo!!!!!!!!!!!')
-                os.system('python speech.py')
+                os.system('python3 speech.py')
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="sound":
-                os.system('python sound.py')
-            elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="facer":
-                os.system('sudo python3 fr1.py')
+                os.system('python3 sound.py')
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="handh":
-                os.system('sudo python3 hp.py')
+                os.system('python3 hp.py')
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="line":
-                os.system('sudo python3 line.py')
+                os.system('python3 line.py')
+            elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="color":
+                os.system('python3 color.py')
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="yolofast":
-                os.system('sudo python3 yolofast.py')
+                os.system('python3 yolofast.py')
+            elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="wifi_set":
+                os.system('sudo python3 wifi_set.py')
+            elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="wpa_set":
+                os.system('sudo python3 wpa_set.py')
+            elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="burn":
+                os.system('python3 ota.py')
+            elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="standard":
+                os.system('python3 standard.py')
+            elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="device":
+                os.system('python3 device.py')
+            elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="network":
+                os.system('sudo python3 network.py')
+            elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="group":
+                os.system('sudo python3 group.py')
             print('program done')
-            draw_title_bar(MENU_CURRENT_SELECT)
-            
-            
-                
+            draw_title_bar(MENU_CURRENT_SELECT)        
         except BaseException as e:
             print(str(e))
             draw_title_bar(MENU_CURRENT_SELECT)
@@ -343,3 +346,6 @@ while True:
 
 print('quit')
     
+print('run demo')
+
+

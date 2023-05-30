@@ -59,7 +59,6 @@ try:
     # draw.rectangle([(0,115),(190,160)],fill = "RED")
     # draw.text((5, 118), 'WaveShare', fill = "WHITE",font=Font2)
     # draw.text((5, 160), '1234567890', fill = "GREEN",font=Font3)
-    # text= u"微雪电子"
     # draw.text((5, 200),text, fill = "BLUE",font=Font3)
     image1=image1.rotate(180)
     disp.ShowImage(image1)

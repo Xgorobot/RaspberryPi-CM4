@@ -2,8 +2,8 @@ import serial
 import struct
 import time
 
-__version__ = '1.1.16'
-__last_modified__ = '2022/11/01'
+__version__ = '1.2.0'
+__last_modified__ = '2023/2/16'
 
 """
 XGOorder 用来存放命令地址和对应数据
@@ -123,7 +123,7 @@ def changePara(version):
             "TRANSLATION_LIMIT": [35, 18, [75, 115]],  # X Y Z 平移范围
             "ATTITUDE_LIMIT": [20, 15, 11],  # Roll Pitch Yaw 姿态范围
             "LEG_LIMIT": [35, 18, [75, 115]],  # 腿长范围
-            "MOTOR_LIMIT": [[-73, 57], [-66, 93], [-31, 31]],  # 下 中 上 舵机范围
+            "MOTOR_LIMIT": [[-73, 57], [-66, 93], [-31, 31], [-65, 65], [-85, 50], [-75, 90]],  # 下 中 上 舵机范围
             "PERIOD_LIMIT": [[1.5, 8]],
             "MARK_TIME_LIMIT": [10, 35],  # 原地踏步高度范围
             "VX_LIMIT": 25,  # X速度范围
@@ -136,7 +136,7 @@ def changePara(version):
             "TRANSLATION_LIMIT": [25, 18, [60, 110]],
             "ATTITUDE_LIMIT": [20, 10, 12],
             "LEG_LIMIT": [25, 18, [60, 110]],
-            "MOTOR_LIMIT": [[-70, 50], [-70, 90], [-30, 30], [-30, 30], [-70, 60], [-90, 105]],
+            "MOTOR_LIMIT": [[-70, 50], [-70, 90], [-30, 30], [-65, 65], [-70, 60], [-90, 105]],
             "PERIOD_LIMIT": [[1.5, 8]],
             "MARK_TIME_LIMIT": [10, 25],
             "VX_LIMIT": 25,
@@ -155,6 +155,9 @@ class XGO():
 
     def __init__(self, port, baud=115200, version='xgomini'):
         self.ser = serial.Serial(port, baud, timeout=0.5)
+        self.ser.flushOutput()
+        self.ser.flushInput()
+        self.port = port
         self.rx_FLAG = 0
         self.rx_COUNT = 0
         self.rx_ADDR = 0
@@ -177,7 +180,7 @@ class XGO():
         tx.extend(value)
         tx.extend([sum_data, 0x00, 0xAA])
         self.ser.write(tx)
-        print("tx_data: ",tx)
+        print("tx_data: ", tx)
 
     def __read(self, addr, read_len=1):
         mode = 0x02
@@ -187,7 +190,12 @@ class XGO():
         time.sleep(0.1)
         self.ser.flushInput()
         self.ser.write(tx)
-        print("tx_data: ",tx)
+        #print("tx_data: ", tx)
+
+    def __change_baud(self, baud):
+        self.ser.flush()
+        self.ser.close()
+        self.ser = serial.Serial(self.port, baud, timeout=0.5)
 
     def stop(self):
         self.move_x(0)
@@ -518,7 +526,7 @@ class XGO():
 
     def read_motor(self):
         """
-        读取12个舵机的角度
+        读取15个舵机的角度
         """
         self.__read(XGOorder["MOTOR_ANGLE"][0], 15)
         self.ser.read_all()
@@ -572,16 +580,16 @@ class XGO():
             yaw = Byte2Float(self.rx_data)
         return round(yaw, 2)
 
-    def __unpack(self):
+    def __unpack(self, timeout=1):
         t = time.time()
-        rx_data = []
-        while time.time() - t < 1:
+        rx_msg = []
+        while time.time() - t < timeout:
             n = self.ser.inWaiting()
             rx_CHECK = 0
             if n:
                 data = self.ser.read(n)
                 for num in data:
-                    rx_data.append(num)
+                    rx_msg.append(num)
                     if self.rx_FLAG == 0:
                         if num == 0x55:
                             self.rx_FLAG = 1
@@ -639,14 +647,13 @@ class XGO():
                     elif self.rx_FLAG == 8:
                         if num == 0xAA:
                             self.rx_FLAG = 0
-                            print("rx_data: ",rx_data)
+                            print("rx_data: ", rx_msg)
                             return True
                         else:
                             self.rx_FLAG = 0
                             self.rx_COUNT = 0
                             self.rx_ADDR = 0
                             self.rx_LEN = 0
-        print("rx_data: ",rx_data)
         return False
 
     def upgrade(self, filename):
@@ -654,39 +661,50 @@ class XGO():
         处于测试阶段，请勿使用
         """
         XGOorder["UPGRADE"][1] = 1
+        self.ser.flush()
         self.__send("UPGRADE")
-        time.sleep(5)
-        self.upload_bin(filename)
+        if self.__unpack(10):
+            if self.rx_data[0] == 0x55:
+                time.sleep(1)
+                print("Start!")
+                self.__send_bin(filename)
+            else:
+                print("Upgrade Response Error!")
+        else:
+            print("Upgrade Timeout!")
 
-    def read_version(self):
-        """
-        处于测试阶段，请勿使用
-        """
-        self.__read(XGOorder["VERSION"][0], 10)
-        time.sleep(1)
-        if self.__unpack():
-            version = self.rx_data.decode('utf-8')
-        return version
+    def read_lib_version(self):
+        return __version__
 
-    def upload_bin(self, filename):
+    def __send_bin(self, filename):
         """
         处于测试阶段，请勿使用
         """
         try:
+            self.__change_baud(350000)
             with open(filename, 'rb') as f:
                 file = f.read()
-            count = self.ser.write(file)
-            print("更新成功，共发送字节数：", count)
+            print("The file size is", len(file), ' bytes.')
+            print("The expected upgrade time is", round(len(file) / 350000 * 8 * 1.3), ' s.')
+            self.ser.write(file)
+            print("Done!")
+            self.__change_baud(115200)
         except Exception as e:
-            print("---更新错误---")
+            print("Send bin file error!")
             print(e)
 
     def calibration(self, state):
         """
         用于软件标定，请谨慎使用！！！
         """
-        XGOorder["CALIBRATION"][1] = state
+        if state == 'start':
+            XGOorder["CALIBRATION"][1] = 1
+        elif state == 'end':
+            XGOorder["CALIBRATION"][1] = 0
+        else:
+            print("ERROR!")
         self.__send("CALIBRATION")
+        return
 
     def arm(self, arm_x, arm_z):
         """

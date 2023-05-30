@@ -9,7 +9,7 @@ import mediapipe as mp
 from numpy import linalg
 from xgolib import XGO
 dog = XGO(port='/dev/ttyAMA0',version="xgolite")
-
+dogtime=0
 
 display = LCD_2inch.LCD_2inch()
 display.clear()
@@ -154,7 +154,6 @@ with mp_hands.Hands(
                     figure_ = finger_stretch_detect(landmark[0],landmark[4*k+2],landmark[4*k+4])
 
                 figure[k] = figure_
-            #print(figure,'\n')
 
             gesture_result = detect_hands_gesture(figure)
 
@@ -163,24 +162,43 @@ with mp_hands.Hands(
     frame = cv2.flip(frame, 1)
     if result.multi_hand_landmarks:
       cv2.putText(frame, f"{gesture_result}", (10,30), cv2.FONT_HERSHEY_COMPLEX, 1, (255 ,255, 0), 5)
-    if gesture_result=="good":
-      dog.action(14)
-    elif gesture_result=="one":
-      dog.action(7)
-    elif gesture_result=="two":
-      dog.action(8)
-    elif gesture_result=="three":
-      dog.action(9)
-    elif gesture_result=="four":
-      dog.action(10)
-    elif gesture_result=="five":
-      dog.action(1)
-    elif gesture_result=="six":
-      dog.action(16)
-    elif gesture_result=="OK":
-      dog.action(19)
-    elif gesture_result=="stone":
-      dog.action(12)
+    if time.time()>dogtime:
+      if gesture_result=="good":
+        dogtime=time.time()
+        dog.action(23)
+        dogtime+=3
+      elif gesture_result=="one":
+        dogtime=time.time()
+        dog.action(7)
+        dogtime+=3
+      elif gesture_result=="two":
+        dogtime=time.time()
+        dog.action(8)
+        dogtime+=3
+      elif gesture_result=="three":
+        dogtime=time.time()
+        dog.action(9)
+        dogtime+=3
+      elif gesture_result=="four":
+        dogtime=time.time()
+        dog.action(22)
+        dogtime+=3
+      elif gesture_result=="five":
+        dogtime=time.time()
+        dog.action(1)
+        dogtime+=3
+      elif gesture_result=="six":
+        dogtime=time.time()
+        dog.action(24)
+        dogtime+=3
+      elif gesture_result=="OK":
+        dogtime=time.time()
+        dog.action(19)
+        dogtime+=3
+      elif gesture_result=="stone":
+        dogtime=time.time()
+        dog.action(20)
+        dogtime+=3
     
     imgok = Image.fromarray(frame)
     display.ShowImage(imgok)

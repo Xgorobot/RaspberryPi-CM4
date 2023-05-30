@@ -117,17 +117,43 @@ with mp_face_mesh.FaceMesh(
         # The Distance Matrix
         dist_matrix = np.zeros((4, 1), dtype=np.float64)
         success, rotation_vec, transition_vec = cv2.solvePnP(face_coordination_in_real_world, face_coordination_in_image,cam_matrix, dist_matrix)
-          # Use Rodrigues function to convert rotation vector to matrix
+        # Use Rodrigues function to convert rotation vector to matrix
         rotation_matrix, jacobian = cv2.Rodrigues(rotation_vec)
         result = rotation_matrix_to_angles(rotation_matrix)
         print(result)
-        pitch=result[0]
-        yaw=result[1]
-        roll=result[2]
-        dog.attitude(['p','y','r'],[int(-pitch/80*20),int(-yaw/80*15),int(-roll/80*15)])
-        
+        pitch=round(-result[0]/100*20)
+        yaw=round(result[1]/80*15)
+        roll=round(result[2]/80*15)
+        if abs(yaw)<= 4:
+            if abs(pitch)<3:
+                pitch = round( pitch * 7 )
+                print("pitch11",pitch)
+                if pitch < -7:
+                    print("hello")
+                    pitch = -3
+                    print("pitch",pitch)
+                elif pitch > 7:
+                    pitch = 3
+                    print("picth",pitch)
+            else:
+                pitch = pitch
+                print("pitch",pitch)
+                yaw = 0
+                roll = 0
+        else:
+            pitch = -3
+            yaw = yaw 
+            if abs(roll) >29:
+                roll = round(roll/6)
+            else:
+                roll = roll
+        print("start")
+        print("pitch,yaw,roll",pitch,yaw,roll)
+        dog.attitude(['p','y','r'],[pitch,yaw,roll])
+        print("end")
+        time.sleep(0.1)
     else:
-      dog.reset()
+      pass
     # Flip the image horizontally for a selfie-view display.
     b,g,r = cv2.split(image)
     image = cv2.merge((r,g,b))
@@ -141,7 +167,6 @@ with mp_face_mesh.FaceMesh(
       pass
     imgok = Image.fromarray(image)
     display.ShowImage(imgok)
-    #cv2.imshow('MediaPipe Face Mesh', cv2.flip(image, 1))
     if cv2.waitKey(5) & 0xFF == 27:
       break
     if button.press_b():

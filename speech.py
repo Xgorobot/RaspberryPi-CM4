@@ -23,6 +23,7 @@ import spidev as SPI
 import LCD_2inch
 from PIL import Image,ImageDraw,ImageFont
 from key import Button
+import threading
 
 import pyaudio
 import wave
@@ -30,13 +31,24 @@ import wave
 import numpy as np
 from scipy import fftpack
 
-from xgolib import XGO
-dog = XGO(port='/dev/ttyAMA0',version="xgolite")
+quitmark=0
+button=Button()
+
+def action(num):
+    global quitmark
+    while quitmark==0:
+        time.sleep(0.01)
+        if button.press_b():
+            quitmark=1
+
+check_button = threading.Thread(target=action, args=(0,))
+check_button.start()
 
 STATUS_FIRST_FRAME = 0  
 STATUS_CONTINUE_FRAME = 1  
 STATUS_LAST_FRAME = 2
 xunfei=''  
+
 
 class Ws_Param(object):
     def __init__(self, APPID, APIKey, APISecret, AudioFile):
@@ -93,6 +105,7 @@ def on_message(ws, message):
             for r in data:
                 tx+=r['cw'][0]['w']
             xunfei+=tx
+
             #textshow=sid.split(" ")[1]
 
 
@@ -158,7 +171,8 @@ def start_audio(time = 3,save_file="test.wav"):
 
     p = pyaudio.PyAudio()   
     print("recording...")
-    lcd_rect(30,40,290,90,splash_theme_color,-1)
+    lcd_rect(30,40,320,90,splash_theme_color,-1)
+    draw.rectangle((20,30,300,100), splash_theme_color, 'white',width=3)
     lcd_draw_string(draw,35,48, "Ready for Recording", color=(255,0,0), scale=font3, mono_space=False)
     display.ShowImage(splash)
     
@@ -194,7 +208,8 @@ def start_audio(time = 3,save_file="test.wav"):
     
     print('auto end')
 
-    lcd_rect(30,40,290,90,splash_theme_color,-1)
+    lcd_rect(30,40,320,90,splash_theme_color,-1)
+    draw.rectangle((20,30,300,100), splash_theme_color, 'white',width=3)
     lcd_draw_string(draw,35,48, "RECORDING DONE!", color=(255,0,0), scale=font3, mono_space=False)
     display.ShowImage(splash)
 
@@ -223,8 +238,7 @@ color_red=(238,55,59)
 display = LCD_2inch.LCD_2inch()
 display.Init()
 display.clear()
-#button
-button=Button()
+
 #font
 font1 = ImageFont.truetype("msyh.ttc",15)
 font2 = ImageFont.truetype("msyh.ttc",16)
@@ -240,7 +254,7 @@ def lcd_rect(x,y,w,h,color,thickness):
     draw.rectangle([(x,y),(w,h)],fill=color,width=thickness)
     
 def action(act):
-    commandlist=['Go forward','Go back','Turn left','Turn, right','Left translation','Right translation','Crawl','Squat','Take a pee','Sit down','Wave hand','Stretch','Hand shake','Pray','Looking for food']
+    commandlist=['Go forward','Go back','Turn left','Turn right','Left translation','Right translation','Dance','Push up','Take a pee','Sit down','Wave hand','Stretch','Hand shake','Pray','Looking for food','Chicken head']
     mincmd=0
     minindex=len(commandlist)
     mark=False
@@ -277,22 +291,22 @@ def action(act):
             dog.move_y(-6)
             time.sleep(3)
             dog.reset()
-        elif mincmd==7:
-            dog.action(3)
+        elif mincmd==7:#dacne
+            dog.action(23)
             time.sleep(3)
-        elif mincmd==8:
-            dog.action(6)
+        elif mincmd==8:#Grab
+            dog.action(21)
             time.sleep(3)
-        elif mincmd==9:
+        elif mincmd==9:#take a pee
             dog.action(11)
             time.sleep(3)
-        elif mincmd==10:
+        elif mincmd==10:#sit down
             dog.action(12)
             time.sleep(3)
-        elif mincmd==11:
+        elif mincmd==11:#wave hand
             dog.action(13)
             time.sleep(3)
-        elif mincmd==12:
+        elif mincmd==12:#stretch
             dog.action(14)
             time.sleep(3)
         elif mincmd==13:
@@ -304,6 +318,9 @@ def action(act):
         elif mincmd==15:
             dog.action(18)
             time.sleep(3)
+        elif mincmd==16:
+            dog.action(20)
+            time.sleep(3)
         tttime.sleep(3)
     else:
         print('command not find')
@@ -313,14 +330,14 @@ dog = XGO(port='/dev/ttyAMA0',version="xgolite")
 #draw.line((2,98,318,98), fill=(255,255,255), width=2)
 draw.rectangle((20,30,300,100), splash_theme_color, 'white',width=3)
 lcd_draw_string(draw,57,100, "Please say the following:", color=(255,255,255), scale=font2, mono_space=False)
-lcd_draw_string(draw,10,130, "Go forward|Go back,Turn left|Turn right", color=(0,255,255), scale=font2, mono_space=False)
-lcd_draw_string(draw,10,150, "Left translation|Right translation|Crawl", color=(0,255,255), scale=font2, mono_space=False)
-lcd_draw_string(draw,10,170, "Squat|Take a pee|Sit dow|Wave hand", color=(0,255,255), scale=font2, mono_space=False)
-lcd_draw_string(draw,10,190, "Stretch|Hand shake,Pray", color=(0,255,255), scale=font2, mono_space=False)
-lcd_draw_string(draw,10,210, "Looking for food", color=(0,255,255), scale=font2, mono_space=False)
+lcd_draw_string(draw,10,130, "Go forward|Go back|Turn left|Turn right", color=(0,255,255), scale=font2, mono_space=False)
+lcd_draw_string(draw,10,150, "Left translation|Right translation|Dance", color=(0,255,255), scale=font2, mono_space=False)
+lcd_draw_string(draw,10,170, "Push up|Take a pee|Sit dow|Wave hand", color=(0,255,255), scale=font2, mono_space=False)
+lcd_draw_string(draw,10,190, "Stretch|Hand shake|Pray", color=(0,255,255), scale=font2, mono_space=False)
+lcd_draw_string(draw,10,210, "Looking for food|Chicken head", color=(0,255,255), scale=font2, mono_space=False)
 display.ShowImage(splash)
     
-time.sleep(2)
+#time.sleep(2)
 while 1:
     start_audio()
     xunfei=''
@@ -328,7 +345,8 @@ while 1:
     wsParam = Ws_Param(APPID='7582fa81', APISecret='NzIyYzFkY2NiMzBiMTY1ZjUwYTg4MTFm',
                        APIKey='924c1939fdffc06651a49289e2fc17f4',
                        AudioFile='test.wav')
-    lcd_rect(30,40,290,90,splash_theme_color,-1)
+    lcd_rect(30,40,320,90,splash_theme_color,-1)
+    draw.rectangle((20,30,300,100), splash_theme_color, 'white',width=3)
     lcd_draw_string(draw,35,48, "Identifying...", color=(255,0,0), scale=font3, mono_space=False)
     display.ShowImage(splash)
     websocket.enableTrace(False)
@@ -338,12 +356,15 @@ while 1:
     ws.run_forever(sslopt={"cert_reqs": ssl.CERT_NONE})
     time2 = datetime.now()
     print(time2-time1)
-    lcd_rect(30,40,290,90,splash_theme_color,-1)
+    lcd_rect(30,40,320,90,splash_theme_color,-1)
+    draw.rectangle((20,30,300,100), splash_theme_color, 'white',width=3)
     lcd_draw_string(draw,35,48,xunfei, color=(255,0,0), scale=font3, mono_space=False)
     display.ShowImage(splash)
     action(xunfei)
-    if button.press_b():
+    if quitmark==1:
+        print('main quit')
         break
+
 
 
 

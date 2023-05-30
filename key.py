@@ -3,14 +3,6 @@ import time,os
 
 GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BCM)
-# GPIO.setup(6,GPIO.IN)
-# while 1:
-#     if GPIO.input(6)==0:
-#         time.sleep(0.02)
-#         if(c==0):
-#             while(GPIO.input(6)==0):
-#                 pass
-#             print('a')
 
 class Button:
     def __init__(self):
@@ -59,13 +51,4 @@ class Button:
                 time.sleep(0.02)
             return True
 
-# button=Button()
-# while 1:
-#     if button.press_a():
-#         print('a')
-#     if button.press_b():
-#         print('b')
-#     if button.press_c():
-#         print('c')
-#     if button.press_d():
-#         print('d')
+

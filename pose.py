@@ -73,8 +73,8 @@ with mp_pose.Pose(
     image = cv2.flip(image, 1)
     try:
         res=str(int(angellist[0]))+'|'+str(int(angellist[1]))+'|'+str(int(angellist[2]))+'|'+str(int(angellist[3]))
-        dog.leg(1,[0,-18+int(angellist[2]/10),0])
-        dog.leg(2,[0,-18+int(angellist[3]/10),0])
+        #dog.leg(1,[0,-18+int(angellist[2]/10),0])
+        #dog.leg(2,[0,-18+int(angellist[3]/10),0])
     except:
         res=' '
     cv2.putText(image,res,(10,220),cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2, cv2.LINE_AA)

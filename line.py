@@ -38,7 +38,6 @@ class LineDetect:
         self.windows_name = 'frame'
         self.color = color_follow()
         self.cols, self.rows = 0, 0
-        # self.FollowLinePID = (100, 1, 50)
         self.FollowLinePID = (50, 0, 30)
         self.PID_init()
         self.dog = XGO(port='/dev/ttyAMA0',version="xgolite")
@@ -49,11 +48,9 @@ class LineDetect:
         print("point_x:%d, point_y:%d, radius:%d, z_Pid:%d" % (point_x, point_y, radius, int(z_Pid)))
         self.dog.turn(int(z_Pid))
     
-    # 停止 stop
     def cancel(self):
         self.dog.reset()
 
-    # 初始化机器狗  init DOGZILLA
     def dog_init(self):
         self.dog.stop()
         time.sleep(.01)
@@ -63,7 +60,6 @@ class LineDetect:
         time.sleep(.01)
         self.dog.attitude('p', 10)
 
-    # 程序处理 program processing
     def process(self, rgb_img, action):
         binary = []
         rgb_img = cv.resize(rgb_img, (320,240))
@@ -85,14 +81,12 @@ class LineDetect:
         return rgb_img, binary
 
 
-    # 重置 reset
     def Reset(self):
         self.PID_init()
         self.Track_state = 'init'
         self.hsv_range = ()
         self.dog_init()
 
-    # 初始化PID参数 init PID parameter
     def PID_init(self):
         self.PID_controller = simplePID(
             [0, 0],

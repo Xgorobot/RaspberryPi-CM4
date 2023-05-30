@@ -32,18 +32,18 @@ def change_color():
         mode=1
     else:
         mode+=1
-    if mode==1:
+    if mode==1:  #red
         color_lower = np.array([0, 43, 46])
         color_upper = np.array([10, 255, 255])
-    elif mode==2:
+    elif mode==2: #green
         color_lower = np.array([35, 43, 46])
         color_upper = np.array([77, 255, 255])
-    elif mode==3:
-        color_lower = np.array([35, 43, 46])
-        color_upper = np.array([77, 255, 255])
-    elif mode==4:
-        color_lower = np.array([35, 43, 46])
-        color_upper = np.array([77, 255, 255])
+    elif mode==3:   #blue
+        color_lower = np.array([100, 43, 46])
+        color_upper = np.array([124, 255, 255])
+    elif mode==4:   #yellow
+        color_lower = np.array([26, 43, 46])
+        color_upper = np.array([34, 255, 255])
 
 
 #-----------------------COMMON INIT-----------------------
@@ -68,12 +68,11 @@ while 1:
     mask = cv2.dilate(mask,None,iterations=2)
     mask = cv2.GaussianBlur(mask,(3,3),0)     
     cnts = cv2.findContours(mask.copy(),cv2.RETR_EXTERNAL,cv2.CHAIN_APPROX_SIMPLE)[-2] 
-    if g_mode == 1: # 按钮切换开关  button switch
+    if g_mode == 1:
         if len(cnts) > 0:
             cnt = max (cnts, key = cv2.contourArea)
             (color_x,color_y),color_radius = cv2.minEnclosingCircle(cnt)
             if color_radius > 10:
-                # 将检测到的颜色标记出来  Mark the detected color
                 cv2.circle(frame,(int(color_x),int(color_y)),int(color_radius),(255,0,255),2)  
                 value_x = color_x - 160
                 value_y = color_y - 120

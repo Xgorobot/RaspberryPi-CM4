@@ -2,8 +2,8 @@ import serial
 import struct
 import time
 
-__version__ = '1.3.7'
-__last_modified__ = '2022/8/10'
+__version__ = '1.1.18'
+__last_modified__ = '2022/12/22'
 
 """
 ORDER 用来存放命令地址和对应数据
@@ -15,8 +15,8 @@ ORDER = {
     "CALIBRATION": [0x04, 0],
     "UPGRADE": [0x05, 0],
     "MOVE_TEST": [0x06, 1],
-    "VERSION": [0x07],
-    "GAIT_TYPE":[0x09,0x00],
+    "FIRMWARE_VERSION": [0x07],
+    "GAIT_TYPE": [0x09, 0x00],
     "BT_NAME": [0x13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     "UNLOAD_MOTOR": [0x20, 0],
     "LOAD_MOTOR": [0x20, 0],
@@ -30,13 +30,17 @@ ORDER = {
     "MOVE_MODE": [0x3D, 0],
     "ACTION": [0x3E, 0],
     "PERIODIC_TRAN": [0x80, 0, 0, 0],
-    "MOTOR_ANGLE": [0x50, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128],
+    "MOTOR_ANGLE": [0x50, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128, 128],
     "MOTOR_SPEED": [0x5C, 1],
     "LEG_POS": [0x40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     "IMU": [0x61, 0],
     "ROLL": [0x62, 0],
     "PITCH": [0x63, 0],
-    "YAW": [0x64, 0]
+    "YAW": [0x64, 0],
+    "CLAW": [0x71, 0],
+    "ARM_MODE": [0x72, 0],
+    "ARM_X": [0x73, 0],
+    "ARM_Z": [0x74, 0]
 }
 
 """
@@ -45,16 +49,17 @@ PARAM is used to store the parameter limit range of the robot dog
 """
 
 PARAM = {
-    "TRANSLATION_LIMIT": [35, 18, [75, 115]],  #X Y Z 平移范围 Scope of translation
-    "ATTITUDE_LIMIT": [20, 15, 11],            #Roll Pitch Yaw 姿态范围 Scope of posture
-    "LEG_LIMIT": [35, 18, [75, 115]],          #腿长范围 Scope of the leg
-    "MOTOR_LIMIT": [[-73, 57], [-66, 93], [-31, 31]], #下 中 上 舵机范围 Lower, middle and upper steering gear range
+    "TRANSLATION_LIMIT": [35, 18, [75, 115]],  # X Y Z 平移范围
+    "ATTITUDE_LIMIT": [20, 15, 11],  # Roll Pitch Yaw 姿态范围
+    "LEG_LIMIT": [35, 18, [75, 115]],  # 腿长范围
+    "MOTOR_LIMIT": [[-73, 57], [-66, 93], [-31, 31], [-30, 30], [-60, 70], [-90, 105]],  # 下 中 上 舵机范围
     "PERIOD_LIMIT": [[1.5, 8]],
-    "MARK_TIME_LIMIT": [10, 35],#原地踏步高度范围 Stationary height range
-    "VX_LIMIT": 25, #X速度范围 X velocity range
-    "VY_LIMIT": 18, #Y速度范围 Y velocity range
-    "VYAW_LIMIT": 100 #旋转速度范围 Rotation speed range
+    "MARK_TIME_LIMIT": [10, 35],  # 原地踏步高度范围
+    "VX_LIMIT": 25,  # X速度范围
+    "VY_LIMIT": 18,  # Y速度范围
+    "VYAW_LIMIT": 100  # 旋转速度范围
 }
+
 
 def search(data, list):
     for i in range(len(list)):
@@ -111,23 +116,53 @@ def Byte2Float(rawdata):
     pass
 
 
+def changePara(version):
+    global PARAM
+    if version == 'xgomini':
+        PARAM = {
+            "TRANSLATION_LIMIT": [35, 18, [75, 115]],  # X Y Z 平移范围
+            "ATTITUDE_LIMIT": [20, 15, 11],  # Roll Pitch Yaw 姿态范围
+            "LEG_LIMIT": [35, 18, [75, 115]],  # 腿长范围
+            "MOTOR_LIMIT": [[-73, 57], [-66, 93], [-31, 31], [-65, 65], [-85, 50], [-75, 90]],  # 下 中 上 舵机范围
+            "PERIOD_LIMIT": [[1.5, 8]],
+            "MARK_TIME_LIMIT": [10, 35],  # 原地踏步高度范围
+            "VX_LIMIT": 25,  # X速度范围
+            "VY_LIMIT": 18,  # Y速度范围
+            "VYAW_LIMIT": 100,  # 旋转速度范围
+            "ARM_LIMIT": [[-80, 155], [-95, 155]]
+        }
+    elif version == 'xgolite':
+        PARAM = {
+            "TRANSLATION_LIMIT": [25, 18, [60, 110]],
+            "ATTITUDE_LIMIT": [20, 10, 12],
+            "LEG_LIMIT": [25, 18, [60, 110]],
+            "MOTOR_LIMIT": [[-70, 50], [-70, 90], [-30, 30], [-65, 65], [-70, 60], [-90, 105]],
+            "PERIOD_LIMIT": [[1.5, 8]],
+            "MARK_TIME_LIMIT": [10, 25],
+            "VX_LIMIT": 25,
+            "VY_LIMIT": 18,
+            "VYAW_LIMIT": 100,
+            "ARM_LIMIT": [[-80, 155], [-95, 155]]
+        }
+
 
 class DOGZILLA():
     """
-    在实例化DOGZILLA时需要指定上位机与机器狗的串口通讯接口
-    When instantiating DOGZILLA, you need to specify the serial
+    在实例化XGO时需要指定上位机与机器狗的串口通讯接口
+    When instantiating XGO, you need to specify the serial
     communication interface between the upper computer and the machine dog
-    "/dev/ttyAMA0"
     """
 
-    def __init__(self, port="/dev/ttyAMA0"):
+    def __init__(self, port="/dev/ttyAMA0",version='xgomini'):
         self.ser = serial.Serial(port, 115200, timeout=0.5)
         self.rx_FLAG = 0
         self.rx_COUNT = 0
         self.rx_ADDR = 0
         self.rx_LEN = 0
+        self.version = version
         self.rx_data = bytearray(50)
         self.__delay = 0.05
+        changePara(version)
         pass
 
     def __send(self, key, index=1, len=1):
@@ -145,7 +180,6 @@ class DOGZILLA():
         tx.extend([sum_data, 0x00, 0xAA])
         self.ser.write(tx)
 
-
     def __read(self, addr, read_len=1):
         mode = 0x02
         sum_data = (0x09 + mode + addr + read_len) % 256
@@ -154,7 +188,6 @@ class DOGZILLA():
         time.sleep(0.1)
         self.ser.flushInput()
         self.ser.write(tx)
-
 
     def stop(self):
         self.move_x(0)
@@ -255,6 +288,7 @@ class DOGZILLA():
         ORDER["ACTION"][1] = action_id
         self.__send("ACTION")
 
+    pass
 
     def reset(self):
         """
@@ -287,7 +321,12 @@ class DOGZILLA():
             self.__send("LEG_POS", index)
 
     def __motor(self, index, data):
-        ORDER["MOTOR_ANGLE"][index] = conver2u8(data, PARAM["MOTOR_LIMIT"][index % 3 - 1])
+        if index < 13:
+            ORDER["MOTOR_ANGLE"][index] = conver2u8(data, PARAM["MOTOR_LIMIT"][index % 3 - 1])
+        elif index == 13:
+            self.claw(conver2u8(data, PARAM["MOTOR_LIMIT"][3]))
+        else:
+            ORDER["MOTOR_ANGLE"][index] = conver2u8(data, PARAM["MOTOR_LIMIT"][index - 10])
         self.__send("MOTOR_ANGLE", index)
 
     def motor(self, motor_id, data):
@@ -295,7 +334,11 @@ class DOGZILLA():
         控制机器狗单个舵机转动
         Control the rotation of a single steering gear of the robot
         """
-        MOTOR_ID = [11, 12, 13, 21, 22, 23, 31, 32, 33, 41, 42, 43]
+        MOTOR_ID = [11, 12, 13, 21, 22, 23, 31, 32, 33, 41, 42, 43, 51, 52, 53]
+        if motor_id == 51:
+            self.claw(data)
+            return
+
         if isinstance(motor_id, list):
             if len(motor_id) != len(data):
                 print("Error!Length Mismatching!")
@@ -314,8 +357,8 @@ class DOGZILLA():
             self.__motor(index, data)
 
     def unload_motor(self, leg_id):
-        if leg_id not in [1, 2, 3, 4]:
-            print('ERROR!leg_id must be 1, 2, 3 or 4')
+        if leg_id not in [1, 2, 3, 4, 5]:
+            print('ERROR!leg_id must be 1, 2, 3 ,4 or 5')
             return
         ORDER["UNLOAD_MOTOR"][1] = 0x10 + leg_id
         self.__send("UNLOAD_MOTOR")
@@ -325,8 +368,8 @@ class DOGZILLA():
         self.__send("UNLOAD_MOTOR")
 
     def load_motor(self, leg_id):
-        if leg_id not in [1, 2, 3, 4]:
-            print('ERROR!leg_id must be 1, 2, 3 or 4')
+        if leg_id not in [1, 2, 3, 4, 5]:
+            print('ERROR!leg_id must be 1, 2, 3 ,4 or 5')
             return
         ORDER["LOAD_MOTOR"][1] = 0x20 + leg_id
         self.__send("LOAD_MOTOR")
@@ -414,10 +457,6 @@ class DOGZILLA():
         self.__send("MOVE_MODE")
 
     def gait_type(self, mode):
-        """
-        改变机器狗的步态
-        Change the gait of the robot
-        """
         if mode == "trot":
             value = 0x00
         elif mode == "walk":
@@ -463,144 +502,218 @@ class DOGZILLA():
         ORDER["MOTOR_SPEED"][1] = speed
         self.__send("MOTOR_SPEED")
 
-    def read_motor(self, out_int=False):
+    def bt_rename(self, name):
+        if type(name) != str:
+            print("ERROR!The input value must be of string type!")
+            return
+        len_name = len(name)
+        if len_name > 10:
+            print("ERROR!The length of the input string cannot be longer than 10!")
+            return
+        try:
+            ORDER["BT_NAME"][1:len_name + 1] = list(name.encode('ascii'))
+            self.__send("BT_NAME", len=len_name)
+        except:
+            print("ERROR!Name only supports characters in ASCII code!")
+
+    def read_motor(self):
         """
-        读取12个舵机的角度 Read the angles of the 12 steering gear
+        读取12个舵机的角度
         """
-        self.__read(ORDER["MOTOR_ANGLE"][0], 12)
-        time.sleep(self.__delay)
+        self.__read(ORDER["MOTOR_ANGLE"][0], 15)
+        self.ser.read_all()
         angle = []
         if self.__unpack():
-            for i in range(12):
-                index = round(conver2float(self.rx_data[i], PARAM["MOTOR_LIMIT"][i % 3]), 2)
-                if out_int:
-                    if index >= 0:
-                        angle.append(int(index+0.5))
-                    else:
-                        angle.append(int(index-0.5))
+            for i in range(self.rx_COUNT + 1):
+                if i < 12:
+                    angle.append(round(conver2float(self.rx_data[i], PARAM["MOTOR_LIMIT"][i % 3]), 2))
                 else:
-                    angle.append(index)
+                    angle.append(round(conver2float(self.rx_data[i], PARAM["MOTOR_LIMIT"][i - 9]), 2))
         return angle
 
     def read_battery(self):
+        self.ser.read_all()
         self.__read(ORDER["BATTERY"][0], 1)
-        time.sleep(self.__delay)
         battery = 0
         if self.__unpack():
             battery = int(self.rx_data[0])
         return battery
 
-    def read_roll(self, out_int=False):
+    def read_firmware(self):
+        self.__read(ORDER["FIRMWARE_VERSION"][0], 10)
+        self.ser.read_all()
+        firmware_version = 'Null'
+        if self.__unpack():
+            data = self.rx_data[0:10]
+            firmware_version = data.decode("utf-8").strip('\0')
+        return firmware_version
+
+    def read_roll(self):
         self.__read(ORDER["ROLL"][0], 4)
-        time.sleep(self.__delay)
+        self.ser.read_all()
         roll = 0
         if self.__unpack():
             roll = Byte2Float(self.rx_data)
-        if out_int:
-            tmp = int(roll)
-            return tmp
         return round(roll, 2)
 
-    def read_pitch(self, out_int=False):
+    def read_pitch(self):
         self.__read(ORDER["PITCH"][0], 4)
-        time.sleep(self.__delay)
+        self.ser.read_all()
         pitch = 0
         if self.__unpack():
             pitch = Byte2Float(self.rx_data)
-        if out_int:
-            tmp = int(pitch)
-            return tmp
         return round(pitch, 2)
 
-    def read_yaw(self, out_int=False):
+    def read_yaw(self):
         self.__read(ORDER["YAW"][0], 4)
-        time.sleep(self.__delay)
+        self.ser.read_all()
         yaw = 0
         if self.__unpack():
             yaw = Byte2Float(self.rx_data)
-        if out_int:
-            tmp = int(yaw)
-            return tmp
         return round(yaw, 2)
 
     def __unpack(self):
-        n = self.ser.inWaiting()
-        rx_CHECK = 0
-        if n:
-            data = self.ser.read(n)
-            for num in data:
-                if self.rx_FLAG == 0:
-                    if num == 0x55:
-                        self.rx_FLAG = 1
-                    else:
-                        self.rx_FLAG = 0
+        t = time.time()
+        rx_data = []
+        while time.time() - t < 1:
+            n = self.ser.inWaiting()
+            rx_CHECK = 0
+            if n:
+                data = self.ser.read(n)
+                for num in data:
+                    rx_data.append(num)
+                    if self.rx_FLAG == 0:
+                        if num == 0x55:
+                            self.rx_FLAG = 1
+                        else:
+                            self.rx_FLAG = 0
 
-                elif self.rx_FLAG == 1:
-                    if num == 0x00:
-                        self.rx_FLAG = 2
-                    else:
-                        self.rx_FLAG = 0
+                    elif self.rx_FLAG == 1:
+                        if num == 0x00:
+                            self.rx_FLAG = 2
+                        else:
+                            self.rx_FLAG = 0
 
-                elif self.rx_FLAG == 2:
-                    self.rx_LEN = num
-                    self.rx_FLAG = 3
+                    elif self.rx_FLAG == 2:
+                        self.rx_LEN = num
+                        self.rx_FLAG = 3
 
-                elif self.rx_FLAG == 3:
-                    self.rx_TYPE = num
-                    self.rx_FLAG = 4
+                    elif self.rx_FLAG == 3:
+                        self.rx_TYPE = num
+                        self.rx_FLAG = 4
 
-                elif self.rx_FLAG == 4:
-                    self.rx_ADDR = num
-                    self.rx_FLAG = 5
-
-                elif self.rx_FLAG == 5:
-                    if self.rx_COUNT == (self.rx_LEN - 9):
-                        self.rx_data[self.rx_COUNT] = num
+                    elif self.rx_FLAG == 4:
+                        self.rx_ADDR = num
+                        self.rx_FLAG = 5
                         self.rx_COUNT = 0
-                        self.rx_FLAG = 6
-                    elif self.rx_COUNT < self.rx_LEN - 9:
-                        self.rx_data[self.rx_COUNT] = num
-                        self.rx_COUNT = self.rx_COUNT + 1
 
-                elif self.rx_FLAG == 6:
-                    for i in self.rx_data[0:(self.rx_LEN - 8)]:
-                        rx_CHECK = rx_CHECK + i
-                    rx_CHECK = 255 - (self.rx_LEN + self.rx_TYPE + self.rx_ADDR + rx_CHECK) % 256
-                    if num == rx_CHECK:
-                        self.rx_FLAG = 7
-                    else:
-                        self.rx_FLAG = 0
-                        self.rx_COUNT = 0
-                        self.rx_ADDR = 0
-                        self.rx_LEN = 0
+                    elif self.rx_FLAG == 5:
+                        if self.rx_COUNT == (self.rx_LEN - 9):
+                            self.rx_data[self.rx_COUNT] = num
+                            self.rx_FLAG = 6
+                        elif self.rx_COUNT < self.rx_LEN - 9:
+                            self.rx_data[self.rx_COUNT] = num
+                            self.rx_COUNT = self.rx_COUNT + 1
 
-                elif self.rx_FLAG == 7:
-                    if num == 0x00:
-                        self.rx_FLAG = 8
-                    else:
-                        self.rx_FLAG = 0
-                        self.rx_COUNT = 0
-                        self.rx_ADDR = 0
-                        self.rx_LEN = 0
+                    elif self.rx_FLAG == 6:
+                        for i in self.rx_data[0:(self.rx_LEN - 8)]:
+                            rx_CHECK = rx_CHECK + i
+                        rx_CHECK = 255 - (self.rx_LEN + self.rx_TYPE + self.rx_ADDR + rx_CHECK) % 256
+                        if num == rx_CHECK:
+                            self.rx_FLAG = 7
+                        else:
+                            self.rx_FLAG = 0
+                            self.rx_COUNT = 0
+                            self.rx_ADDR = 0
+                            self.rx_LEN = 0
 
-                elif self.rx_FLAG == 8:
-                    if num == 0xAA:
-                        self.rx_FLAG = 0
-                        self.rx_COUNT = 0
-                        return True
-                    else:
-                        self.rx_FLAG = 0
-                        self.rx_COUNT = 0
-                        self.rx_ADDR = 0
-                        self.rx_LEN = 0
+                    elif self.rx_FLAG == 7:
+                        if num == 0x00:
+                            self.rx_FLAG = 8
+                        else:
+                            self.rx_FLAG = 0
+                            self.rx_COUNT = 0
+                            self.rx_ADDR = 0
+                            self.rx_LEN = 0
+
+                    elif self.rx_FLAG == 8:
+                        if num == 0xAA:
+                            self.rx_FLAG = 0
+                            print("rx_data: ", rx_data)
+                            return True
+                        else:
+                            self.rx_FLAG = 0
+                            self.rx_COUNT = 0
+                            self.rx_ADDR = 0
+                            self.rx_LEN = 0
         return False
+
+    def upgrade(self, filename):
+        """
+        处于测试阶段，请勿使用
+        """
+        ORDER["UPGRADE"][1] = 1
+        self.__send("UPGRADE")
+        time.sleep(5)
+        self.upload_bin(filename)
+
+    def read_lib_version(self):
+        return __version__
+
+    def upload_bin(self, filename):
+        """
+        处于测试阶段，请勿使用
+        """
+        try:
+            with open(filename, 'rb') as f:
+                file = f.read()
+            count = self.ser.write(file)
+            print("更新成功，共发送字节数：", count)
+        except Exception as e:
+            print("---更新错误---")
+            print(e)
 
     def calibration(self, state):
         """
-        用于软件标定，请谨慎使用！！！ For software calibration, please use with caution!!!
+        用于软件标定，请谨慎使用！！！
         """
-        if state:
+        if state == 'start':
             ORDER["CALIBRATION"][1] = 1
-        else:
+        elif state == 'end':
             ORDER["CALIBRATION"][1] = 0
+        else:
+            print("ERROR!")
         self.__send("CALIBRATION")
+        return
+
+    def arm(self, arm_x, arm_z):
+        """
+        控制机器狗的机械臂的前后和上下移动
+        Control the movement of the arm of the robot
+        """
+        try:
+            arm_x_u8 = conver2u8(arm_x, PARAM["ARM_LIMIT"][0])
+            arm_z_u8 = conver2u8(arm_z, PARAM["ARM_LIMIT"][1])
+        except:
+            print("Error!Illegal Value!")
+            return
+        ORDER["ARM_X"][1] = arm_x_u8
+        ORDER["ARM_Z"][1] = arm_z_u8
+        self.__send("ARM_X")
+        self.__send("ARM_Z")
+
+    def arm_mode(self, mode):
+        if mode != 0x01 and mode != 0x00:
+            print("Error!Illegal Value!")
+            return
+        ORDER["ARM_MODE"][1] = mode
+        self.__send("ARM_MODE")
+
+    def claw(self, pos):
+        try:
+            claw_pos = conver2u8(pos, [0, 255])
+        except:
+            print("Error!Illegal Value!")
+            return
+        ORDER["CLAW"][1] = claw_pos
+        self.__send("CLAW")

@@ -2,7 +2,11 @@ import argparse
 from src.stream_analyzer import Stream_Analyzer
 import time
 from key import Button
-
+from subprocess import Popen
+from xgolib import XGO
+import threading
+import os,sys
+dog = XGO(port='/dev/ttyAMA0',version="xgolite")
 bt=Button()
 
 def parse_args():
@@ -30,6 +34,24 @@ def convert_window_ratio(window_ratio):
         return float_ratio
     raise ValueError('window_ratio should be in the format: float/float')
 
+exitcode = True
+def checks():
+    global exitcode
+    time.sleep(10)
+    while exitcode:
+        dog.action(20)
+        time.sleep(5)
+        dog.action(22)
+        time.sleep(5)
+        dog.action(23)
+        time.sleep(5)
+    else:
+        print("kill")
+
+t = threading.Thread(target=checks)
+t.start()
+
+
 def run_FFT_analyzer():
     args = parse_args()
     window_ratio = convert_window_ratio(args.window_ratio)
@@ -38,7 +60,7 @@ def run_FFT_analyzer():
                     device = args.device,        # Pyaudio (portaudio) device index, defaults to first mic input
                     rate   = None,               # Audio samplerate, None uses the default source settings
                     FFT_window_size_ms  = 60,    # Window size used for the FFT transform
-                    updates_per_second  = 1000,  # How often to read the audio stream for new data
+                    updates_per_second  = 100,   # How often to read the audio stream for new data
                     smoothing_length_ms = 50,    # Apply some temporal smoothing to reduce noisy features
                     n_frequency_bins = args.frequency_bins, # The FFT features are grouped in bins
                     visualize = 1,               # Visualize the FFT features with PyGame
@@ -49,10 +71,13 @@ def run_FFT_analyzer():
 
     fps = 60  #How often to update the FFT features + display
     last_update = time.time()
+    proc=Popen("mplayer dream.mp3 -loop 0", shell=True)
     while True:
+        global exitcode
         if bt.press_b():
+            exitcode = False
+            print("1")
             break
         raw_fftx, raw_fft, binned_fftx, binned_fft = ear.get_audio_features()
-
 if __name__ == '__main__':
     run_FFT_analyzer()

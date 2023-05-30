@@ -31,7 +31,6 @@ font2 = ImageFont.truetype("msyh.ttc",22)
 font3 = ImageFont.truetype("msyh.ttc",30)
 splash = Image.new("RGB", (display.height, display.width ),splash_theme_color)
 draw = ImageDraw.Draw(splash)
-#splash=splash.rotate(180)
 display.ShowImage(splash)
 button=Button()
 servo=[11, 12, 13, 21, 22, 23, 31, 32, 33, 41, 42, 43, 51, 52, 53]
@@ -57,7 +56,6 @@ display.ShowImage(splash)
 lcd_rect(0,0,320,240,color=color_black,thickness=-1)
 data = [[],[],[],[],[],[],[],[],[],[],[],[]]
 
-dog.unload_allmotor()
 time.sleep(2)
 
 

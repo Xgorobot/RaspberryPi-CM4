@@ -31,9 +31,7 @@ def show(expression_name_cs, pic_num):
     for i in range(0, pic_num):
         filename=pic_path + expression_name_cs + "/" + str(i+1) + ".png"
         exp = Image.open(pic_path + expression_name_cs + "/" + str(i+1) + ".png")
-        splash.paste(exp,(40,0))
-        #canvas.draw_image(image.Image().open(pic_path + expression_name_cs + "/" + str(i+1) + ".png"), _canvas_x, _canvas_y)
-        display.ShowImage(splash)
+        display.ShowImage(exp)
         time.sleep(0.05)
         if button.press_b():
           sys.exit()
@@ -72,12 +70,9 @@ while True:
             label=class_labels[preds.argmax()]
             print(label)
             label_position=(x,y)
-            #cv2.putText(frame,label,label_position,cv2.FONT_HERSHEY_SIMPLEX,2,(0,255,0),3)
         else:
             pass
-            #cv2.putText(frame,'No Face Found',(20,20),cv2.FONT_HERSHEY_SIMPLEX,2,(0,255,0),3)
     
-    #cv2.imshow('Emotion Detector',frame)
     b,g,r = cv2.split(frame)
     frame = cv2.merge((r,g,b))
     frame = cv2.flip(frame, 1)
@@ -95,40 +90,44 @@ while True:
         sad=0
         surprise=0
         if angry>2:
+          dog.action(24)
           proc=Popen(['mplayer','hate.mp3'])
           show("angry", 8)
           angry=0
-          time.sleep(2)
+          time.sleep(7)
       if label=='Happy':
         angry=0
         happy+=1
         sad=0
         surprise=0
         if happy>2:
+          dog.action(24)
           proc=Popen(['mplayer','happy.wav'])
           show("happy", 6)
           happy=0
-          time.sleep(2)
+          time.sleep(7)
       if label=='Sad':
         angry=0
         happy=0
         sad+=1
         surprise=0
         if sad>2:
+          dog.action(24)
           proc=Popen(['mplayer','sad.wav'])
           show("sad", 8)
           sad=0
-          time.sleep(2)
+          time.sleep(7)
       if label=='Surprise':
         angry==0
         happy=0
         sad=0
         surprise+=1
         if surprise>2:
+          dog.action(24)
           proc=Popen(['mplayer','surprise.wav'])
           show("surprise", 8)
           surprise=0
-          time.sleep(2)
+          time.sleep(7)
 
 
     if cv2.waitKey(1) & 0xFF == ord('q'):

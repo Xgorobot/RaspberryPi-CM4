@@ -534,10 +534,11 @@ def parse_data(data):
             dogzilla_reset()
         elif num_action == 20:
             g_press_up = 1
+            g_dog.action(num_action)
         else:
             g_press_up = 0
             g_dog.action(num_action)
-
+    
     elif cmd == '32':
         num_continuous = hex2int(data[7:9])
         if g_debug:

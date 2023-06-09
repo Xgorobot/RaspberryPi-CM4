@@ -1,11 +1,10 @@
-import cv2,random
+import random
 import os,socket,sys,time
 import spidev as SPI
 import LCD_2inch
 from PIL import Image,ImageDraw,ImageFont
 from key import Button
 import numpy as np
-import mediapipe as mp
 from numpy import linalg
 from xgolib import XGO
 

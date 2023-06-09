@@ -47,6 +47,12 @@ while 1:
     show("seek", 12)
     show("lookaround", 12)
     show("love", 13)
-    
+    show("awkwardness", 11)
+    show("eyes", 15)
+    show("guffaw", 8)
+    show("query", 7)
+    show("Shakehead", 7)
+    show("Stun", 8)
+    show("wronged", 14)
 dog.perform(0)  
 proc.kill()

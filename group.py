@@ -1,6 +1,6 @@
 from subprocess import Popen
 import _thread
-import cv2
+#import cv2
 import os,socket,sys,time
 import spidev as SPI
 import LCD_2inch

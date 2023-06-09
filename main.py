@@ -5,6 +5,7 @@ from PIL import Image,ImageDraw,ImageFont
 from key import Button
 from xgolib import XGO
 
+os.system("sudo chmod 777 -R /dev/ttyAMA0")
 dog = XGO(port='/dev/ttyAMA0',version="xgolite")
 fm=dog.read_firmware()
 if fm[0]=='M':
@@ -40,9 +41,9 @@ display.clear()
 button=Button()
 #const
 if dog_type=='M':
-    firmware_info='MINI-v1.2'
+    firmware_info='MINI'
 elif dog_type=='L':
-    firmware_info='LITE-v1.2'
+    firmware_info='LITE'
 #font
 font1 = ImageFont.truetype("msyh.ttc",15)
 font2 = ImageFont.truetype("msyh.ttc",22)
@@ -189,7 +190,7 @@ def main_program():
 #-------------------------init UI---------------------------------
 logo = Image.open("./pics/luwu@3x.png")
 draw.bitmap((74,49),logo)
-lcd_draw_string(draw,177,133, firmware_info, color=color_white, scale=font1)
+lcd_draw_string(draw,210,133, firmware_info, color=color_white, scale=font1)
 wifiy = Image.open("./pics/wifi@2x.png")
 wifin = Image.open("./pics/wifi-un@2x.png")
 bat = Image.open("./pics/battery.png")

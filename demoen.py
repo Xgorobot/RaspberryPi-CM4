@@ -54,30 +54,24 @@ MENU_ITEM_PARENT_PATH = "./pics/"
 MENU_ITEMS = [
     #pic kinds program show
     ("dog_show", "1movement","dog_show","Show"),
-    ("face_mask", "2vision", "face_mask" ,"Mask"),
-    ("group", "3vision","group","Group"),
+    ("group", "2vision","group","Group"),
+    ("face_mask", "3vision", "face_mask" ,"Mask"),
     ("hands", "4vision", "hands","Hands"),
     ("vision", "5movement","vision","Teach"),
     ("segmentation", "6vision","segmentation","Segment"),
     ("face_decetion", "7vision", "face_decetion" ,"FaceTrack"),
     ("pose", "8vision", "pose","Pose"),
     ("qrcode", "9vision","qrcode","QRCode"),
-    ("agesex", "10vision","agesex","AgeSex"),
-    ("traffic", "11vision","traffic","Traffic"),
-    ("emotion", "12vision","emotion","Emotion"),
-    ("ball_trace", "13vision","ball","Ball"),
-    ("speech", "14voice","speech","Speech"),
-    ("line", "15vision","line","Line"),
-    ("color", "16vision","color","Color"),
-    ("sound", "17vision","sound","Sound"),
-    ("height", "18vision","handh","Height"),
-    ("yolo", "19vision","yolofast","Yolo"),
-    ("wifi_set", "20vision","wifi_set","Wifiset"),
-    ("wpa_set", "21vision","wpa_set","Wpaset"),
-    ("burn", "22vision","burn","Burn"),
-    ("standard", "23vision","standard","Standard"),
-    ("network", "24vision","network","Network"),
-    ("device", "25vision","device","Device"),
+    ("speech", "10voice","speech","Speech"),
+    ("color", "11vision","color","Color"),
+    ("sound", "12vision","sound","Sound"),
+    ("height", "13vision","handh","Height"),
+    ("yolo", "14vision","yolofast","Yolo"),
+    ("wifi_set", "15vision","wifi_set","Wifiset"),
+    ("wpa_set", "16vision","wpa_set","Wpaset"),
+    ("burn", "17vision","burn","Burn"),
+    ("network", "18vision","network","Network"),
+    ("device", "19vision","device","Device"),
 ]
 
 SELECT_BOX=[80,68]
@@ -299,22 +293,12 @@ while True:
                 os.system('python3 image_dete.py')
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="qrcode":
                 os.system('python3 qrcode.py')
-            elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="agesex":
-                os.system('python3 agesex.py')
-            elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="traffic":
-                os.system('sudo python3 traffic.py')
-            elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="emotion":
-                os.system('python3 emotion.py')
-            elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="ball":
-                os.system('sudo python3 ball.py')
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="speech":
                 os.system('python3 speech.py')
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="sound":
                 os.system('python3 sound.py')
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="handh":
                 os.system('python3 hp.py')
-            elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="line":
-                os.system('python3 line.py')
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="color":
                 os.system('python3 color.py')
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="yolofast":
@@ -325,8 +309,6 @@ while True:
                 os.system('sudo python3 wpa_set.py')
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="burn":
                 os.system('python3 ota.py')
-            elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="standard":
-                os.system('python3 standard.py')
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="device":
                 os.system('python3 device.py')
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="network":

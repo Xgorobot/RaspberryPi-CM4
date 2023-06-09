@@ -10,8 +10,8 @@ from PIL import Image,ImageDraw,ImageFont
 os.system('sudo chmod 777 /dev/ttyAMA0')
 xgo = xgolib.XGO(port = '/dev/ttyAMA0',version='xgomini')
 fm=xgo.read_firmware()
-filename_mini = "mini.bin"
-filename_lite = "lite.bin"
+filename_mini = "/home/pi/RaspberryPi-CM4-main/bin/mini.bin"
+filename_lite = "/home/pi/RaspberryPi-CM4-main/bin/lite.bin"
 
 GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BCM)
@@ -23,8 +23,8 @@ splash = Image.new("RGB",(320,240),"black")
 display.ShowImage(splash)
 
 #字体载入
-font1 = ImageFont.truetype("/home/pi/xgoEdu/Font/msyh.ttc",50)
-font2 = ImageFont.truetype("/home/pi/xgoEdu/Font/msyh.ttc",30)
+font1 = ImageFont.truetype("/home/pi/RaspberryPi-CM4-main/msyh.ttc",50)
+font2 = ImageFont.truetype("/home/pi/RaspberryPi-CM4-main/msyh.ttc",30)
 def lcd_text(x,y,content):
         draw = ImageDraw.Draw(splash)
         draw.text((x,y),content,fill = "WHITE",font=font1)

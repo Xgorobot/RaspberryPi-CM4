@@ -72,6 +72,8 @@ lcd_rect(0,195,320,240,(48,50,73),thickness=-1)
 #--------------------------get IP&SSID--------------------------
 ipadd=ip()
 ssid=get_ssid()
+print(ipadd)
+
 if ipadd=='0.0.0.0':
     print('wlan disconnected')
     splash.paste(wifin,(65,200))
@@ -95,6 +97,7 @@ mark=True
 running=True
 status=0
 exitcode=False
+
 def checks():
     global cmd
     for i in iter(pi.stdout.readline,'b'):
@@ -139,3 +142,4 @@ print('aiblocks over')
 os.system('sudo fuser -k -n tcp 8081')
 print('8081 killed!')
 sys.exit()
+

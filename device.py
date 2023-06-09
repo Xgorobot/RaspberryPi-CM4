@@ -16,8 +16,8 @@ splash = Image.new("RGB",(320,240),"black")
 display.ShowImage(splash)
 
 #字体载入
-font1 = ImageFont.truetype("/home/pi/xgoEdu/Font/msyh.ttc",35)
-font2 = ImageFont.truetype("/home/pi/xgoEdu/Font/msyh.ttc",30)
+font1 = ImageFont.truetype("/home/pi/RaspberryPi-CM4-main/msyh.ttc",35)
+font2 = ImageFont.truetype("/home/pi/RaspberryPi-CM4-main/msyh.ttc",30)
 
 def lcd_text(x,y,content):
         draw = ImageDraw.Draw(splash)
@@ -31,7 +31,7 @@ def lcd_text1(x,y,content):
 
 fm1 = xgo.read_firmware()
 fm2 = xgo.read_lib_version()
-fm3 = "xgo_0512"
+fm3 = "xgo_0609"
 
 lcd_text1(20,10,"DevicesInformation")
 lcd_text(50,50,"bin:")

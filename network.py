@@ -1,4 +1,3 @@
-import cv2
 import os,socket,sys,time
 import spidev as SPI
 import LCD_2inch
@@ -13,6 +12,8 @@ display.ShowImage(splash)
 button=Button()
 
 import pyzbar.pyzbar as pyzbar
+import cv2
+
 
 def cv2AddChineseText(img, text, position, textColor=(200, 0, 200), textSize=10):
     if (isinstance(img, np.ndarray)):  

@@ -276,45 +276,45 @@ while True:
             if MENU_ITEMS[MENU_CURRENT_SELECT][2]=="dog_show":
                 import dog_show
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="face_mask":
-                os.system('python3 face_mask.py')
+                os.system('python3 \demos\face_mask.py')
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="hands":
-                os.system(' python3 hands.py')
+                os.system(' python3 \demos\hands.py')
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="vision":
-                os.system('python3 dog_vision_show.py')
+                os.system('python3 \demos\dog_vision_show.py')
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="segmentation":
-                os.system('python3 segmentation.py')
+                os.system('python3 \demos\segmentation.py')
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="face_decetion":
-                os.system('python3 face_decetion.py')
+                os.system('python3 \demos\face_decetion.py')
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="pose":
-                os.system('python3 pose.py')
+                os.system('python3 \demos\pose.py')
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="image_class":
-                os.system('python3 image_class.py')
+                os.system('python3 \demos\image_class.py')
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="image_dete":
-                os.system('python3 image_dete.py')
+                os.system('python3 \demos\image_dete.py')
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="qrcode":
-                os.system('python3 qrcode.py')
+                os.system('python3 \demos\qrcode.py')
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="speech":
-                os.system('python3 speech.py')
+                os.system('python3 \demos\speech.py')
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="sound":
-                os.system('python3 sound.py')
+                os.system('python3 \demos\sound.py')
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="handh":
-                os.system('python3 hp.py')
+                os.system('python3 \demos\hp.py')
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="color":
-                os.system('python3 color.py')
+                os.system('python3 \demos\color.py')
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="yolofast":
-                os.system('python3 yolofast.py')
+                os.system('python3 \demos\yolofast.py')
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="wifi_set":
-                os.system('sudo python3 wifi_set.py')
+                os.system('sudo python3 \demos\wifi_set.py')
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="wpa_set":
-                os.system('sudo python3 wpa_set.py')
+                os.system('sudo python3 \demos\wpa_set.py')
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="burn":
-                os.system('python3 ota.py')
+                os.system('python3 \demos\ota.py')
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="device":
-                os.system('python3 device.py')
+                os.system('python3 \demos\device.py')
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="network":
-                os.system('sudo python3 network.py')
+                os.system('sudo python3 \demos\network.py')
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="group":
-                os.system('sudo python3 group.py')
+                os.system('sudo python3 \demos\group.py')
             print('program done')
             draw_title_bar(MENU_CURRENT_SELECT)        
         except BaseException as e:

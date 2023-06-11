@@ -171,7 +171,7 @@ def main_program():
             lcd_rect(160,188,320,240,color=btn_selected,thickness=-1)
             lcd_draw_string(draw, 181, 195, "Try demos", color=color_white, scale=font2)
             print('turn demos')
-            os.system("python3 app_dogzilla.py")
+            os.system("python3 app/app_dogzilla.py")
             
         if current_selection == 3: 
             lcd_rect(160,188,320,240,color=btn_selected,thickness=-1)

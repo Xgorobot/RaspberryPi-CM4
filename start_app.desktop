@@ -1,5 +1,0 @@
-[Desktop Entry]
-
-Type=Application
-
-Exec=sh /home/pi/DOGZILLA/app_dogzilla/start_app.sh

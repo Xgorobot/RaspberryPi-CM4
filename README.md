@@ -13,3 +13,10 @@ This repository contains the following components:
 - [tools/](https://github.com/Xgorobot/RaspberryPi-CM4/tree/main/tools) -- 
 Some testing and compilation tools.
 
+If you want to upgrade xgo-pythonlib,please run these two commands:
+
+```
+pip install --upgrade xgo-pythonlib
+sudo pip install --upgrade xgo-pythonlib
+```
+

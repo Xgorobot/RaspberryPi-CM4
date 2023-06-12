@@ -3,7 +3,7 @@ import _thread
 #import cv2
 import os,socket,sys,time
 import spidev as SPI
-import LCD_2inch
+import xgoscreen.LCD_2inch as LCD_2inch
 from PIL import Image,ImageDraw,ImageFont
 from key import Button
 from xgolib import XGO

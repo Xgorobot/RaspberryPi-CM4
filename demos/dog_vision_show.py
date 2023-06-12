@@ -2,7 +2,7 @@ from subprocess import Popen
 import cv2
 import os,socket,sys,time
 import spidev as SPI
-import LCD_2inch
+import xgoscreen.LCD_2inch as LCD_2inch
 from PIL import Image,ImageDraw,ImageFont
 from key import Button
 from xgolib import XGO
@@ -37,7 +37,7 @@ servo=[11, 12, 13, 21, 22, 23, 31, 32, 33, 41, 42, 43, 51, 52, 53]
 num = 0
 isCollect = 0
 n = 0
-font2 = ImageFont.truetype("msyh.ttc",22)
+font2 = ImageFont.truetype("/home/pi/model/msyh.ttc",22)
 
 dog = XGO(port='/dev/ttyAMA0',version="xgolite")
 

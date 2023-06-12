@@ -4,7 +4,7 @@ import numpy as np
 import onnxruntime 
 import os,socket,sys,time
 import spidev as SPI
-import LCD_2inch
+import xgoscreen.LCD_2inch as LCD_2inch
 from PIL import Image,ImageDraw,ImageFont
 from key import Button
 
@@ -134,17 +134,14 @@ def detection(session, img, input_width, input_height, thresh):
 while 1:
     success, image = cap.read()
     input_width, input_height = 352, 352
-    session = onnxruntime.InferenceSession('FastestDet.onnx')
+    session = onnxruntime.InferenceSession('/home/pi/model/Model.onnx')
     start = time.perf_counter()
     bboxes = detection(session, image, input_width, input_height, 0.65)
     end = time.perf_counter()
     times = (end - start) * 1000.
     print("forward time:%fms"%times)
     if bboxes!=None:
-      names = []
-      with open("coco.names", 'r') as f:
-        for line in f.readlines():
-            names.append(line.strip())
+      names = ['person','bicycle','car','motorbike','aeroplane','bus','train','truck','boat','traffic light','fire hydrant','stop sign','parking meter','bench','bird','cat','dog','horse','sheep','cow','elephant','bear','zebra','giraffe','backpack','umbrella','handbag','tie','suitcase','frisbee','skis','snowboard','sports ball','kite','baseball bat','baseball glove','skateboard','surfboard','tennis racket','bottle','wine glass','cup','fork','knife','spoon','bowl','banana','apple','sandwich','orange','broccoli','carrot','hot dog','pizza','donut','cake','chair','sofa','pottedplant','bed','diningtable','toilet','tvmonitor','laptop','mouse','remote','keyboard','cell phone','microwave','oven','toaster','sink','refrigerator','book','clock','vase','scissors','teddy bear','hair drier','toothbrush']
       for b in bboxes:
           print(b)
           obj_score, cls_index = b[4], int(b[5])

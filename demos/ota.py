@@ -3,15 +3,15 @@ import time
 import random
 import os
 import sys
-import LCD_2inch
+import xgoscreen.LCD_2inch as LCD_2inch
 import RPi.GPIO as GPIO
 from PIL import Image,ImageDraw,ImageFont
 
 os.system('sudo chmod 777 /dev/ttyAMA0')
 xgo = xgolib.XGO(port = '/dev/ttyAMA0',version='xgomini')
 fm=xgo.read_firmware()
-filename_mini = "/home/pi/RaspberryPi-CM4-main/bin/mini.bin"
-filename_lite = "/home/pi/RaspberryPi-CM4-main/bin/lite.bin"
+filename_mini = "./bin/mini.bin"
+filename_lite = "./bin/lite.bin"
 
 GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BCM)

@@ -1,6 +1,6 @@
 import os,time,sys
 import xgolib
-import LCD_2inch
+import xgoscreen.LCD_2inch as LCD_2inch
 from key import Button
 from PIL import Image,ImageDraw,ImageFont
 

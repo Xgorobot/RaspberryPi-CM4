@@ -1,5 +1,5 @@
 import argparse
-from src.stream_analyzer import Stream_Analyzer
+from fft.stream_analyzer import Stream_Analyzer
 import time
 from key import Button
 from subprocess import Popen
@@ -71,7 +71,7 @@ def run_FFT_analyzer():
 
     fps = 60  #How often to update the FFT features + display
     last_update = time.time()
-    proc=Popen("mplayer dream.mp3 -loop 0", shell=True)
+    proc=Popen("mplayer ./demos/fft/dream.mp3 -loop 0", shell=True)
     while True:
         global exitcode
         if bt.press_b():

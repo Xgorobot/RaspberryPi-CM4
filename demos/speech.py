@@ -20,7 +20,7 @@ import time
 import cv2
 import os,socket,sys,time
 import spidev as SPI
-import LCD_2inch
+import xgoscreen.LCD_2inch as LCD_2inch
 from PIL import Image,ImageDraw,ImageFont
 from key import Button
 import threading
@@ -240,9 +240,9 @@ display.Init()
 display.clear()
 
 #font
-font1 = ImageFont.truetype("msyh.ttc",15)
-font2 = ImageFont.truetype("msyh.ttc",16)
-font3 = ImageFont.truetype("msyh.ttc",24)
+font1 = ImageFont.truetype("/home/pi/model/msyh.ttc",15)
+font2 = ImageFont.truetype("/home/pi/model/msyh.ttc",16)
+font3 = ImageFont.truetype("/home/pi/model/msyh.ttc",24)
 splash = Image.new("RGB", (display.height, display.width ),splash_theme_color)
 draw = ImageDraw.Draw(splash)
 display.ShowImage(splash)

@@ -1,7 +1,7 @@
 print('run demo')
 import os,socket,sys,time,math
 import spidev as SPI
-import LCD_2inch
+import xgoscreen.LCD_2inch as LCD_2inch
 from PIL import Image,ImageDraw,ImageFont
 from key import Button
 
@@ -27,9 +27,9 @@ button=Button()
 #const
 firmware_info='v1.0'
 #font
-font1 = ImageFont.truetype("msyh.ttc",12)
-font2 = ImageFont.truetype("msyh.ttc",20)
-font3 = ImageFont.truetype("msyh.ttc",30)
+font1 = ImageFont.truetype("/home/pi/model/msyh.ttc",12)
+font2 = ImageFont.truetype("/home/pi/model/msyh.ttc",20)
+font3 = ImageFont.truetype("/home/pi/model/msyh.ttc",30)
 #splash
 splash = Image.new("RGB", (display.height, display.width ),splash_theme_color)
 draw = ImageDraw.Draw(splash)
@@ -274,7 +274,7 @@ while True:
             print("Running: " + MENU_ITEMS[MENU_CURRENT_SELECT][2])
             draw_title_open()
             if MENU_ITEMS[MENU_CURRENT_SELECT][2]=="dog_show":
-                import dog_show
+                import demos.dog_show
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="face_mask":
                 os.system('python3 \demos\face_mask.py')
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="hands":

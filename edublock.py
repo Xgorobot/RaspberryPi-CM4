@@ -1,6 +1,6 @@
 import os,socket,sys,time
 import spidev as SPI
-import LCD_2inch
+import xgoscreen.LCD_2inch as LCD_2inch
 from PIL import Image,ImageDraw,ImageFont
 from key import Button
 from subprocess import check_output
@@ -26,9 +26,9 @@ button=Button()
 #const
 firmware_info='v1.0'
 #font
-font1 = ImageFont.truetype("msyh.ttc",15)
-font2 = ImageFont.truetype("msyh.ttc",23)
-font3 = ImageFont.truetype("msyh.ttc",30)
+font1 = ImageFont.truetype("/home/pi/model/msyh.ttc",15)
+font2 = ImageFont.truetype("/home/pi/model/msyh.ttc",22)
+font3 = ImageFont.truetype("/home/pi/model/msyh.ttc",30)
 #init splash
 splash = Image.new("RGB", (display.height, display.width ),splash_theme_color)
 draw = ImageDraw.Draw(splash)

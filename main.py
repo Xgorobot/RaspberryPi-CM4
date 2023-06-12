@@ -1,6 +1,6 @@
 import os,socket,sys,time
 import spidev as SPI
-import LCD_2inch
+import xgoscreen.LCD_2inch as LCD_2inch
 from PIL import Image,ImageDraw,ImageFont
 from key import Button
 from xgolib import XGO
@@ -45,9 +45,9 @@ if dog_type=='M':
 elif dog_type=='L':
     firmware_info='LITE'
 #font
-font1 = ImageFont.truetype("msyh.ttc",15)
-font2 = ImageFont.truetype("msyh.ttc",22)
-font3 = ImageFont.truetype("msyh.ttc",30)
+font1 = ImageFont.truetype("/home/pi/model/msyh.ttc",15)
+font2 = ImageFont.truetype("/home/pi/model/msyh.ttc",22)
+font3 = ImageFont.truetype("/home/pi/model/msyh.ttc",30)
 #init splash
 splash = Image.new("RGB", (display.height, display.width ),splash_theme_color)
 draw = ImageDraw.Draw(splash)
@@ -160,7 +160,7 @@ def main_program():
             lcd_rect(0,188,160,240,color=btn_selected,thickness=-1)
             lcd_draw_string(draw, 25, 195, "Opening...", color=color_white, scale=font2)
             time.sleep(1)
-            os.system("sudo python3 edublock.py")
+            os.system("python3 edublock.py")
             lcd_rect(0,188,160,240,color=btn_selected,thickness=-1)
             lcd_draw_string(draw, 25, 195, "Program", color=color_white, scale=font2)
 

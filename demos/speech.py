@@ -159,6 +159,7 @@ def on_open(ws):
     thread.start_new_thread(run, ())
 
 def start_audio(time = 3,save_file="test.wav"):
+    global quitmark
     start_threshold=30000
     end_threshold=8000
     endlast=10     
@@ -188,6 +189,9 @@ def start_audio(time = 3,save_file="test.wav"):
     data_list =[0]*endlast
 
     while not break_luyin:
+        if quitmark==1:
+            print('main quit')
+            break
         data = stream.read(CHUNK)
         rt_data = np.frombuffer(data,dtype=np.int16)
         fft_temp_data = fftpack.fft(rt_data, rt_data.size, overwrite_x=True)
@@ -208,21 +212,22 @@ def start_audio(time = 3,save_file="test.wav"):
     
     print('auto end')
 
-    lcd_rect(30,40,320,90,splash_theme_color,-1)
-    draw.rectangle((20,30,300,100), splash_theme_color, 'white',width=3)
-    lcd_draw_string(draw,35,48, "RECORDING DONE!", color=(255,0,0), scale=font3, mono_space=False)
-    display.ShowImage(splash)
+    if quitmark==0:
+        lcd_rect(30,40,320,90,splash_theme_color,-1)
+        draw.rectangle((20,30,300,100), splash_theme_color, 'white',width=3)
+        lcd_draw_string(draw,35,48, "RECORDING DONE!", color=(255,0,0), scale=font3, mono_space=False)
+        display.ShowImage(splash)
 
-    stream.stop_stream()
-    stream.close()
-    p.terminate()
+        stream.stop_stream()
+        stream.close()
+        p.terminate()
 
-    wf = wave.open(WAVE_OUTPUT_FILENAME, 'wb')  
-    wf.setnchannels(CHANNELS)
-    wf.setsampwidth(p.get_sample_size(FORMAT))
-    wf.setframerate(RATE)
-    wf.writeframes(b''.join(frames))
-    wf.close()
+        wf = wave.open(WAVE_OUTPUT_FILENAME, 'wb')  
+        wf.setnchannels(CHANNELS)
+        wf.setsampwidth(p.get_sample_size(FORMAT))
+        wf.setframerate(RATE)
+        wf.writeframes(b''.join(frames))
+        wf.close()
     
 
 #define colors
@@ -340,27 +345,28 @@ display.ShowImage(splash)
 #time.sleep(2)
 while 1:
     start_audio()
-    xunfei=''
-    time1 = datetime.now()
-    wsParam = Ws_Param(APPID='7582fa81', APISecret='NzIyYzFkY2NiMzBiMTY1ZjUwYTg4MTFm',
-                       APIKey='924c1939fdffc06651a49289e2fc17f4',
-                       AudioFile='test.wav')
-    lcd_rect(30,40,320,90,splash_theme_color,-1)
-    draw.rectangle((20,30,300,100), splash_theme_color, 'white',width=3)
-    lcd_draw_string(draw,35,48, "Identifying...", color=(255,0,0), scale=font3, mono_space=False)
-    display.ShowImage(splash)
-    websocket.enableTrace(False)
-    wsUrl = wsParam.create_url()
-    ws = websocket.WebSocketApp(wsUrl, on_message=on_message, on_error=on_error, on_close=on_close)
-    ws.on_open = on_open
-    ws.run_forever(sslopt={"cert_reqs": ssl.CERT_NONE})
-    time2 = datetime.now()
-    print(time2-time1)
-    lcd_rect(30,40,320,90,splash_theme_color,-1)
-    draw.rectangle((20,30,300,100), splash_theme_color, 'white',width=3)
-    lcd_draw_string(draw,35,48,xunfei, color=(255,0,0), scale=font3, mono_space=False)
-    display.ShowImage(splash)
-    action(xunfei)
+    if quitmark==0:
+        xunfei=''
+        time1 = datetime.now()
+        wsParam = Ws_Param(APPID='7582fa81', APISecret='NzIyYzFkY2NiMzBiMTY1ZjUwYTg4MTFm',
+                        APIKey='924c1939fdffc06651a49289e2fc17f4',
+                        AudioFile='test.wav')
+        lcd_rect(30,40,320,90,splash_theme_color,-1)
+        draw.rectangle((20,30,300,100), splash_theme_color, 'white',width=3)
+        lcd_draw_string(draw,35,48, "Identifying...", color=(255,0,0), scale=font3, mono_space=False)
+        display.ShowImage(splash)
+        websocket.enableTrace(False)
+        wsUrl = wsParam.create_url()
+        ws = websocket.WebSocketApp(wsUrl, on_message=on_message, on_error=on_error, on_close=on_close)
+        ws.on_open = on_open
+        ws.run_forever(sslopt={"cert_reqs": ssl.CERT_NONE})
+        time2 = datetime.now()
+        print(time2-time1)
+        lcd_rect(30,40,320,90,splash_theme_color,-1)
+        draw.rectangle((20,30,300,100), splash_theme_color, 'white',width=3)
+        lcd_draw_string(draw,35,48,xunfei, color=(255,0,0), scale=font3, mono_space=False)
+        display.ShowImage(splash)
+        action(xunfei)
     if quitmark==1:
         print('main quit')
         break

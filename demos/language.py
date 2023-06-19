@@ -51,7 +51,6 @@ with open(language_ini_path, 'r') as f:
 display_cjk_string(draw,15,17, la['LANGUAGE']['NOW']+content, font_size=font2, color=color_white, background_color=color_bg)
 display_cjk_string(draw,15,77, la['LANGUAGE']['SET'], font_size=font2, color=color_white, background_color=color_bg)
 display.ShowImage(splash)
-print(ct_code,ct_code2)
 
 country_list=[
     ['English','en'],

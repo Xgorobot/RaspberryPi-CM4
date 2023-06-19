@@ -57,5 +57,9 @@
         "BURN":"Burn",
         "NETWORK":"Network",
         "DEVICE":"Device",
-    },
+        "EXAMPLES":"EXAMPLES",
+        "OPENING":"OPEN...",
+        "FAIL":"FAIL",
+        "DEVICE":"Device"
+    }
 }

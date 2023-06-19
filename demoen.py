@@ -184,7 +184,7 @@ def draw_title_bar(index):
 def draw_title_open():
     lcd_rect(0,0,320,35, color=color_bg, thickness=-1)
     draw.line((0, 35, 320, 35), color_unselect)
-    display_cjk_string(draw,85,7, la['DEMOEN']['OPEN...'], font_size=font2, color=color_white, background_color=color_bg)
+    display_cjk_string(draw,85,7, la['DEMOEN']['OPENING'], font_size=font2, color=color_white, background_color=color_bg)
 
 
 def draw_title_error():

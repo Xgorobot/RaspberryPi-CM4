@@ -73,8 +73,8 @@ MENU_ITEMS = [
     ("wpa_set", "16vision","wpa_set",la['DEMOEN']['WAPSET']),
     ("burn", "17vision","burn",la['DEMOEN']['BURN']),
     ("network", "18vision","network",la['DEMOEN']['NETWORK']),
-    ("device", "19vision","device",la['DEMOEN']['DEVICE']),
     ("language", "20vision","language",la['DEMOEN']['LANGUAGE']),
+    ("device", "19vision","device",la['DEMOEN']['DEVICE']) 
 ]
 
 SELECT_BOX=[80,68]
@@ -318,6 +318,8 @@ while True:
                 os.system('sudo python3 ./demos/network.py')
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="group":
                 os.system('python3 ./demos/group.py')
+            elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="language":
+                os.system('python3 ./demos/language.py')
             print('program done')
             draw_title_bar(MENU_CURRENT_SELECT)        
         except BaseException as e:

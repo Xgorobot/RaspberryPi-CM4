@@ -4,6 +4,11 @@ import xgoscreen.LCD_2inch as LCD_2inch
 from key import Button
 from PIL import Image,ImageDraw,ImageFont
 
+import sys
+sys.path.append("..")
+import uiutils
+la=uiutils.load_language()
+
 os.system('sudo chmod 777 /dev/ttyAMA0')
 xgo = xgolib.XGO(port = '/dev/ttyAMA0',version='xgomini')
 
@@ -33,7 +38,7 @@ fm1 = xgo.read_firmware()
 fm2 = xgo.read_lib_version()
 fm3 = "xgo_0609"
 
-lcd_text1(20,10,"DevicesInformation")
+lcd_text1(20,10,la['DEVICE']['DEVICEINFO'])
 lcd_text(50,50,"bin:")
 lcd_text(120,50,fm1)
 lcd_text(50,110,"python:")

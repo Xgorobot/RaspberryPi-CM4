@@ -2,8 +2,10 @@ import os,socket,sys,time
 import spidev as SPI
 import xgoscreen.LCD_2inch as LCD_2inch
 from PIL import Image,ImageDraw,ImageFont
-from key import Button
+import uiutils
 from xgolib import XGO
+
+la=uiutils.load_language()
 
 os.system("sudo chmod 777 -R /dev/ttyAMA0")
 dog = XGO(port='/dev/ttyAMA0',version="xgolite")
@@ -38,7 +40,7 @@ display = LCD_2inch.LCD_2inch()
 display.Init()
 display.clear()
 #button
-button=Button()
+button=utils.Button()
 #const
 if dog_type=='M':
     firmware_info='MINI'
@@ -128,27 +130,27 @@ def main_program():
     if current_selection==1:
         lcd_rect(0,188,320,240,color=btn_unselected,thickness=-1)
         lcd_rect(0,188,110,240,color=btn_selected,thickness=-1)
-        lcd_draw_string(draw, 7, 195, "Program", color=color_white, scale=font2)
-        lcd_draw_string(draw, 142, 195, "R.C.", color=color_white, scale=font2)
-        lcd_draw_string(draw, 215, 195, "Try demo", color=color_white, scale=font2)
+        lcd_draw_string(draw, 7, 195, la['MAIN']['PROGRAM'], color=color_white, scale=font2)
+        lcd_draw_string(draw, 142, 195, la['MAIN']['RC'], color=color_white, scale=font2)
+        lcd_draw_string(draw, 215, 195, la['MAIN']['TRYDEMO'], color=color_white, scale=font2)
         draw.line((110,188,110,240),fill=txt_unselected,width=1,joint=None)
         draw.line((210,188,210,240),fill=txt_unselected,width=1,joint=None)
         draw.rectangle((0,188,320,240),outline=txt_unselected,width=1)
     elif current_selection==2:
         lcd_rect(0,188,320,240,color=btn_unselected,thickness=-1)
         lcd_rect(110,188,210,240,color=btn_selected,thickness=-1)
-        lcd_draw_string(draw, 7, 195, "Program", color=color_white, scale=font2)
-        lcd_draw_string(draw, 142, 195, "R.C.", color=color_white, scale=font2)
-        lcd_draw_string(draw, 215, 195, "Try demo", color=color_white, scale=font2)
+        lcd_draw_string(draw, 7, 195, la['MAIN']['PROGRAM'], color=color_white, scale=font2)
+        lcd_draw_string(draw, 142, 195, la['MAIN']['RC'], color=color_white, scale=font2)
+        lcd_draw_string(draw, 215, 195, la['MAIN']['TRYDEMO'], color=color_white, scale=font2)
         draw.line((110,188,110,240),fill=txt_unselected,width=1,joint=None)
         draw.line((210,188,210,240),fill=txt_unselected,width=1,joint=None)
         draw.rectangle((0,188,320,240),outline=txt_unselected,width=1)
     elif current_selection==3:
         lcd_rect(0,188,320,240,color=btn_unselected,thickness=-1)
         lcd_rect(210,188,320,240,color=btn_selected,thickness=-1)
-        lcd_draw_string(draw, 7, 195, "Program", color=color_white, scale=font2)
-        lcd_draw_string(draw, 142, 195, "R.C.", color=color_white, scale=font2)
-        lcd_draw_string(draw, 215, 195, "Try demo", color=color_white, scale=font2)
+        lcd_draw_string(draw, 7, 195, la['MAIN']['PROGRAM'], color=color_white, scale=font2)
+        lcd_draw_string(draw, 142, 195, la['MAIN']['RC'], color=color_white, scale=font2)
+        lcd_draw_string(draw, 215, 195,la['MAIN']['TRYDEMO'], color=color_white, scale=font2)
         draw.line((110,188,110,240),fill=txt_unselected,width=1,joint=None)
         draw.line((210,188,210,240),fill=txt_unselected,width=1,joint=None)
         draw.rectangle((0,188,320,240),outline=txt_unselected,width=1)
@@ -158,27 +160,27 @@ def main_program():
         if current_selection == 1: 
             print("edublock")
             lcd_rect(0,188,160,240,color=btn_selected,thickness=-1)
-            lcd_draw_string(draw, 25, 195, "Opening...", color=color_white, scale=font2)
+            lcd_draw_string(draw, 25, 195,la['MAIN']['OPENING'], color=color_white, scale=font2)
             time.sleep(1)
             os.system("python3 edublock.py")
             lcd_rect(0,188,160,240,color=btn_selected,thickness=-1)
-            lcd_draw_string(draw, 25, 195, "Program", color=color_white, scale=font2)
+            lcd_draw_string(draw, 25, 195, la['MAIN']['PROGRAM'], color=color_white, scale=font2)
 
         if current_selection == 2: 
             lcd_rect(160,188,320,240,color=btn_selected,thickness=-1)
-            lcd_draw_string(draw, 181, 195, "Opening...", color=color_white, scale=font2)
+            lcd_draw_string(draw, 181, 195, la['MAIN']['OPENING'], color=color_white, scale=font2)
             time.sleep(1)
             lcd_rect(160,188,320,240,color=btn_selected,thickness=-1)
-            lcd_draw_string(draw, 181, 195, "Try demos", color=color_white, scale=font2)
+            lcd_draw_string(draw, 181, 195, la['MAIN']['TRYDEMO'], color=color_white, scale=font2)
             print('turn demos')
             os.system("python3 app/app_dogzilla.py")
             
         if current_selection == 3: 
             lcd_rect(160,188,320,240,color=btn_selected,thickness=-1)
-            lcd_draw_string(draw, 181, 195, "Opening...", color=color_white, scale=font2)
+            lcd_draw_string(draw, 181, 195, la['MAIN']['OPENING'], color=color_white, scale=font2)
             time.sleep(1)
             lcd_rect(160,188,320,240,color=btn_selected,thickness=-1)
-            lcd_draw_string(draw, 181, 195, "Try demos", color=color_white, scale=font2)
+            lcd_draw_string(draw, 181, 195, la['MAIN']['TRYDEMO'], color=color_white, scale=font2)
             #__import__("try_demo-cs.py")
             print('turn demos')
             os.system("python3 demoen.py")

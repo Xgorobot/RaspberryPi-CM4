@@ -1,0 +1,11 @@
+{
+    "MAIN":{
+        "PROGRAM":"Program",
+        "RC":"R.C",
+        "TRYDEMO":"Try demo",
+        "OPENING":"opening..."
+    },
+    "DEVICE":{
+        "DEVICEINFO":"DevicesInformation"
+    }
+}

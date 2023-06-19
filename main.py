@@ -40,7 +40,7 @@ display = LCD_2inch.LCD_2inch()
 display.Init()
 display.clear()
 #button
-button=utils.Button()
+button=uiutils.Button()
 #const
 if dog_type=='M':
     firmware_info='MINI'

@@ -11,6 +11,11 @@ import os
 import _thread as thread
 import signal
 
+import sys
+sys.path.append("..")
+import uiutils
+la=uiutils.load_language()
+
 
 display = LCD_2inch.LCD_2inch()
 display.clear()
@@ -109,7 +114,7 @@ while 1:
           print('ready...')
           splash = Image.new("RGB", (display.height, display.width ),"black")
           draw = ImageDraw.Draw(splash)
-          draw.text((100,95),'READY',fill =(255,255,255),font = font) 
+          draw.text((100,95),la['GROUP']['READY'],fill =(255,255,255),font = font) 
           display.ShowImage(splash)
     if button.press_b() or exitmark==True:
         exitmark=True

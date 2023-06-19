@@ -5,6 +5,11 @@ from PIL import Image,ImageDraw,ImageFont
 from key import Button
 import numpy as np
 
+import sys
+sys.path.append("..")
+import uiutils
+la=uiutils.load_language()
+
 display = LCD_2inch.LCD_2inch()
 display.clear()
 splash = Image.new("RGB", (display.height, display.width ),"black")
@@ -72,7 +77,7 @@ while(True):
 
     if len(barcodes) == 0:
         print('useless data')
-        text = "{}".format('No QR')
+        text = "{}".format(la['NETWORK']['NOQR'])
         img=cv2AddChineseText(img,text, (10, 30),(255, 0, 0),50)
 
     else:
@@ -86,7 +91,7 @@ while(True):
                 print(count_space)
                 if count_space != 0:
                     print('space')
-                    text = "{}".format('QR has space')
+                    text = "{}".format(la['NETWORK']['SPACE'])
                     img=cv2AddChineseText(img,text, (10, 30),(0, 0, 255),45)
                     break
                 else:
@@ -104,7 +109,7 @@ while(True):
                     with open(wifi, 'w') as f:
                         f.write(fc)
                     #text = "{},{},{}".format(barcodeData[a+2:b],barcodeData[c+2:d-9],'success')
-                    text = "{}".format('success')
+                    text = "{}".format(la['NETWORK']['SUCCESS'])
                     img=cv2AddChineseText(img,text, (10, 30),(0, 255, 0), 50)
                     print("[INFO] Found {} barcode: {}".format(barcodeType, barcodeData))
                     break

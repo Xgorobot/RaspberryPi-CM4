@@ -7,5 +7,55 @@
     },
     "DEVICE":{
         "DEVICEINFO":"DevicesInformation"
-    }
+    },
+    "EDUBLOCK":{
+        "NONET":"No net!"
+    },
+    "GROUP":{
+        "READY":"READY"
+    },
+    "OTA":{
+        "BURNING":"Burning"
+    },
+    "DOG_VISION_SHOW":{
+        "PRESSA":"Press A:Record",
+        "PRESSB":"Press B: End Record",
+        "PRESSC":"Press C: Quit",
+        "PRESSD":"Press D: Execute",
+        "ACTION":"ACTION",
+        "READY":"Action Group is Ready",
+        "EXECUTING":"Action Executing",
+        "DONE":"Action Done"
+    },
+    "NETWORK":{
+        "NOQR":"No QR",
+        "SPACE":"QR has space",
+        "SUCCESS":"success"
+    },
+    "WIFISET":{
+        "NOW":"Now contry:",
+        "SET":"Set your contry:",
+        "SAVED":"Saved! Please reset."
+    },
+    "DEMOEN":{
+        "SHOW":"Show",
+        "GROUP":"Group",
+        "MASK":"Mask",
+        "HANDS":"Hands",
+        "TEACH":"Teach",
+        "SEGMENT":"Segment",
+        "FACETRACK":"FaceTrack",
+        "POSE":"Pose",
+        "QRCODE":"QRCode",
+        "SPEECH":"Speech",
+        "COLOR":"Color",
+        "SOUND":"Sound",
+        "HEIGHT":"Height",
+        "YOLO":"Yolo",
+        "WIFISET":"Wifiset",
+        "WAPSET":"Wpaset",
+        "BURN":"Burn",
+        "NETWORK":"Network",
+        "DEVICE":"Device",
+    },
 }

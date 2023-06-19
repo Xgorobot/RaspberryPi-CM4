@@ -4,6 +4,9 @@ import xgoscreen.LCD_2inch as LCD_2inch
 from PIL import Image,ImageDraw,ImageFont
 from key import Button
 from subprocess import check_output
+import uiutils
+
+la=uiutils.load_language()
 
 path=os.getcwd()
 
@@ -77,7 +80,7 @@ print(ipadd)
 if ipadd=='0.0.0.0':
     print('wlan disconnected')
     splash.paste(wifin,(65,200))
-    lcd_draw_string(draw,100, 200, 'No net!', color=color_white, scale=font2)
+    lcd_draw_string(draw,100, 200, la['EDUBLOCK']['NONET'], color=color_white, scale=font2)
 else:
     print('wlan connected')
     splash.paste(wifiy,(65,200))

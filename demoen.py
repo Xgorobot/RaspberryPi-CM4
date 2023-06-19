@@ -1,9 +1,11 @@
-print('run demo')
 import os,socket,sys,time,math
 import spidev as SPI
 import xgoscreen.LCD_2inch as LCD_2inch
 from PIL import Image,ImageDraw,ImageFont
 from key import Button
+
+import uiutils
+la=uiutils.load_language()
 
 path=os.getcwd()
 
@@ -53,25 +55,25 @@ MENU_ITEM_PARENT_PATH = "./pics/"
 
 MENU_ITEMS = [
     #pic kinds program show
-    ("dog_show", "1movement","dog_show","Show"),
-    ("group", "2vision","group","Group"),
-    ("face_mask", "3vision", "face_mask" ,"Mask"),
-    ("hands", "4vision", "hands","Hands"),
-    ("vision", "5movement","vision","Teach"),
-    ("segmentation", "6vision","segmentation","Segment"),
-    ("face_decetion", "7vision", "face_decetion" ,"FaceTrack"),
-    ("pose", "8vision", "pose","Pose"),
-    ("qrcode", "9vision","qrcode","QRCode"),
-    ("speech", "10voice","speech","Speech"),
-    ("color", "11vision","color","Color"),
-    ("sound", "12vision","sound","Sound"),
-    ("height", "13vision","handh","Height"),
-    ("yolo", "14vision","yolofast","Yolo"),
-    ("wifi_set", "15vision","wifi_set","Wifiset"),
-    ("wpa_set", "16vision","wpa_set","Wpaset"),
-    ("burn", "17vision","burn","Burn"),
-    ("network", "18vision","network","Network"),
-    ("device", "19vision","device","Device"),
+    ("dog_show", "1movement","dog_show",la['DEMOEN']['SHOW']),
+    ("group", "2vision","group",la['DEMOEN']['GROUP']),
+    ("face_mask", "3vision", "face_mask" ,la['DEMOEN']['MASK']),
+    ("hands", "4vision", "hands",la['DEMOEN']['HANDS']),
+    ("vision", "5movement","vision",la['DEMOEN']['TEACH']),
+    ("segmentation", "6vision","segmentation",la['DEMOEN']['SEGMENT']),
+    ("face_decetion", "7vision", "face_decetion" ,la['DEMOEN']['FACETRACK']),
+    ("pose", "8vision", "pose",la['DEMOEN']['POSE']),
+    ("qrcode", "9vision","qrcode",la['DEMOEN']['QRCODE']),
+    ("speech", "10voice","speech",la['DEMOEN']['SPEECH']),
+    ("color", "11vision","color",la['DEMOEN']['COLOR']),
+    ("sound", "12vision","sound",la['DEMOEN']['SOUND']),
+    ("height", "13vision","handh",la['DEMOEN']['HEIGHT']),
+    ("yolo", "14vision","yolofast",la['DEMOEN']['YOLO']),
+    ("wifi_set", "15vision","wifi_set",la['DEMOEN']['WIFISET']),
+    ("wpa_set", "16vision","wpa_set",la['DEMOEN']['WAPSET']),
+    ("burn", "17vision","burn",la['DEMOEN']['BURN']),
+    ("network", "18vision","network",la['DEMOEN']['NETWORK']),
+    ("device", "19vision","device",la['DEMOEN']['DEVICE']),
 ]
 
 SELECT_BOX=[80,68]
@@ -175,20 +177,20 @@ def clear_page():
 def draw_title_bar(index):
     lcd_rect(0,0,320,35, color=color_bg, thickness=-1)
     draw.line((0, 35, 320, 35), color_unselect)
-    display_cjk_string(draw,77,7, "EXAMPLES", font_size=font2, color=color_white, background_color=color_bg)
+    display_cjk_string(draw,77,7, la['DEMOEN']['EXAMPLES'], font_size=font2, color=color_white, background_color=color_bg)
     display_cjk_string(draw, 203,7, str(index+1) + "/" + str(MENU_TOTAL_ITEMS+1), font_size=font2, color=color_white, background_color=color_bg)
 
 
 def draw_title_open():
     lcd_rect(0,0,320,35, color=color_bg, thickness=-1)
     draw.line((0, 35, 320, 35), color_unselect)
-    display_cjk_string(draw,85,7, "OPEN...", font_size=font2, color=color_white, background_color=color_bg)
+    display_cjk_string(draw,85,7, la['DEMOEN']['OPEN...'], font_size=font2, color=color_white, background_color=color_bg)
 
 
 def draw_title_error():
     lcd_rect(0,0,320,35, color=color_bg, thickness=-1)
     draw.line((0, 35, 320, 35), color_unselect)
-    display_cjk_string(draw,85,7, "FAIL", font_size=font2, color=color_white, background_color=color_bg)
+    display_cjk_string(draw,85,7, la['DEMOEN']['FAIL'], font_size=font2, color=color_white, background_color=color_bg)
    
 draw_title_bar(0)
 
@@ -328,6 +330,5 @@ while True:
 
 print('quit')
     
-print('run demo')
 
 

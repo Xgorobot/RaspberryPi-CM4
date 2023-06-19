@@ -7,6 +7,11 @@ import numpy as np
 from numpy import linalg
 from xgolib import XGO
 
+import sys
+sys.path.append("..")
+import uiutils
+la=uiutils.load_language()
+
 button=Button()
 #define colors
 color_bg=(8,10,26)
@@ -44,8 +49,8 @@ with open(wifi2, 'r') as f:
     ct2=content2.find('country=')
     ct_code2=content2[ct2+8:ct2+10]
 
-display_cjk_string(draw,15,17, 'Now contry:'+ct_code, font_size=font2, color=color_white, background_color=color_bg)
-display_cjk_string(draw,15,77, 'Set your contry:', font_size=font2, color=color_white, background_color=color_bg)
+display_cjk_string(draw,15,17, la['WIFISET']['NOW']+ct_code, font_size=font2, color=color_white, background_color=color_bg)
+display_cjk_string(draw,15,77, la['WIFISET']['SET'], font_size=font2, color=color_white, background_color=color_bg)
 display.ShowImage(splash)
 print(ct_code,ct_code2)
 
@@ -64,7 +69,7 @@ country_list=[
 select=0
 while 1:
     lcd_rect(0,70,320,120,(255,0,0),-1)
-    display_cjk_string(draw,15,77, 'Set your contry:'+country_list[select][0], font_size=font2, color=color_white, background_color=color_bg)
+    display_cjk_string(draw,15,77, la['WIFISET']['NOW']+country_list[select][0], font_size=font2, color=color_white, background_color=color_bg)
     display.ShowImage(splash)
     if button.press_c():
         if select==0:
@@ -97,7 +102,7 @@ with open(wifi1, 'w') as f:
 with open(wifi2, 'w') as f:
     f.write(content2)
 
-display_cjk_string(draw,15,157, 'Saved! Please reset.', font_size=font2, color=color_white, background_color=color_bg)
+display_cjk_string(draw,15,157, la['WIFISET']['SAVED'], font_size=font2, color=color_white, background_color=color_bg)
 display.ShowImage(splash)
 
 

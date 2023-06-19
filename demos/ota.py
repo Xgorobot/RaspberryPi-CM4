@@ -7,6 +7,11 @@ import xgoscreen.LCD_2inch as LCD_2inch
 import RPi.GPIO as GPIO
 from PIL import Image,ImageDraw,ImageFont
 
+import sys
+sys.path.append("..")
+import uiutils
+la=uiutils.load_language()
+
 os.system('sudo chmod 777 /dev/ttyAMA0')
 xgo = xgolib.XGO(port = '/dev/ttyAMA0',version='xgomini')
 fm=xgo.read_firmware()
@@ -41,7 +46,7 @@ def lcd_rectangleN(x1,y1,x2,y2):
         draw = ImageDraw.Draw(splash)
         draw.rectangle((x1,y1,x2,y2),fill = None,outline = "WHITE",width = 2)
         display.ShowImage(splash)
-lcd_text(70,60,"Burning")
+lcd_text(70,60,la['OTA']['BURNING'])
 lcd_rectangleN(70,130,250,170)
 if fm[0]=='M':
     print('XGO-MINI')

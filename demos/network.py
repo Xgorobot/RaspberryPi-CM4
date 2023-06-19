@@ -69,27 +69,46 @@ while(True):
     ret, img = cap.read() 
     img_ROI_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     barcodes = pyzbar.decode(img_ROI_gray) 
-    for barcode in barcodes:
-        barcodeData = barcode.data.decode("utf-8")
-        barcodeType = barcode.type
-        a = barcodeData.find("S:")
-        b = barcodeData.find(";T:")
-        zz = barcodeData[a+2:b]
-        print(zz)
-        c = barcodeData.find("P:")
-        d = len(barcodeData)
-        yy = barcodeData[c+2:d-9]
-        print(yy)
-        print("hello")
-        ssid = zz
-        pwd =yy
-        fc=makefile(ssid,pwd)
-        with open(wifi, 'w') as f:
-            f.write(fc)
-        text = "{},{}".format(barcodeData[a+2:b],barcodeData[c+2:d-9])
-        img=cv2AddChineseText(img,text, (10, 30),(255, 255, 0), 30)
-        print("[INFO] Found {} barcode: {}".format(barcodeType, barcodeData))
-    
+
+    if len(barcodes) == 0:
+        print('useless data')
+        text = "{}".format('No QR')
+        img=cv2AddChineseText(img,text, (10, 30),(255, 0, 0),50)
+
+    else:
+        for barcode in barcodes:
+            barcodeData = barcode.data.decode("utf-8")
+            barcodeType = barcode.type
+            if len(barcodeData) == 0:
+                pass
+            elif len(barcodeData) != 0:
+                count_space = barcodeData.count(" ")
+                print(count_space)
+                if count_space != 0:
+                    print('space')
+                    text = "{}".format('QR has space')
+                    img=cv2AddChineseText(img,text, (10, 30),(0, 0, 255),45)
+                    break
+                else:
+                    a = barcodeData.find("S:")
+                    b = barcodeData.find(";T:")
+                    SSID = barcodeData[a+2:b]
+                    print(SSID)
+                    print(SSID.count(" "))
+                    c = barcodeData.find("P:")
+                    d = len(barcodeData)
+                    PWD = barcodeData[c+2:d-9]
+                    print(PWD)
+                    print(PWD.count(" "))
+                    fc=makefile(SSID,PWD)
+                    with open(wifi, 'w') as f:
+                        f.write(fc)
+                    #text = "{},{},{}".format(barcodeData[a+2:b],barcodeData[c+2:d-9],'success')
+                    text = "{}".format('success')
+                    img=cv2AddChineseText(img,text, (10, 30),(0, 255, 0), 50)
+                    print("[INFO] Found {} barcode: {}".format(barcodeType, barcodeData))
+                    break
+    print('end')
     b,g,r = cv2.split(img)
     img = cv2.merge((r,g,b))
     imgok = Image.fromarray(img)

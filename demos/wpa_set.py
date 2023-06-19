@@ -111,7 +111,7 @@ while 1:
         fc=makefile(ssid,pwd)
         with open(wifi, 'w') as f:
             f.write(fc)
-    elif button.press_a():
+    elif button.press_b():
         break
 
 

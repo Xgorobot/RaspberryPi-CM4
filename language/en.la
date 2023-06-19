@@ -57,6 +57,7 @@
         "BURN":"Burn",
         "NETWORK":"Network",
         "DEVICE":"Device",
+        "LANGUAGE":"language",
         "EXAMPLES":"EXAMPLES",
         "OPENING":"OPEN...",
         "FAIL":"FAIL",

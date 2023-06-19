@@ -57,6 +57,7 @@
         "BURN":"烧录固件",
         "NETWORK":"无线联网",
         "DEVICE":"设备信息",
+        "LANGUAGE":"语言切换",
         "EXAMPLES":"示例程序",
         "OPENING":"打开中",
         "FAIL":"失败",

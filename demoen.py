@@ -74,6 +74,7 @@ MENU_ITEMS = [
     ("burn", "17vision","burn",la['DEMOEN']['BURN']),
     ("network", "18vision","network",la['DEMOEN']['NETWORK']),
     ("device", "19vision","device",la['DEMOEN']['DEVICE']),
+    ("language", "20vision","language",la['DEMOEN']['LANGUAGE']),
 ]
 
 SELECT_BOX=[80,68]

@@ -7,10 +7,13 @@ import numpy as np
 from numpy import linalg
 from xgolib import XGO
 
-import sys
+import sys,os
 sys.path.append("..")
 import uiutils
 la=uiutils.load_language()
+
+current_dir = os.getcwd()
+language_ini_path = os.path.join(current_dir, "language", "language.ini")
 
 button=Button()
 #define colors
@@ -36,40 +39,30 @@ def display_cjk_string(splash,x, y, text, color=(255,255,255), font_size=1, scal
 def lcd_rect(x,y,w,h,color,thickness):
     draw.rectangle([(x,y),(w,h)],fill=color,width=thickness)
 
-wifi1="/etc/default/crda"
-wifi2="/etc/wpa_supplicant/wpa_supplicant.conf"
+current_dir = os.getcwd()
+language_ini_path = os.path.join(current_dir, "language", "language.ini")
 
-with open(wifi1, 'r') as f:
+
+with open(language_ini_path, 'r') as f:
     content=f.read()
-    ct=content.find('REGDOMAIN=')
-    ct_code=content[ct+10:ct+12]
 
-with open(wifi2, 'r') as f:
-    content2=f.read()
-    ct2=content2.find('country=')
-    ct_code2=content2[ct2+8:ct2+10]
 
-display_cjk_string(draw,15,17, la['WIFISET']['NOW']+ct_code, font_size=font2, color=color_white, background_color=color_bg)
-display_cjk_string(draw,15,77, la['WIFISET']['SET'], font_size=font2, color=color_white, background_color=color_bg)
+
+display_cjk_string(draw,15,17, la['LANGUAGE']['NOW']+content, font_size=font2, color=color_white, background_color=color_bg)
+display_cjk_string(draw,15,77, la['LANGUAGE']['SET'], font_size=font2, color=color_white, background_color=color_bg)
 display.ShowImage(splash)
 print(ct_code,ct_code2)
 
 country_list=[
-    ['United States','US'],
-    ['Britain(UK)','GB'],
-    ['Japan','JP'],
-    ['Koera(South)','KR'],
-    ['China','CN'],
-    ['Australia','AU'],
-    ['Canada','CA'],
-    ['France','FR'],
-    ['Hong Kong','HK'],
-    ['Singapore','SG'],
+    ['English','en'],
+    ['中文','cn'],
+    ['日本語','jp'],
+
 ]
 select=0
 while 1:
     lcd_rect(0,70,320,120,(255,0,0),-1)
-    display_cjk_string(draw,15,77, la['WIFISET']['NOW']+country_list[select][0], font_size=font2, color=color_white, background_color=color_bg)
+    display_cjk_string(draw,15,77, la['LANGUAGE']['NOW']+country_list[select][0], font_size=font2, color=color_white, background_color=color_bg)
     display.ShowImage(splash)
     if button.press_c():
         if select==0:
@@ -85,24 +78,15 @@ while 1:
         break
 
 
-ct_code=country_list[select][1]
-print(ct_code)
-ct_list=list(content)
-ct_list[ct+10:ct+12]=ct_code
-content=''.join(ct_list)
+content=country_list[select][1]
 
-ct_list2=list(content2)
-ct_list2[ct2+8:ct2+10]=ct_code
-content2=''.join(ct_list2)
-print(content,content2)
 
-with open(wifi1, 'w') as f:
+with open(language_ini_path, 'w') as f:
     f.write(content)
 
-with open(wifi2, 'w') as f:
-    f.write(content2)
 
-display_cjk_string(draw,15,157, la['WIFISET']['SAVED'], font_size=font2, color=color_white, background_color=color_bg)
+
+display_cjk_string(draw,15,157, la['LANGUAGE']['SAVED'], font_size=font2, color=color_white, background_color=color_bg)
 display.ShowImage(splash)
 
 

@@ -37,6 +37,11 @@
         "SET":"Set your contry:",
         "SAVED":"Saved! Please reset."
     },
+    "LANGUAGE":{
+        "NOW":"Now language:",
+        "SET":"Set your language:",
+        "SAVED":"Saved! Please reset."
+    },
     "DEMOEN":{
         "SHOW":"Show",
         "GROUP":"Group",

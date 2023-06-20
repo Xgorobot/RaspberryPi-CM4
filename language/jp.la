@@ -1,8 +1,71 @@
 {
     "MAIN":{
-        "PROGRAM":"書式",
-        "RC":"遠隔操作",
-        "TRYDEMO":"実例",
-        "OPENING":"開けて下さい"
+        "PROGRAM":"プログラミング",
+        "RC":"リモコン",
+        "TRYDEMO":"サンプル",
+        "OPENING":"開ける"
+    },
+    "DEVICE":{
+        "DEVICEINFO":"デバイス情報"
+    },
+    "EDUBLOCK":{
+        "NONET":"ネットワークなし"
+    },
+    "GROUP":{
+        "READY":"準備をして"
+    },
+    "OTA":{
+        "BURNING":"燃える"
+    },
+    "DOG_VISION_SHOW":{
+        "PRESSA":"Aキー:録音",
+        "PRESSB":"Bキー: 終わる",
+        "PRESSC":"Cキー: 辞める",
+        "PRESSD":"Dキー: 実行する",
+        "ACTION":"アクション",
+        "READY":"アクション 準備をして",
+        "EXECUTING":"アクション 実行する",
+        "DONE":"アクション 終わる"
+    },
+    "NETWORK":{
+        "NOQR":"QR いいえ",
+        "SPACE":"QR 空砲",
+        "SUCCESS":"継ぐ"
+    },
+    "WIFISET":{
+        "NOW":"Now contry:",
+        "SET":"Set your contry:",
+        "SAVED":"Saved! Please reset."
+    },
+    "LANGUAGE":{
+        "NOW":"今の言語:",
+        "SET":"新しい言語を設定する:",
+        "SAVED":"保存が成功した場合は再起動してください"
+    },
+    "DEMOEN":{
+        "SHOW":"デモモード",
+        "GROUP":"クラスタ制御",
+        "MASK":"人面マスク",
+        "HANDS":"ジェスチャー識別",
+        "TEACH":"ティーチングモード",
+        "SEGMENT":"背景分割",
+        "FACETRACK":"顔追跡",
+        "POSE":"骨識別",
+        "QRCODE":"QRコード",
+        "SPEECH":"音声識別",
+        "COLOR":"カラートラッキング",
+        "SOUND":"オーディオ識別",
+        "HEIGHT":"かんかくせいぎょ",
+        "YOLO":"ターゲット検出",
+        "WIFISET":"チャネルの設定",
+        "WAPSET":"ワイヤレス設定",
+        "BURN":"書き込みファームウェア",
+        "NETWORK":"インターネット",
+        "DEVICE":"デバイス",
+        "LANGUAGE":"言語",
+        "EXAMPLES":"サンプル",
+        "OPENING":"開ける...",
+        "FAIL":"失敗する",
+        "DEVICE":"デバイス"
     }
 }

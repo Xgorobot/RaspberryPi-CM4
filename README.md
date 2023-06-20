@@ -20,3 +20,13 @@ pip install --upgrade xgo-pythonlib
 sudo pip install --upgrade xgo-pythonlib
 ```
 
+## ChangeLog
+
+### [1.0.0] - 2023-6-20 
+
+### The stable version of the image file has been released.
+
+#### Added
+
+- Added a language switching feature for Chinese, English, and Japanese languages.
+- The current version number is displayed on the main page.

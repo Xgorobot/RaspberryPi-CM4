@@ -20,6 +20,8 @@ pip install --upgrade xgo-pythonlib
 sudo pip install --upgrade xgo-pythonlib
 ```
 
+[Xgorobot/XGO-PythonLib(github.com)](https://github.com/Xgorobot/XGO-PythonLib)
+
 ## ChangeLog
 
 ### [1.0.0] - 2023-6-20 

@@ -68,16 +68,19 @@ lcd_rect(0,195,320,240,(48,50,73),thickness=-1)
 
 #--------------------------get IP&SSID--------------------------
 ipadd=ip()
+net=False
 if ipadd=='0.0.0.0':
     print('wlan disconnected')
     lcd_rect(0,195,320,240,(48,50,73),thickness=-1)
     splash.paste(wifin,(65,200))
     lcd_draw_string(draw,100, 200, 'No net!', color=color_white, scale=font2)
+    net=False
 else:
     print('wlan connected')
     lcd_rect(0,195,320,240,(48,50,73),thickness=-1)
     splash.paste(wifiy,(65,200))
     lcd_draw_string(draw,100, 200, ipadd, color=color_white, scale=font2)
+    net=True
     
 splash.paste(uncn,(0,0))
 display.ShowImage(splash)
@@ -98,38 +101,6 @@ from DOGZILLALib import DOGZILLA
 from camera_dogzilla import Dogzilla_Camera
 from gevent import pywsgi
 
-g_debug = False
-
-if len(sys.argv) > 1:
-    if str(sys.argv[1]) == "debug":
-        g_debug = True
-print("debug=", g_debug)
-
-os.system('sudo chmod 777 /dev/ttyAMA0')
-
-g_dog = DOGZILLA()
-g_camera = Dogzilla_Camera(debug=g_debug)
-g_tcp_ip = "x.x.x.x"
-g_init = False
-g_mode = 'Home'
-
-app = Flask(__name__)
-g_step_control = 50
-g_pace_freq = 2
-g_motor_speed = [0, 0, 0, 0]
-g_car_stabilize_state = 0
-
-STEP_SCALE_X = 0.25
-STEP_SCALE_Y = 0.2
-STEP_SCALE_Z = 0.7
-
-g_height = 108
-g_shoulder = 0
-g_action_continuous = 0
-g_press_up = 0
-g_motor_id = 1
-
-g_tcp_except_count = 0
 
 def my_map(x, in_min, in_max, out_min, out_max):
     return (out_max - out_min) * (x - in_min) / (in_max - in_min) + out_min
@@ -709,6 +680,39 @@ def mode_handle():
                 m_fps = 0
                 t_start = time.time()
 
+g_debug = False
+
+if len(sys.argv) > 1:
+    if str(sys.argv[1]) == "debug":
+        g_debug = True
+print("debug=", g_debug)
+
+os.system('sudo chmod 777 /dev/ttyAMA0')
+
+g_dog = DOGZILLA()
+g_camera = Dogzilla_Camera(debug=g_debug)
+g_tcp_ip = "x.x.x.x"
+g_init = False
+g_mode = 'Home'
+
+app = Flask(__name__)
+g_step_control = 50
+g_pace_freq = 2
+g_motor_speed = [0, 0, 0, 0]
+g_car_stabilize_state = 0
+
+STEP_SCALE_X = 0.25
+STEP_SCALE_Y = 0.2
+STEP_SCALE_Z = 0.7
+
+g_height = 108
+g_shoulder = 0
+g_action_continuous = 0
+g_press_up = 0
+g_motor_id = 1
+
+g_tcp_except_count = 0
+
 
 
 @app.route('/')
@@ -730,36 +734,40 @@ def init():
     return render_template('init.html')
 
 
+if net:
+    task_1 = threading.Thread(target=task_press_up_handle, name="task_press_up")
+    task_1.setDaemon(True)
+    task_1.start()
 
-task_1 = threading.Thread(target=task_press_up_handle, name="task_press_up")
-task_1.setDaemon(True)
-task_1.start()
+    def check_button():
+        while 1:
+            time.sleep(0.1)
+            if button.press_b():
+                break
+        print('try to kill')
+        os.system('sudo fuser -k -n tcp 6500')
+        print('6500 killed!')
 
-def check_button():
+    task_2=threading.Thread(target=check_button, name="task_press_up")
+    task_2.start()
+
+
+    init_tcp_socket()
+
+    print("Waiting for connect to the APP!")
+
     while 1:
-        time.sleep(0.1)
         if button.press_b():
             break
-    print('try to kill')
-    os.system('sudo fuser -k -n tcp 6500')
-    print('6500 killed!')
-
-task_2=threading.Thread(target=check_button, name="task_press_up")
-task_2.start()
-
-
-init_tcp_socket()
-
-print("Waiting for connect to the APP!")
-
-while 1:
-    if button.press_b():
-        break
-    try:
-        server = pywsgi.WSGIServer(('0.0.0.0', 6500), app)
-        server.serve_forever()
-    except KeyboardInterrupt:
-        print("-----program end-----")
-        break
+        try:
+            server = pywsgi.WSGIServer(('0.0.0.0', 6500), app)
+            server.serve_forever()
+        except KeyboardInterrupt:
+            print("-----program end-----")
+            break
+else:
+    while 1:
+        if button.press_b():
+            break
 
 print('app quit!')

@@ -330,46 +330,64 @@ def action(act):
     else:
         print('command not find')
         dog.reset()
-    
-dog = XGO(port='/dev/ttyAMA0',version="xgolite")
-#draw.line((2,98,318,98), fill=(255,255,255), width=2)
-draw.rectangle((20,30,300,100), splash_theme_color, 'white',width=3)
-lcd_draw_string(draw,57,100, "Please say the following:", color=(255,255,255), scale=font2, mono_space=False)
-lcd_draw_string(draw,10,130, "Go forward|Go back|Turn left|Turn right", color=(0,255,255), scale=font2, mono_space=False)
-lcd_draw_string(draw,10,150, "Left translation|Right translation|Dance", color=(0,255,255), scale=font2, mono_space=False)
-lcd_draw_string(draw,10,170, "Push up|Take a pee|Sit dow|Wave hand", color=(0,255,255), scale=font2, mono_space=False)
-lcd_draw_string(draw,10,190, "Stretch|Hand shake|Pray", color=(0,255,255), scale=font2, mono_space=False)
-lcd_draw_string(draw,10,210, "Looking for food|Chicken head", color=(0,255,255), scale=font2, mono_space=False)
-display.ShowImage(splash)
-    
-#time.sleep(2)
-while 1:
-    start_audio()
-    if quitmark==0:
-        xunfei=''
-        time1 = datetime.now()
-        wsParam = Ws_Param(APPID='7582fa81', APISecret='NzIyYzFkY2NiMzBiMTY1ZjUwYTg4MTFm',
-                        APIKey='924c1939fdffc06651a49289e2fc17f4',
-                        AudioFile='test.wav')
-        lcd_rect(30,40,320,90,splash_theme_color,-1)
-        draw.rectangle((20,30,300,100), splash_theme_color, 'white',width=3)
-        lcd_draw_string(draw,35,48, "Identifying...", color=(255,0,0), scale=font3, mono_space=False)
-        display.ShowImage(splash)
-        websocket.enableTrace(False)
-        wsUrl = wsParam.create_url()
-        ws = websocket.WebSocketApp(wsUrl, on_message=on_message, on_error=on_error, on_close=on_close)
-        ws.on_open = on_open
-        ws.run_forever(sslopt={"cert_reqs": ssl.CERT_NONE})
-        time2 = datetime.now()
-        print(time2-time1)
-        lcd_rect(30,40,320,90,splash_theme_color,-1)
-        draw.rectangle((20,30,300,100), splash_theme_color, 'white',width=3)
-        lcd_draw_string(draw,35,48,xunfei, color=(255,0,0), scale=font3, mono_space=False)
-        display.ShowImage(splash)
-        action(xunfei)
-    if quitmark==1:
-        print('main quit')
-        break
+
+
+import requests
+net=False
+try:
+    html = requests.get("http://www.baidu.com",timeout=2)
+    net=True
+except:
+    net=False
+
+if net:
+    dog = XGO(port='/dev/ttyAMA0',version="xgolite")
+    #draw.line((2,98,318,98), fill=(255,255,255), width=2)
+    draw.rectangle((20,30,300,100), splash_theme_color, 'white',width=3)
+    lcd_draw_string(draw,57,100, "Please say the following:", color=(255,255,255), scale=font2, mono_space=False)
+    lcd_draw_string(draw,10,130, "Go forward|Go back|Turn left|Turn right", color=(0,255,255), scale=font2, mono_space=False)
+    lcd_draw_string(draw,10,150, "Left translation|Right translation|Dance", color=(0,255,255), scale=font2, mono_space=False)
+    lcd_draw_string(draw,10,170, "Push up|Take a pee|Sit dow|Wave hand", color=(0,255,255), scale=font2, mono_space=False)
+    lcd_draw_string(draw,10,190, "Stretch|Hand shake|Pray", color=(0,255,255), scale=font2, mono_space=False)
+    lcd_draw_string(draw,10,210, "Looking for food|Chicken head", color=(0,255,255), scale=font2, mono_space=False)
+    display.ShowImage(splash)
+        
+    #time.sleep(2)
+    while 1:
+        start_audio()
+        if quitmark==0:
+            xunfei=''
+            time1 = datetime.now()
+            wsParam = Ws_Param(APPID='7582fa81', APISecret='NzIyYzFkY2NiMzBiMTY1ZjUwYTg4MTFm',
+                            APIKey='924c1939fdffc06651a49289e2fc17f4',
+                            AudioFile='test.wav')
+            lcd_rect(30,40,320,90,splash_theme_color,-1)
+            draw.rectangle((20,30,300,100), splash_theme_color, 'white',width=3)
+            lcd_draw_string(draw,35,48, "Identifying...", color=(255,0,0), scale=font3, mono_space=False)
+            display.ShowImage(splash)
+            websocket.enableTrace(False)
+            wsUrl = wsParam.create_url()
+            ws = websocket.WebSocketApp(wsUrl, on_message=on_message, on_error=on_error, on_close=on_close)
+            ws.on_open = on_open
+            ws.run_forever(sslopt={"cert_reqs": ssl.CERT_NONE})
+            time2 = datetime.now()
+            print(time2-time1)
+            lcd_rect(30,40,320,90,splash_theme_color,-1)
+            draw.rectangle((20,30,300,100), splash_theme_color, 'white',width=3)
+            lcd_draw_string(draw,35,48,xunfei, color=(255,0,0), scale=font3, mono_space=False)
+            display.ShowImage(splash)
+            action(xunfei)
+        if quitmark==1:
+            print('main quit')
+            break
+
+else:
+    lcd_draw_string(draw,57,70, "Can't run without network!", color=(255,255,255), scale=font2, mono_space=False)
+    lcd_draw_string(draw,57,120, "Press C button to quit.", color=(255,255,255), scale=font2, mono_space=False)
+    display.ShowImage(splash)
+    while 1:
+        if button.press_b():
+            break
 
 
 

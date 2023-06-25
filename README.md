@@ -30,6 +30,7 @@ sudo pip install --upgrade xgo-pythonlib
 
 - Fixed the bug where the app and speech would get stuck and unable to exit when not connected to the network.
 - Fixed the bug that the sound demo would get stuck and unable to exit.
+- Fixed the bug that the speech demo can't be run correct.
 
 ### [1.0.0] - 2023-6-20 
 

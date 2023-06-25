@@ -165,8 +165,8 @@ def start_audio(time = 3,save_file="test.wav"):
     endlast=10     
     CHUNK = 1024
     FORMAT = pyaudio.paInt16
-    CHANNELS = 2
-    RATE = 8000
+    CHANNELS = 1
+    RATE = 16000
     RECORD_SECONDS = time 
     WAVE_OUTPUT_FILENAME = save_file  
 
@@ -187,7 +187,6 @@ def start_audio(time = 3,save_file="test.wav"):
     start_luyin = False
     break_luyin = False
     data_list =[0]*endlast
-
     while not break_luyin:
         if quitmark==1:
             print('main quit')

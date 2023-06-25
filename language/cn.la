@@ -25,7 +25,8 @@
         "ACTION":"动作",
         "READY":"动作组已经就绪",
         "EXECUTING":"动作组执行中",
-        "DONE":"动作组执行完毕"
+        "DONE":"动作组执行完毕",
+        "MAX":"此功能最多记录12组舵机动作"
     },
     "NETWORK":{
         "NOQR":"没有QR",
@@ -35,12 +36,19 @@
     "WIFISET":{
         "NOW":"现在的国家：",
         "SET":"设置您的国家：",
-        "SAVED":"保存成功！请重启"
+        "QUIT":"关闭",
+        "SAVED":"设置成功，请重启机器人"
+    },
+    "VOLUME":{
+        "VOLUMe":"音量设置",
+        "PERCENT":"百分比:",
+        "QUIT":"关闭",
+        "SAVED":"设置成功，请重启机器人"
     },
      "LANGUAGE":{
         "NOW":"当前语言:",
         "SET":"设置新语言:",
-        "SAVED":"已保存！请重启"
+        "SAVED":"设置成功，请重启机器人"
     },
     "DEMOEN":{
         "SHOW":"表演模式",
@@ -61,6 +69,7 @@
         "WAPSET":"无线设置",
         "BURN":"烧录固件",
         "NETWORK":"无线联网",
+        "VOLUME":"音量",
         "DEVICE":"设备信息",
         "LANGUAGE":"语言切换",
         "EXAMPLES":"示例程序",

@@ -36,7 +36,7 @@ def lcd_text1(x,y,content):
 
 fm1 = xgo.read_firmware()
 fm2 = xgo.read_lib_version()
-fm3 = "xgo_0609"
+fm3 = "xgo623_T"
 
 lcd_text1(20,10,la['DEVICE']['DEVICEINFO'])
 lcd_text(50,50,"bin:")

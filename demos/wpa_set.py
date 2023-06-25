@@ -8,6 +8,11 @@ import numpy as np
 from numpy import linalg
 from xgolib import XGO
 
+import sys
+sys.path.append("..")
+import uiutils
+la=uiutils.load_language()
+
 button=Button()
 #define colors
 color_bg=(8,10,26)
@@ -111,10 +116,16 @@ while 1:
         fc=makefile(ssid,pwd)
         with open(wifi, 'w') as f:
             f.write(fc)
-    elif button.press_b():
+    elif button.press_a():
+        #lcd_rect(0,73,320,125,(0,255,0),-1)
+        display_cjk_string(draw,35,77, 'SSID:'+ssid, font_size=font2, color=color_white, background_color=color_bg)
+        display_cjk_string(draw,35,97, 'PWD:'+pwd, font_size=font2, color=color_white, background_color=color_bg)
+        display_cjk_string(draw,15,157, la['WIFISET']['SAVED'], font_size=font2, color=color_white, background_color=color_bg)
+        display.ShowImage(splash)
+        time.sleep(1)
         break
-
-
+    elif button.press_b():
+        sys.exit()
 
 
 

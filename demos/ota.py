@@ -15,8 +15,8 @@ la=uiutils.load_language()
 os.system('sudo chmod 777 /dev/ttyAMA0')
 xgo = xgolib.XGO(port = '/dev/ttyAMA0',version='xgomini')
 fm=xgo.read_firmware()
-filename_mini = "./bin/mini.bin"
-filename_lite = "./bin/lite.bin"
+filename_mini = "/home/pi/RaspberryPi-CM4-main/firmware/mini.bin"
+filename_lite = "/home/pi/RaspberryPi-CM4-main/firmware/lite.bin"
 
 GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BCM)

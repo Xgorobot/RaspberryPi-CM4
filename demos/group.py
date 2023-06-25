@@ -16,7 +16,6 @@ sys.path.append("..")
 import uiutils
 la=uiutils.load_language()
 
-
 display = LCD_2inch.LCD_2inch()
 display.clear()
 splash = Image.new("RGB", (display.height, display.width ),"white")
@@ -30,7 +29,7 @@ boardcast=False
 exitmark=False
 
 
-pic_path = "./expression/"
+pic_path = "/home/pi/RaspberryPi-CM4-main/demos/expression/"
 _canvas_x, _canvas_y = 0, 0
 
 def display_cjk_string(splash,x, y, text, color=(255,255,255), font_size=1, scale=1, mono_space=False, auto_wrap=True, background_color=(0,0,0)):
@@ -87,7 +86,7 @@ while 1:
           if not playmark:
               playmark=True
               dog.perform(1)  
-              proc=Popen("mplayer dog.mp3", shell=True,preexec_fn=os.setsid) 
+              proc=Popen("mplayer ./demos/dog.mp3", shell=True,preexec_fn=os.setsid) 
               while 1:
                   if playmark==False or boardcast==False or exitmark==True:
                       break
@@ -119,7 +118,7 @@ while 1:
     if button.press_b() or exitmark==True:
         exitmark=True
         try:
-            proc=Popen("mplayer dog.mp3", shell=True) 
+            proc=Popen("mplayer ./demos/dog.mp3", shell=True) 
             proc.terminate()
             proc.kill()
         except:

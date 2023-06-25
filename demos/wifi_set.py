@@ -69,7 +69,7 @@ country_list=[
 select=0
 while 1:
     lcd_rect(0,70,320,120,(255,0,0),-1)
-    display_cjk_string(draw,15,77, la['WIFISET']['NOW']+country_list[select][0], font_size=font2, color=color_white, background_color=color_bg)
+    display_cjk_string(draw,15,77, la['WIFISET']['SET']+country_list[select][0], font_size=font2, color=color_white, background_color=color_bg)
     display.ShowImage(splash)
     if button.press_c():
         if select==0:
@@ -81,9 +81,13 @@ while 1:
             select=0
         else:
             select+=1
-    elif button.press_b():
+    elif button.press_a():
         break
-
+    elif button.press_b():
+        #display_cjk_string(draw,15,157,la['WIFISET']['QUIT'], font_size=font2, color=color_white, background_color=color_bg)
+        #display.ShowImage(splash)
+        time.sleep(0.5)
+        sys.exit()
 
 ct_code=country_list[select][1]
 print(ct_code)

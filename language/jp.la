@@ -1,6 +1,6 @@
 {
     "MAIN":{
-        "PROGRAM":"プログラミング",
+        "PROGRAM":"プログラム",
         "RC":"リモコン",
         "TRYDEMO":"サンプル",
         "OPENING":"開ける"
@@ -25,7 +25,8 @@
         "ACTION":"アクション",
         "READY":"アクション 準備をして",
         "EXECUTING":"アクション 実行する",
-        "DONE":"アクション 終わる"
+        "DONE":"アクション 終わる",
+        "MAX":"12セットまでの最大記録数 "
     },
     "NETWORK":{
         "NOQR":"QR いいえ",
@@ -33,35 +34,43 @@
         "SUCCESS":"継ぐ"
     },
     "WIFISET":{
-        "NOW":"Now contry:",
-        "SET":"Set your contry:",
-        "SAVED":"Saved! Please reset."
+        "NOW":"現在の照合:",
+        "SET":"設定制御:",
+        "QUIT":"終了",
+        "SAVED":"成功しました,再起動してください"
+    },
+    "VOLUME":{
+        "VOLUMe":"たいせき",
+        "PERCENT":"パーセント:",
+        "QUIT":"閉じる",
+        "SAVED":"成功しました,再起動してください"
     },
     "LANGUAGE":{
         "NOW":"今の言語:",
         "SET":"新しい言語を設定する:",
-        "SAVED":"保存が成功した場合は再起動してください"
+        "SAVED":"成功しました,再起動してください"
     },
     "DEMOEN":{
         "SHOW":"デモモード",
         "GROUP":"クラスタ制御",
         "MASK":"人面マスク",
-        "HANDS":"ジェスチャー識別",
-        "TEACH":"ティーチングモード",
+        "HANDS":"ジェスチャー",
+        "TEACH":"教える",
         "SEGMENT":"背景分割",
         "FACETRACK":"顔追跡",
         "POSE":"骨識別",
         "QRCODE":"QRコード",
         "SPEECH":"音声識別",
-        "COLOR":"カラートラッキング",
-        "SOUND":"オーディオ識別",
-        "HEIGHT":"かんかくせいぎょ",
-        "YOLO":"ターゲット検出",
-        "WIFISET":"チャネルの設定",
-        "WAPSET":"ワイヤレス設定",
-        "BURN":"書き込みファームウェア",
-        "NETWORK":"インターネット",
-        "DEVICE":"デバイス",
+        "COLOR":"カラー",
+        "SOUND":"オーディオ",
+        "HEIGHT":"身長",
+        "YOLO":"Yolo",
+        "WIFISET":"5G",
+        "WAPSET":"SSID",
+        "BURN":"書き込み",
+        "NETWORK":"スキャン",
+        "VOLUME":"音量",
+        "DEVICE":"機器情報s",
         "LANGUAGE":"言語",
         "EXAMPLES":"サンプル",
         "OPENING":"開ける...",

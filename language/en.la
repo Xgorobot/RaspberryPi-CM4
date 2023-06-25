@@ -25,7 +25,8 @@
         "ACTION":"ACTION",
         "READY":"Action Group is Ready",
         "EXECUTING":"Action Executing",
-        "DONE":"Action Done"
+        "DONE":"Action Done",
+        "MAX":"Maximum record of 12 sets"
     },
     "NETWORK":{
         "NOQR":"No QR",
@@ -35,12 +36,19 @@
     "WIFISET":{
         "NOW":"Now contry:",
         "SET":"Set your contry:",
-        "SAVED":"Saved! Please reset."
+        "QUIT":"Quit",
+        "SAVED":"Success,Please restart the robot"
+    },
+    "VOLUME":{
+        "VOLUMe":"Volume",
+        "PERCENT":"Percent:",
+        "QUIT":"Quit",
+        "SAVED":"Success,Please restart the robot"
     },
     "LANGUAGE":{
         "NOW":"Now language:",
         "SET":"Set your language:",
-        "SAVED":"Saved! Please reset."
+        "SAVED":"Success,Please restart the robot"
     },
     "DEMOEN":{
         "SHOW":"Show",
@@ -57,12 +65,13 @@
         "SOUND":"Sound",
         "HEIGHT":"Height",
         "YOLO":"Yolo",
-        "WIFISET":"Wifiset",
-        "WAPSET":"Wpaset",
+        "WIFISET":"5G",
+        "WAPSET":"Ssid",
         "BURN":"Burn",
         "NETWORK":"Network",
+        "VOLUME":"Volume",
         "DEVICE":"Device",
-        "LANGUAGE":"language",
+        "LANGUAGE":"Language",
         "EXAMPLES":"EXAMPLES",
         "OPENING":"OPEN...",
         "FAIL":"FAIL",

@@ -43,9 +43,9 @@ display.clear()
 button=uiutils.Button()
 #const
 if dog_type=='M':
-    firmware_info='MINI v1.0.1'
+    firmware_info='MINI'
 elif dog_type=='L':
-    firmware_info='LITE v1.0.1'
+    firmware_info='LITE'
 #font
 font1 = ImageFont.truetype("/home/pi/model/msyh.ttc",15)
 font2 = ImageFont.truetype("/home/pi/model/msyh.ttc",22)

@@ -74,7 +74,8 @@ MENU_ITEMS = [
     ("burn", "17vision","burn",la['DEMOEN']['BURN']),
     ("network", "18vision","network",la['DEMOEN']['NETWORK']),
     ("language", "20vision","language",la['DEMOEN']['LANGUAGE']),
-    ("device", "19vision","device",la['DEMOEN']['DEVICE']) 
+    ("volume", "21vision","volume",la['DEMOEN']['VOLUME']) ,
+    ("device", "19vision","device",la['DEMOEN']['DEVICE'])
 ]
 
 SELECT_BOX=[80,68]
@@ -320,6 +321,8 @@ while True:
                 os.system('python3 ./demos/group.py')
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="language":
                 os.system('python3 ./demos/language.py')
+            elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="volume":
+                os.system('python3 ./demos/volume.py')
             print('program done')
             draw_title_bar(MENU_CURRENT_SELECT)        
         except BaseException as e:

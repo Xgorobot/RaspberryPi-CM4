@@ -54,13 +54,24 @@ class Button:
             return True
 
 def load_language():
+    #返回当前的目录
     current_dir = os.getcwd()
+    #test
+    print(current_dir)
+    #用于路径拼接文件路径
     language_ini_path = os.path.join(current_dir, "language", "language.ini")
+    #test
+    print(language_ini_path)
     with open(language_ini_path,'r') as f:#r为标识符，表示只读
         language=f.read()
+        #test
+        print(language)
     language_pack=os.path.join(current_dir, "language", language+".la")
+    #test
+    print(language_pack)
     with open(language_pack,'r') as f:#r为标识符，表示只读
         language_json=f.read()
+    #读取到这个文件中的所有内容，并且读取的结果返回为python的dict对象
     language_dict=json.loads(language_json)
     return language_dict
     

@@ -28,6 +28,7 @@ sudo pip install --upgrade xgo-pythonlib
 #### Fixed
 - English language keywords have been revised.
 - Unifying the interaction logic of 5G SSID and volume.
+- Upgraded the bin firmware for mini and lite.
 ### [1.0.1] - 2023-6-25
 
 #### Fixed

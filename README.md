@@ -23,7 +23,11 @@ sudo pip install --upgrade xgo-pythonlib
 [Xgorobot/XGO-PythonLib(github.com)](https://github.com/Xgorobot/XGO-PythonLib)
 
 ## ChangeLog
+### [xgo0627] - 2023-6-27
 
+#### Fixed
+- English language keywords have been revised.
+- Unifying the interaction logic of 5G SSID and volume.
 ### [1.0.1] - 2023-6-25
 
 #### Fixed

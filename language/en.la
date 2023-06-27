@@ -34,8 +34,8 @@
         "SUCCESS":"success"
     },
     "WIFISET":{
-        "NOW":"Now contry:",
-        "SET":"Set your contry:",
+        "NOW":"Current Country:",
+        "SET":"Select your country:",
         "QUIT":"Quit",
         "SAVED":"Success,Please restart the robot"
     },
@@ -46,8 +46,8 @@
         "SAVED":"Success,Please restart the robot"
     },
     "LANGUAGE":{
-        "NOW":"Now language:",
-        "SET":"Set your language:",
+        "NOW":"Current language:",
+        "SET":"Language setting:",
         "SAVED":"Success,Please restart the robot"
     },
     "DEMOEN":{

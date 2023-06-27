@@ -18,7 +18,7 @@
         "BURNING":"烧录中"
     },
     "DOG_VISION_SHOW":{
-        "PRESSA":"按下A：开始录制",
+        "PRESSA":"按下A：开始记录",
         "PRESSB":"按下B：结束录制",
         "PRESSC":"按下C：退出程序",
         "PRESSD":"按下D：执行动作",
@@ -34,8 +34,8 @@
         "SUCCESS":"成功"
     },
     "WIFISET":{
-        "NOW":"现在的国家：",
-        "SET":"设置您的国家：",
+        "NOW":"当前国家：",
+        "SET":"选择您所在的国家：",
         "QUIT":"关闭",
         "SAVED":"设置成功，请重启机器人"
     },
@@ -47,7 +47,7 @@
     },
      "LANGUAGE":{
         "NOW":"当前语言:",
-        "SET":"设置新语言:",
+        "SET":"语言设置:",
         "SAVED":"设置成功，请重启机器人"
     },
     "DEMOEN":{
@@ -69,12 +69,11 @@
         "WAPSET":"无线设置",
         "BURN":"烧录固件",
         "NETWORK":"无线联网",
-        "VOLUME":"音量",
+        "VOLUME":"音量设置",
         "DEVICE":"设备信息",
         "LANGUAGE":"语言切换",
         "EXAMPLES":"示例程序",
         "OPENING":"打开中",
-        "FAIL":"失败",
-        "DEVICE":"设备"
+        "FAIL":"失败"
     }
 }

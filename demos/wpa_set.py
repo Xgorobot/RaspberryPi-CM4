@@ -26,12 +26,12 @@ display.clear()
 #splash
 splash = Image.new("RGB", (display.height, display.width ),splash_theme_color)
 draw = ImageDraw.Draw(splash)
-#splash=splash.rotate(180)
+
 display.ShowImage(splash)
 #font
 font1 = ImageFont.truetype("/home/pi/model/msyh.ttc",12)
 font2 = ImageFont.truetype("/home/pi/model/msyh.ttc",20)
-#-----------------------COMMON INIT-----------------------
+
 def display_cjk_string(splash,x, y, text, color=(255,255,255), font_size=1, scale=1, mono_space=False, auto_wrap=True, background_color=(0,0,0)):
     splash.text((x,y),text,fill =color,font = font_size) 
 def lcd_rect(x,y,w,h,color,thickness):
@@ -117,7 +117,6 @@ while 1:
         with open(wifi, 'w') as f:
             f.write(fc)
     elif button.press_a():
-        #lcd_rect(0,73,320,125,(0,255,0),-1)
         display_cjk_string(draw,35,77, 'SSID:'+ssid, font_size=font2, color=color_white, background_color=color_bg)
         display_cjk_string(draw,35,97, 'PWD:'+pwd, font_size=font2, color=color_white, background_color=color_bg)
         display_cjk_string(draw,15,157, la['WIFISET']['SAVED'], font_size=font2, color=color_white, background_color=color_bg)

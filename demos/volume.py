@@ -63,11 +63,8 @@ while 1:
     elif button.press_a():
         break
     elif button.press_b():
-        #display_cjk_string(draw,15,157, la['VOLUME']['QUIT'], font_size=font2, color=color_white, background_color=color_bg)
-        #display.ShowImage(splash)
         time.sleep(0.5)
         sys.exit()
-
 
 ct_code=country_list[select][0]
 print(ct_code)

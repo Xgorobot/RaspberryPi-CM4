@@ -229,46 +229,59 @@ while True:
 
     if (key_state_left == 1):
         MENU_CURRENT_SELECT -= 1
-        if MENU_CURRENT_SELECT <= 0: MENU_CURRENT_SELECT = 0
+        if MENU_CURRENT_SELECT <0:
+            MENU_CURRENT_SELECT = MENU_TOTAL_ITEMS
+            MENU_PAGE_SWAP_COUNT += 1
 
         draw_title_bar(MENU_CURRENT_SELECT)
 
-        if (MENU_CURRENT_SELECT % 12 > 0) and (MENU_CURRENT_SELECT % 12 < 11): 
+        if (MENU_CURRENT_SELECT % 12 >= 0) and (MENU_CURRENT_SELECT % 12 < 11) and (MENU_PAGE_SWAP_COUNT == 0): 
             draw_item(MENU_CURRENT_SELECT % 12, "cleardown", MENU_CURRENT_SELECT+1)
-            draw_item(MENU_CURRENT_SELECT % 12, 'selected', MENU_CURRENT_SELECT)
-        elif (MENU_CURRENT_SELECT % 12 == 0): 
+        elif (MENU_CURRENT_SELECT % 12 >= 0) and (MENU_CURRENT_SELECT % 12 < 8) and (MENU_PAGE_SWAP_COUNT == 1): 
             draw_item(MENU_CURRENT_SELECT % 12, "cleardown", MENU_CURRENT_SELECT+1)
-            draw_item(MENU_CURRENT_SELECT % 12, 'selected', MENU_CURRENT_SELECT)
+            
+        draw_item(MENU_CURRENT_SELECT % 12, 'selected', MENU_CURRENT_SELECT)
 
         if ((MENU_CURRENT_SELECT % 12) == 11) and (MENU_CURRENT_SELECT != 0):
             clear_page()
             MENU_PAGE_SWAP_COUNT -= 1 
             for i in range(MENU_CURRENT_SELECT-11,MENU_CURRENT_SELECT+1,1):
                 draw_item(i % 12, 'unselected', i)
-            draw_item(MENU_CURRENT_SELECT % 12, 'selected', MENU_CURRENT_SELECT)
-
+        elif ((MENU_CURRENT_SELECT % 12) == 8) and (MENU_CURRENT_SELECT > 11):
+               clear_page()
+               for i in range(MENU_CURRENT_SELECT-8,MENU_TOTAL_ITEMS+1,1):
+                   draw_item(i % 12, 'unselected', i)
+               
+        draw_item(MENU_CURRENT_SELECT % 12, 'selected', MENU_CURRENT_SELECT)
+        
         print("Key A Pressed, Current Selection: " + str(MENU_CURRENT_SELECT) + ", \t"+ str(MENU_CURRENT_SELECT % 12) + ", "+ str(MENU_PAGE_SWAP_COUNT) + ", "+ str(MENU_PAGES_TOTAL))
 
     if (key_state_right == 1):
         MENU_CURRENT_SELECT += 1
-        if MENU_CURRENT_SELECT >= MENU_TOTAL_ITEMS: MENU_CURRENT_SELECT = MENU_TOTAL_ITEMS
+        if MENU_CURRENT_SELECT > MENU_TOTAL_ITEMS: 
+            MENU_CURRENT_SELECT = 0
+            MENU_PAGE_SWAP_COUNT -= 1
+
         draw_title_bar(MENU_CURRENT_SELECT)
 
         if (MENU_CURRENT_SELECT % 12 > 0) and (MENU_CURRENT_SELECT % 12 < 11): 
             draw_item(MENU_CURRENT_SELECT % 12, "clearup", MENU_CURRENT_SELECT-1)
-            draw_item(MENU_CURRENT_SELECT % 12, 'selected', MENU_CURRENT_SELECT)
         elif (MENU_CURRENT_SELECT % 12 == 11): 
             draw_item(MENU_CURRENT_SELECT % 12, "clearup", MENU_CURRENT_SELECT-1)
-            draw_item(MENU_CURRENT_SELECT % 12, 'selected', MENU_CURRENT_SELECT)
-
+         
+        draw_item(MENU_CURRENT_SELECT % 12, 'selected', MENU_CURRENT_SELECT)
 
         if ((MENU_CURRENT_SELECT % 12) == 0) and (MENU_CURRENT_SELECT != 0):
             clear_page()
             MENU_PAGE_SWAP_COUNT += 1 
-            print(MENU_CURRENT_SELECT,MENU_TOTAL_ITEMS+1,1)
-            for i in range(MENU_CURRENT_SELECT,MENU_TOTAL_ITEMS+1,1):
+            for i in range(MENU_CURRENT_SELECT,MENU_TOTAL_ITEMS+1,1): #works
                 draw_item(i % 12, 'unselected', i)
-            draw_item(MENU_CURRENT_SELECT % 12, 'selected', MENU_CURRENT_SELECT)
+        elif (MENU_CURRENT_SELECT % 12) == 0:
+              clear_page()
+              for i in range(MENU_CURRENT_SELECT, MENU_CURRENT_SELECT + 12,1):
+                  draw_item(i % 12, 'unselected', i)
+                  
+        draw_item(MENU_CURRENT_SELECT % 12, 'selected', MENU_CURRENT_SELECT)
 
         print("Key B Pressed, Current Selection: " + str(MENU_CURRENT_SELECT) + ", \t"+ str(MENU_CURRENT_SELECT % 12) + ", "+ str(MENU_PAGE_SWAP_COUNT) + ", "+ str(MENU_PAGES_TOTAL))
 
@@ -336,5 +349,6 @@ while True:
 
 print('quit')
     
+
 
 

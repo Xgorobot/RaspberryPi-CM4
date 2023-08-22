@@ -60,7 +60,7 @@
         "FACETRACK":"人脸跟踪",
         "POSE":"骨骼识别",
         "QRCODE":"二维码",
-        "SPEECH":"语言识别",
+        "SPEECH":"语音识别",
         "COLOR":"颜色跟踪",
         "SOUND":"音频识别",
         "HEIGHT":"隔空控制",
@@ -74,6 +74,9 @@
         "LANGUAGE":"语言切换",
         "EXAMPLES":"示例程序",
         "OPENING":"打开中",
-        "FAIL":"失败"
+        "FAIL":"失败",
+        "CHATGPT":"ChatGPT",
+        "GPTCMD":"具身智能"
+
     }
 }

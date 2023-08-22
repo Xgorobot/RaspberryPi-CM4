@@ -75,6 +75,8 @@
         "EXAMPLES":"サンプル",
         "OPENING":"開ける...",
         "FAIL":"失敗する",
-        "DEVICE":"デバイス"
+        "DEVICE":"デバイス",
+        "CHATGPT":"ChatGPT",
+        "GPTCMD":"RobotGPT"
     }
 }

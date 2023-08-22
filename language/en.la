@@ -75,6 +75,8 @@
         "EXAMPLES":"EXAMPLES",
         "OPENING":"OPEN...",
         "FAIL":"FAIL",
-        "DEVICE":"Device"
+        "DEVICE":"Device",
+        "CHATGPT":"ChatGPT",
+        "GPTCMD":"RobotGPT"
     }
 }

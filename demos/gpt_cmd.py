@@ -21,67 +21,64 @@ from xgoedu import XGOEDU
 xgo = XGOEDU()
 
 prompt='''
-【角色】请扮演一个资深的机器人开发者，你精通树莓派，机器人和python开发。
-【任务】根据命令词让机器狗按照提供的python库自动生成python代码。
-【要求】只返回根据命令词语自动生成的python代码，代码前面的内容和代码后面的内容都不要回复给我。
-具体的python库如下，机器狗的Python控制接口,分别为前进，后退、左平移、右平移，旋转、沿XYZ轴三个轴方向平移和旋转，以及做动作组。
-xgo.move_x(step)  #step的单位为毫米,前进为正,后退为负，0表示停止，取值范围是[-25,25]mm。
-xgo.move_y(step)  #step的单位为毫米,左平移为正,右平移为负，0表示停止，取值范围是[-18,18]mm。
-xgo.turn(speed)  #speed为角速度, 正数为顺时针,负数为逆时针，0表示停止，取值范围是[-150,150] 。
-xgo.pace(mode) #mode为slow,normal或者high 。表示机器狗的踏步频率高低。
-time.sleep(X) #X的单位是秒，表示上一条指令运动时长。
-xgo.action(id) #id为动作组接口，id取值范围为1-21,分别对应[趴下,站起,转圈,匍匐前进,原地踏步,蹲起,沿x转动,沿y转动,沿z转动,三轴转动,撒尿,坐下,招手,伸懒腰,波浪运动,摇摆运动,求食,找食物,握手,展示机械臂,俯卧撑],即趴下的id为1,匍匐前进为4,求食为18。        
-xgo.translation(direction, data)  # direction取值为'x','y','z' ,data的单位是毫米，沿X轴正方向平移为正数，0表示回到初始位置，沿着X负方向平移为负数，取值范围是[-35,35]mm，y轴和z轴同理。
-xgo.attitude(direction, data)  #direction取值为'r','p','y' ,data的单位是度，沿X轴正时针旋转为正数，0表示回到初始位置，沿着X逆时针旋转为负数，取值范围是[-20,20]mm，y轴和z轴旋转运动同理。
-arm( arm_x, arm_z) #表示arm_x取值范围是[-80,155]和arm_z的取值范围是[-95，155]
-claw(pos) #pos的取值是0-255，其中0表示机夹爪完全张开，255表示夹爪完全闭合。
-imu(mode) #mode的取值为0或者1，0代表关闭自稳定模式，1表示打开自稳定模式。
-reset()# 复位
-lcd_picture(filename)   #此函数用于机器狗显示表情，有攻击，愤怒，厌恶，喜欢，调皮，祈祷，伤心，敏感，困，道歉，惊讶。
-我希望你能根据我的命令,利用以上函数写出对应的运动代码。
+【Role】Please play the role of an experienced robot developer. You are an expert in Raspberry Pi, robotics, and Python development.
+【Task】Generate Python code based on command words for the robot dog using the provided Python library.
+【Requirements】The Python code, which is automatically generated based on command words, must output a document in MD format.
 
-下面我会给你一些例子形式为(命令,代码):
+The specific Python library is as follows, the Python control interface for the robot dog, including: forward, backward, left shift, right shift, rotate, translate and rotate along the XYZ axis, and perform action groups.
+xgo.move_x(step)  #The unit of step is millimeters. Positive is forward, negative is backward, 0 means stop, and the range is [-25,25]mm.
+xgo.move_y(step)  #The unit of step is millimeters. Positive is left shift, negative is right shift, 0 means stop, and the range is [-18,18]mm.
+xgo.turn(speed)  #Speed is the angular velocity, positive is clockwise, negative is counterclockwise, 0 means stop, and the range is [-150,150].
+xgo.pace(mode) #Mode is slow, normal, or high. This represents the pace of the robot dog.
+time.sleep(X) #The unit of X is seconds, which indicates the duration of the previous instruction.
+xgo.action(id) #id is the action group interface, id ranges from 1-24, corresponding to [lie down, stand up, crawl ,turn around, squat, Turn roll, Turn pitch, Turn yaw, 3 axis motion, tke a pee, sit down, wave hand, stretch, wave body, wave side, pray, looking for food, handshake, Chicken head, push-up,seek,dance,Naughty], i.e. the id for lie down is 1, crawl is 4, pray is 18, grab up is 129 , grab mid is 130 , grab down is 130.
+xgo.translation(direction, data)  #The value of direction is 'x', 'y', 'z'. The unit of data is millimeters. Positive along the X-axis means forward, 0 means return to the initial position, and negative along the X-axis means backward. The range is [-35,35]mm. The same applies to the y-axis and z-axis.
+xgo.attitude(direction, data)  #The value of direction is 'r', 'p', 'y'. The unit of data is degrees. Positive along the X-axis means clockwise rotation, 0 means return to the initial position, and negative along the X-axis means counterclockwise rotation. The range is [-20,20]mm. The same applies to rotation along the y-axis and z-axis.
+arm( arm_x, arm_z) #The range for arm_x is [-80,155] and the range for arm_z is [-95,155]
+claw(pos) #The range for pos is 0-255, where 0 means the claw is fully open, 255 means the claw is fully closed.
+imu(mode) #The value for mode is 0 or 1, 0 means turn off self-stabilization mode, 1 means turn on self-stabilization mode.
+reset()#
+lcd_picture(filename)   #This function is used for the robot dog to display expressions, such as attack, anger, disgust, like, naughty, pray, sad, sensitive, sleepy, apologize, surprise.
+xgoSpeaker(filename)  #This function is used for the robot dog to bark, such as attack, anger, disgust, like, naughty, pray, sad, sensitive, sleepy, apologize, surprise.
+I hope you can generate the corresponding motion code using the above functions according to my command.
 
-请在每个程序前加上以下两句初始化代码
+Below are some examples in the form of (command, code):
+
+Please add the following two initialization codes before each program
 from xgolib import XGO
 from xgoedu import XGOEDU
 xgo=XGO("xgolite")
 XGO_edu = XGOEDU()
 
-示例1
-命令:前进5秒
-代码:
-import time
+Example 1
+Command: Move forward for 5 seconds
+Code:
 from xgolib import XGO
 xgo=XGO("xgolite")
 xgo.move_x(15)
 time.sleep(5)
 xgo.move_x(0)
 
-示例2
-命令:左平移5秒
-代码:
-import time
+Example 2
+Command: Shift left for 5 seconds
+Code:
 from xgolib import XGO
 xgo=XGO("xgolite")
 xgo.move_y(15)
 time.sleep(5)
 xgo.move_y(0)
 
-示例3
-命令:以100的角速度旋转3秒
-代码:
-import time
+Example 3
+Command: Rotate at an angular velocity of 100 for 3 seconds
+Code:
 from xgolib import XGO
 xgo=XGO("xgolite")
 xgo.turn(100)
 time.sleep(3)
 xgo.turn(0)
 
-
-示例4
-命令:前进3秒,撒个尿,左转3秒,展示机械臂:
-import time
+Example 4
+Command: Move forward for 3 seconds, urinate, turn left for 3 seconds, show mechanical arm
 from xgolib import XGO
 xgo=XGO("xgolite")
 xgo.move_x(15)
@@ -93,17 +90,18 @@ time.sleep(3)
 xgo.turn(0)
 xgo.action(20)
 
-示例5
-命令：显示开心的表情，并伸懒腰
-import time
+Example 5
+Command: Display a happy expression, then stretch
 from xgolib import XGO
 from xgoedu import XGOEDU
 xgo=XGO("xgolite")
 XGO_edu = XGOEDU()
+
+
 xgo.action(14)
 time.sleep(3)
 XGO_edu.lcd_picture(like) 
-示例结束了，请根据命令返回python代码，把注释写在返回的代码里面，最后一句是xgo.reset()让其复位，你必须输出md格式的文档。
+The example has ended. Please provide Python code based on the commands, with comments included within the code. The final statement should be xgo.reset() to reset it. You must output the document in Markdown format.
 '''
 
 quitmark=0

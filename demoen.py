@@ -65,6 +65,8 @@ MENU_ITEMS = [
     ("pose", "8vision", "pose",la['DEMOEN']['POSE']),
     ("qrcode", "9vision","qrcode",la['DEMOEN']['QRCODE']),
     ("speech", "10voice","speech",la['DEMOEN']['SPEECH']),
+    ("chatgpt", "10voice","chatgpt",la['DEMOEN']['CHATGPT']),
+    ("gpt_cmd", "10voice","gpt_cmd",la['DEMOEN']['GPTCMD']),
     ("color", "11vision","color",la['DEMOEN']['COLOR']),
     ("sound", "12vision","sound",la['DEMOEN']['SOUND']),
     ("height", "13vision","handh",la['DEMOEN']['HEIGHT']),
@@ -336,6 +338,10 @@ while True:
                 os.system('python3 ./demos/language.py')
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="volume":
                 os.system('python3 ./demos/volume.py')
+            elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="chatgpt":
+                os.system('python3 ./demos/chatgpt.py')
+            elif MENU_ITEMS[MENU_CURRENT_SELECT][2]=="gpt_cmd":
+                os.system('python3 ./demos/gpt_cmd.py')
             print('program done')
             draw_title_bar(MENU_CURRENT_SELECT)        
         except BaseException as e:
@@ -349,6 +355,5 @@ while True:
 
 print('quit')
     
-
 
 

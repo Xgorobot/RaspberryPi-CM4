@@ -119,7 +119,7 @@ def lcd_rect(x,y,w,h,color,thickness):
     draw.rectangle([(x,y),(w,h)],fill=color,width=thickness)
 
 
-openai.api_key = "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"
+openai.api_key = "***"
 
 def gpt(speech_text):
     completion = openai.ChatCompletion.create(

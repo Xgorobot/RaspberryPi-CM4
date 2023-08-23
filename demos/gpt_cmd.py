@@ -18,6 +18,10 @@ from scipy import fftpack
 
 from xgoedu import XGOEDU 
 
+#os.environ["http_proxy"] = "http://192.168.31.203:7890"
+#os.environ["https_proxy"] = "http://192.168.31.203:7890"
+openai.api_key = "***"
+
 xgo = XGOEDU()
 
 prompt='''
@@ -117,8 +121,7 @@ def action(num):
 check_button = threading.Thread(target=action, args=(0,))
 check_button.start()
 
-#os.environ["http_proxy"] = "http://192.168.31.203:7890"
-#os.environ["https_proxy"] = "http://192.168.31.203:7890"
+
 
 btn_selected = (24,47,223)
 btn_unselected = (20,30,53)
@@ -147,7 +150,7 @@ def lcd_draw_string(splash,x, y, text, color=(255,255,255), font_size=1, scale=1
 def lcd_rect(x,y,w,h,color,thickness):
     draw.rectangle([(x,y),(w,h)],fill=color,width=thickness)
     
-openai.api_key = "***"
+
 
 def gpt(speech_text):
     completion = openai.ChatCompletion.create(

@@ -12,6 +12,7 @@ import json,base64
 
 #os.environ["http_proxy"] = "http://192.168.31.203:7890"
 #os.environ["https_proxy"] = "http://192.168.31.203:7890"
+openai.api_key = "***"
 
 import pyaudio
 import wave
@@ -118,8 +119,6 @@ def lcd_draw_string(splash,x, y, text, color=(255,255,255), font_size=1, scale=1
 def lcd_rect(x,y,w,h,color,thickness):
     draw.rectangle([(x,y),(w,h)],fill=color,width=thickness)
 
-
-openai.api_key = "***"
 
 def gpt(speech_text):
     completion = openai.ChatCompletion.create(

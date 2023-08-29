@@ -80,6 +80,8 @@ while 1:
 
 
 content=country_list[select][1]
+print(content)
+print('write ini')
 
 
 with open(language_ini_path, 'w') as f:

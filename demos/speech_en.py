@@ -160,8 +160,8 @@ def on_open(ws):
 
 def start_audio(time = 3,save_file="test.wav"):
     global quitmark
-    start_threshold=30000
-    end_threshold=8000
+    start_threshold=60000
+    end_threshold=40000
     endlast=10     
     CHUNK = 1024
     FORMAT = pyaudio.paInt16
@@ -205,7 +205,7 @@ def start_audio(time = 3,save_file="test.wav"):
                 print('start recording')
                 start_luyin=True
         if start_luyin :
-            kkk= lambda x:float(x)<start_threshold
+            kkk= lambda x:float(x)<end_threshold
             if all([kkk(i) for i in data_list]):
                 break_luyin =True
                 frames=frames[:-5]

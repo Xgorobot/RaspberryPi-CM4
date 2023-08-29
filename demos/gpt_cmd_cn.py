@@ -135,9 +135,9 @@ check_button.start()
 
 import SparkApi
 #以下密钥信息从控制台获取
-appid = "*****"     #填写控制台中获取的 APPID 信息
-api_secret = "*******"   #填写控制台中获取的 APISecret 信息
-api_key ="********"    #填写控制台中获取的 APIKey 信息
+appid = "7582fa81"     #填写控制台中获取的 APPID 信息
+api_secret = "NzIyYzFkY2NiMzBiMTY1ZjUwYTg4MTFm"   #填写控制台中获取的 APISecret 信息
+api_key ="924c1939fdffc06651a49289e2fc17f4"    #填写控制台中获取的 APIKey 信息
 
 #用于配置大模型版本，默认“general/generalv2”
 #domain = "general"   # v1.5版本
@@ -366,8 +366,8 @@ def gpt(speech_text):
 
 def start_audio(time = 3,save_file="recog.wav"):
     global quitmark
-    start_threshold=30000
-    end_threshold=8000
+    start_threshold=60000
+    end_threshold=40000
     endlast=10     
     CHUNK = 1024
     FORMAT = pyaudio.paInt16
@@ -411,7 +411,7 @@ def start_audio(time = 3,save_file="recog.wav"):
                 print('start recording')
                 start_luyin=True
         if start_luyin :
-            kkk= lambda x:float(x)<start_threshold
+            kkk= lambda x:float(x)<end_threshold
             if all([kkk(i) for i in data_list]):
                 break_luyin =True
                 frames=frames[:-5]
@@ -549,48 +549,49 @@ if net:
             ws.on_open = on_open
             ws.run_forever(sslopt={"cert_reqs": ssl.CERT_NONE})
             speech_text=xunfei
-            speech_list=split_string(speech_text)
-            print(speech_list)
-            for sp in speech_list:
-                lcd_rect(0,0,320,290,splash_theme_color,-1)
-                draw.rectangle((20,10,300,80), splash_theme_color, 'white',width=3)
-                lcd_draw_string(draw,35,28,sp, color=(255,0,0), scale=font2, mono_space=False)
-                lcd_draw_string(draw,27,90, "等待AI回复...", color=(255,255,255), scale=font2, mono_space=False)
-                display.ShowImage(splash)
-                time.sleep(0.7)
-            res=gpt(speech_text)
-            re_e=line_break(res)
-            print(re_e)
-            if re_e!='':
-                lcd_rect(0,0,320,290,splash_theme_color,-1)
-                draw.rectangle((20,10,300,80), splash_theme_color, 'white',width=3)
-                lcd_draw_string(draw,35,28, "代码生成中...", color=(255,0,0), scale=font3, mono_space=False)
-                lcd_draw_string(draw,10,90, re_e, color=(255,255,255), scale=font2, mono_space=False)
-                display.ShowImage(splash)
-                with open("cmd.py", "w") as file:
-                    code_blocks = re.findall(r'```python(.*?)```', res, re.DOTALL)
-                    extracted_code = []
-                    for block in code_blocks:
-                        code_lines = block.strip().split('\n')
-                        extracted_code.append("\n".join(code_lines))  # Include all lines, including the first one
-                    try:
-                        file.write(extracted_code[0])
-                    except:
-                        file.write(res)
-                scroll_text_on_lcd(re_e, 10, 90, 7, 0.3)
-                lcd_rect(0,0,320,290,splash_theme_color,-1)
-                draw.rectangle((20,10,300,80), splash_theme_color, 'white',width=3)
-                lcd_draw_string(draw,35,28, "代码运行中...", color=(255,0,0), scale=font3, mono_space=False)
-                lcd_draw_string(draw,10,90, re_e, color=(255,255,255), scale=font2, mono_space=False)
-                display.ShowImage(splash)
-                try:
-                    process = subprocess.Popen(['python3','cmd.py'])
-                    exitCode=process.wait()
-                except:
-                    lcd_rect(0,0,320,290,splash_theme_color,-1)
-                    draw.rectangle((20,10,300,80), splash_theme_color, 'white',width=3)
-                    lcd_draw_string(draw,10,90, "无法正常代码。", color=(255,255,255), scale=font2, mono_space=False)
-                    display.ShowImage(splash)
+            if speech_text!="":
+              speech_list=split_string(speech_text)
+              print(speech_list)
+              for sp in speech_list:
+                  lcd_rect(0,0,320,290,splash_theme_color,-1)
+                  draw.rectangle((20,10,300,80), splash_theme_color, 'white',width=3)
+                  lcd_draw_string(draw,35,28,sp, color=(255,0,0), scale=font2, mono_space=False)
+                  lcd_draw_string(draw,27,90, "等待AI回复...", color=(255,255,255), scale=font2, mono_space=False)
+                  display.ShowImage(splash)
+                  time.sleep(1.5)
+              res=gpt(speech_text)
+              re_e=line_break(res)
+              print(re_e)
+              if re_e!='':
+                  lcd_rect(0,0,320,290,splash_theme_color,-1)
+                  draw.rectangle((20,10,300,80), splash_theme_color, 'white',width=3)
+                  lcd_draw_string(draw,35,28, "代码生成中...", color=(255,0,0), scale=font3, mono_space=False)
+                  lcd_draw_string(draw,10,90, re_e, color=(255,255,255), scale=font2, mono_space=False)
+                  display.ShowImage(splash)
+                  with open("cmd.py", "w") as file:
+                      code_blocks = re.findall(r'```python(.*?)```', res, re.DOTALL)
+                      extracted_code = []
+                      for block in code_blocks:
+                          code_lines = block.strip().split('\n')
+                          extracted_code.append("\n".join(code_lines))  # Include all lines, including the first one
+                      try:
+                          file.write(extracted_code[0])
+                      except:
+                          file.write(res)
+                  scroll_text_on_lcd(re_e, 10, 90, 7, 0.3)
+                  lcd_rect(0,0,320,290,splash_theme_color,-1)
+                  draw.rectangle((20,10,300,80), splash_theme_color, 'white',width=3)
+                  lcd_draw_string(draw,35,28, "代码运行中...", color=(255,0,0), scale=font3, mono_space=False)
+                  lcd_draw_string(draw,10,90, re_e, color=(255,255,255), scale=font2, mono_space=False)
+                  display.ShowImage(splash)
+                  try:
+                      process = subprocess.Popen(['python3','cmd.py'])
+                      exitCode=process.wait()
+                  except:
+                      lcd_rect(0,0,320,290,splash_theme_color,-1)
+                      draw.rectangle((20,10,300,80), splash_theme_color, 'white',width=3)
+                      lcd_draw_string(draw,10,90, "无法正常代码。", color=(255,255,255), scale=font2, mono_space=False)
+                      display.ShowImage(splash)
             
         if quitmark==1:
             print('main quit')

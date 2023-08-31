@@ -116,14 +116,14 @@ def main_program():
     if key_state_left == 1 :
         show_battery()
         if current_selection==1:
-            current_selection=3
+            current_selection=1
         else:
             current_selection-=1
 
     if key_state_right == 1 :
         show_battery()
         if current_selection==3:
-            current_selection=1
+            current_selection=3
         else:
             current_selection+=1
 

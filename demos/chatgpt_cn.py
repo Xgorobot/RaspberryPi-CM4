@@ -208,18 +208,6 @@ from xgoedu import XGOEDU
 
 xgo = XGOEDU()
 
-quitmark=0
-button=Button()
-
-def action(num):
-    global quitmark
-    while quitmark==0:
-        time.sleep(0.01)
-        if button.press_b():
-            quitmark=1
-
-check_button = threading.Thread(target=action, args=(0,))
-check_button.start()
 
 btn_selected = (24,47,223)
 btn_unselected = (20,30,53)
@@ -242,6 +230,49 @@ splash = Image.new("RGB", (display.height, display.width ),splash_theme_color)
 draw = ImageDraw.Draw(splash)
 display.ShowImage(splash)
 
+def lcd_draw_string(splash,x, y, text, color=(255,255,255), font_size=1, scale=1, mono_space=False, auto_wrap=True, background_color=(0,0,0)):
+    splash.text((x,y),text,fill =color,font = scale) 
+
+def lcd_rect(x,y,w,h,color,thickness):
+    draw.rectangle([(x,y),(w,h)],fill=color,width=thickness)
+
+quitmark=0
+automark=True
+button=Button()
+
+def action(num):
+    global quitmark
+    while quitmark==0:
+        time.sleep(0.01)
+        if button.press_b():
+            quitmark=1
+
+def mode(num):
+    start=130
+    lcd_rect(start,0,200,19,splash_theme_color,-1)
+    lcd_draw_string(draw,start,0, "自动模式", color=(255,0,0), scale=font2, mono_space=False)
+    display.ShowImage(splash)
+    global automark,quitmark
+    while quitmark==0:
+        time.sleep(0.01)
+        if button.press_c():
+            automark=not automark
+            if automark:
+                lcd_rect(start,0,200,19,splash_theme_color,-1)
+                lcd_draw_string(draw,start,0, "自动模式", color=(255,0,0), scale=font2, mono_space=False)
+                display.ShowImage(splash)
+            else:
+                lcd_rect(start,0,200,19,splash_theme_color,-1)
+                lcd_draw_string(draw,start,0, "手动模式", color=(255,0,0), scale=font2, mono_space=False)
+                display.ShowImage(splash)
+            print(automark)
+
+mode_button = threading.Thread(target=mode, args=(0,))
+mode_button.start()
+
+check_button = threading.Thread(target=action, args=(0,))
+check_button.start()
+
 def scroll_text_on_lcd(text, x, y, max_lines, delay):
     lines = text.split('\n')
     total_lines = len(lines)
@@ -258,7 +289,7 @@ def scroll_text_on_lcd(text, x, y, max_lines, delay):
         time.sleep(delay)
 
 def get_wav_duration():
-    filename='/home/pi/xgoMusic/result.wav'
+    filename='test.wav'
     with wave.open(filename, 'rb') as wav_file:
         # 获取帧数和采样率
         n_frames = wav_file.getnframes()
@@ -267,12 +298,6 @@ def get_wav_duration():
         # 计算持续时间
         duration = n_frames / frame_rate
         return duration
-
-def lcd_draw_string(splash,x, y, text, color=(255,255,255), font_size=1, scale=1, mono_space=False, auto_wrap=True, background_color=(0,0,0)):
-    splash.text((x,y),text,fill =color,font = scale) 
-
-def lcd_rect(x,y,w,h,color,thickness):
-    draw.rectangle([(x,y),(w,h)],fill=color,width=thickness)
 
 
 def gpt(speech_text):
@@ -286,8 +311,8 @@ def gpt(speech_text):
     return SparkApi.answer
 
 
-def start_audio(time = 3,save_file="recog.wav"):
-    global quitmark
+def start_audio(timel = 3,save_file="test.wav"):
+    global automark,quitmark
     start_threshold=60000
     end_threshold=40000
     endlast=10     
@@ -295,61 +320,126 @@ def start_audio(time = 3,save_file="recog.wav"):
     FORMAT = pyaudio.paInt16
     CHANNELS = 1
     RATE = 16000
-    RECORD_SECONDS = time 
-    WAVE_OUTPUT_FILENAME = path="/home/pi/xgoMusic/"+save_file  
+    RECORD_SECONDS = timel
+    WAVE_OUTPUT_FILENAME = save_file  
 
-    p = pyaudio.PyAudio()   
-    print("录音中...")
-    lcd_rect(30,20,320,90,splash_theme_color,-1)
-    draw.rectangle((20,10,300,80), splash_theme_color, 'white',width=3)
-    lcd_draw_string(draw,35,28, "请开始讲话", color=(255,0,0), scale=font3, mono_space=False)
-    display.ShowImage(splash)
     
-    
-    stream = p.open(format=FORMAT,
-                    channels=CHANNELS,
-                    rate=RATE,
-                    input=True,
-                    frames_per_buffer=CHUNK)
-    frames = []
-    start_luyin = False
-    break_luyin = False
-    data_list =[0]*endlast
-    sum_vol=0
-    while not break_luyin:
-        if quitmark==1:
-            print('main quit')
-            break
-        data = stream.read(CHUNK)
-        rt_data = np.frombuffer(data,dtype=np.int16)
-        fft_temp_data = fftpack.fft(rt_data, rt_data.size, overwrite_x=True)
-        fft_data = np.abs(fft_temp_data)[0:fft_temp_data.size // 2 + 1]
-        vol=sum(fft_data) // len(fft_data)
-        data_list.pop(0)
-        data_list.append(vol)
-        if vol>start_threshold:
-            sum_vol+=1
-            if sum_vol==2:
-                print('准备识别')
-                start_luyin=True
-        if start_luyin :
-            kkk= lambda x:float(x)<end_threshold
-            if all([kkk(i) for i in data_list]):
-                break_luyin =True
-                frames=frames[:-5]
-        if start_luyin:
-            frames.append(data)
-    
-    print('auto end')
+    if automark:
+        p = pyaudio.PyAudio()   
+        print("正在聆听")
+        lcd_rect(30,40,320,90,splash_theme_color,-1)
+        draw.rectangle((20,30,300,80), splash_theme_color, 'white',width=3)
+        lcd_draw_string(draw,35,40, "正在聆听", color=(255,0,0), scale=font3, mono_space=False)
+        display.ShowImage(splash)
+        
+        
+        stream_a = p.open(format=FORMAT,
+                        channels=CHANNELS,
+                        rate=RATE,
+                        input=True,
+                        frames_per_buffer=CHUNK)
+        frames = []
+        start_luyin = False
+        break_luyin = False
+        data_list =[0]*endlast
+        sum_vol=0
+        while not break_luyin:
+            if not automark:
+                break_luyin=True
+            if quitmark==1:
+                print('main quit')
+                break
+            data = stream_a.read(CHUNK,exception_on_overflow=False)
+            rt_data = np.frombuffer(data,dtype=np.int16)
+            fft_temp_data = fftpack.fft(rt_data, rt_data.size, overwrite_x=True)
+            fft_data = np.abs(fft_temp_data)[0:fft_temp_data.size // 2 + 1]
+            vol=sum(fft_data) // len(fft_data)
+            data_list.pop(0)
+            data_list.append(vol)
+            if vol>start_threshold:
+                sum_vol+=1
+                if sum_vol==2:
+                    print('start recording')
+                    start_luyin=True
+            if start_luyin :
+                kkk= lambda x:float(x)<end_threshold
+                if all([kkk(i) for i in data_list]):
+                    break_luyin =True
+                    frames=frames[:-5]
+            if start_luyin:
+                frames.append(data)
+            print(start_threshold)
+            print(vol)
+        
+        print('auto end')
+    else:
+        p = pyaudio.PyAudio()   
+        print("录音中...")
+        lcd_rect(30,40,320,90,splash_theme_color,-1)
+        draw.rectangle((20,30,300,80), splash_theme_color, 'white',width=3)
+        lcd_draw_string(draw,35,40, "按B键开始", color=(255,0,0), scale=font3, mono_space=False)
+        display.ShowImage(splash)
+        
+        
+        stream_m = p.open(format=FORMAT,
+                        channels=CHANNELS,
+                        rate=RATE,
+                        input=True,
+                        frames_per_buffer=CHUNK)
+        frames = []
+        start_luyin = False
+        break_luyin = False
+        data_list =[0]*endlast
+        sum_vol=0
+        while not break_luyin:
+            if automark:
+                break
+            if quitmark==1:
+                print('main quit')
+                break
+            if button.press_d():
+                lcd_rect(30,40,320,90,splash_theme_color,-1)
+                draw.rectangle((20,30,300,80), splash_theme_color, 'white',width=3)
+                lcd_draw_string(draw,35,40, "正在聆听，按B健停止", color=(255,0,0), scale=font3, mono_space=False)
+                display.ShowImage(splash)
+                print('start recording')
+                while 1:
+                    data = stream_m.read(CHUNK,exception_on_overflow=False)
+                    rt_data = np.frombuffer(data,dtype=np.int16)
+                    fft_temp_data = fftpack.fft(rt_data, rt_data.size, overwrite_x=True)
+                    fft_data = np.abs(fft_temp_data)[0:fft_temp_data.size // 2 + 1]
+                    vol=sum(fft_data) // len(fft_data)
+                    data_list.pop(0)
+                    data_list.append(vol)
+                    frames.append(data)
+                    print(start_threshold)
+                    print(vol)
+                    if button.press_d():
+                        break_luyin =True
+                        frames=frames[:-5]
+                        break
+                    if automark:
+                        break
+                
+            
+        time.sleep(0.3)
+        print('manual end')
 
     if quitmark==0:
         lcd_rect(30,40,320,90,splash_theme_color,-1)
-        draw.rectangle((20,10,300,80), splash_theme_color, 'white',width=3)
-        lcd_draw_string(draw,35,48, "语音输入完毕!", color=(255,0,0), scale=font3, mono_space=False)
+        draw.rectangle((20,30,300,80), splash_theme_color, 'white',width=3)
+        lcd_draw_string(draw,35,40, "录音完毕!", color=(255,0,0), scale=font3, mono_space=False)
         display.ShowImage(splash)
-
-        stream.stop_stream()
-        stream.close()
+        try:
+            stream_a.stop_stream()
+            stream_a.close()
+        except:
+            pass
+        try:
+            stream_m.stop_stream()
+            stream_m.close()
+        except:
+            pass
         p.terminate()
 
         wf = wave.open(WAVE_OUTPUT_FILENAME, 'wb')  
@@ -431,7 +521,7 @@ except:
 
 if net:
     dog = XGO(port='/dev/ttyAMA0',version="xgolite")
-    draw.rectangle((20,10,300,80), splash_theme_color, 'white',width=3)
+    draw.rectangle((20,30,300,80), splash_theme_color, 'white',width=3)
     display.ShowImage(splash)
         
     while 1:
@@ -440,10 +530,10 @@ if net:
             xunfei=''
             wsParam = Ws_Param(APPID='7582fa81', APISecret='NzIyYzFkY2NiMzBiMTY1ZjUwYTg4MTFm',
                             APIKey='924c1939fdffc06651a49289e2fc17f4',
-                            AudioFile='/home/pi/xgoMusic/recog.wav')
-            lcd_rect(0,0,320,290,splash_theme_color,-1)
-            draw.rectangle((20,10,300,80), splash_theme_color, 'white',width=3)
-            lcd_draw_string(draw,35,28, "识别中...", color=(255,0,0), scale=font3, mono_space=False)
+                            AudioFile='test.wav')
+            lcd_rect(30,40,320,90,splash_theme_color,-1)
+            draw.rectangle((20,30,300,80), splash_theme_color, 'white',width=3)
+            lcd_draw_string(draw,35,40, "正在识别", color=(255,0,0), scale=font3, mono_space=False)
             display.ShowImage(splash)
             websocket.enableTrace(False)
             wsUrl = wsParam.create_url()
@@ -455,17 +545,17 @@ if net:
               speech_list=split_string(speech_text)
               print(speech_list)
               for sp in speech_list:
-                  lcd_rect(0,0,320,290,splash_theme_color,-1)
-                  draw.rectangle((20,10,300,80), splash_theme_color, 'white',width=3)
-                  lcd_draw_string(draw,35,28,sp, color=(255,0,0), scale=font3, mono_space=False)
-                  lcd_draw_string(draw,27,90, "等待AI回答...", color=(255,255,255), scale=font2, mono_space=False)
+                  lcd_rect(0,40,320,290,splash_theme_color,-1)
+                  draw.rectangle((20,30,300,80), splash_theme_color, 'white',width=3)
+                  lcd_draw_string(draw,35,40,sp, color=(255,0,0), scale=font3, mono_space=False)
+                  lcd_draw_string(draw,27,90, "等待星火大模型", color=(255,255,255), scale=font2, mono_space=False)
                   display.ShowImage(splash)
                   time.sleep(1.5)
               re=gpt(speech_text)
               re_e=line_break(re)
               print(re_e)
-              lcd_rect(0,0,320,290,splash_theme_color,-1)
-              draw.rectangle((20,10,300,80), splash_theme_color, 'white',width=3)
+              lcd_rect(0,40,320,290,splash_theme_color,-1)
+              draw.rectangle((20,30,300,80), splash_theme_color, 'white',width=3)
               lcd_draw_string(draw,10,90, re_e, color=(255,255,255), scale=font2, mono_space=False)
               display.ShowImage(splash)
               lines=len(re_e.split('\n'))
@@ -480,8 +570,8 @@ if net:
             break
 
 else:
-    lcd_draw_string(draw,57,70, "无法在没有网络的环境中运行!", color=(255,255,255), scale=font2, mono_space=False)
-    lcd_draw_string(draw,57,120, "按c键退出。", color=(255,255,255), scale=font2, mono_space=False)
+    lcd_draw_string(draw,57,70, "XGO没有联网，请检查网络设置", color=(255,255,255), scale=font2, mono_space=False)
+    lcd_draw_string(draw,57,120, "按C键退出", color=(255,255,255), scale=font2, mono_space=False)
     display.ShowImage(splash)
     while 1:
         if button.press_b():

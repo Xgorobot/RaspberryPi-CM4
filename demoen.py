@@ -239,7 +239,7 @@ while True:
 
         if (MENU_CURRENT_SELECT % 12 >= 0) and (MENU_CURRENT_SELECT % 12 < 11) and (MENU_PAGE_SWAP_COUNT == 0): 
             draw_item(MENU_CURRENT_SELECT % 12, "cleardown", MENU_CURRENT_SELECT+1)
-        elif (MENU_CURRENT_SELECT % 12 >= 0) and (MENU_CURRENT_SELECT % 12 < 8) and (MENU_PAGE_SWAP_COUNT == 1): 
+        elif (MENU_CURRENT_SELECT % 12 >= 0) and (MENU_CURRENT_SELECT % 12 < 10) and (MENU_PAGE_SWAP_COUNT == 1): #increase from 8 to 10 for 2 new menu items            
             draw_item(MENU_CURRENT_SELECT % 12, "cleardown", MENU_CURRENT_SELECT+1)
             
         draw_item(MENU_CURRENT_SELECT % 12, 'selected', MENU_CURRENT_SELECT)
@@ -249,9 +249,9 @@ while True:
             MENU_PAGE_SWAP_COUNT -= 1 
             for i in range(MENU_CURRENT_SELECT-11,MENU_CURRENT_SELECT+1,1):
                 draw_item(i % 12, 'unselected', i)
-        elif ((MENU_CURRENT_SELECT % 12) == 8) and (MENU_CURRENT_SELECT > 11):
+        elif ((MENU_CURRENT_SELECT % 12) == 10) and (MENU_CURRENT_SELECT > 11): #increase from 8 to 10 for 2 new menu items            
                clear_page()
-               for i in range(MENU_CURRENT_SELECT-8,MENU_TOTAL_ITEMS+1,1):
+               for i in range(MENU_CURRENT_SELECT-10,MENU_TOTAL_ITEMS+1,1): #increase from 8 to 10 for 2 new menu items                   
                    draw_item(i % 12, 'unselected', i)
                
         draw_item(MENU_CURRENT_SELECT % 12, 'selected', MENU_CURRENT_SELECT)
@@ -276,7 +276,7 @@ while True:
         if ((MENU_CURRENT_SELECT % 12) == 0) and (MENU_CURRENT_SELECT != 0):
             clear_page()
             MENU_PAGE_SWAP_COUNT += 1 
-            for i in range(MENU_CURRENT_SELECT,MENU_TOTAL_ITEMS+1,1): #works
+            for i in range(MENU_CURRENT_SELECT,MENU_TOTAL_ITEMS+1,1):
                 draw_item(i % 12, 'unselected', i)
         elif (MENU_CURRENT_SELECT % 12) == 0:
               clear_page()

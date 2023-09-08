@@ -101,6 +101,8 @@ running=True
 status=0
 exitcode=False
 
+status=0
+
 def checks():
     global cmd
     for i in iter(pi.stdout.readline,'b'):
@@ -113,9 +115,35 @@ def checks():
 
 t = threading.Thread(target=checks)
 t.start()
+
+def display_status():
+    global status,exitcode
+    nowstatus=0
+    while 1:
+        if exitcode:
+            break
+        if status==nowstatus:
+            pass
+        else:
+            nowstatus=status
+            if nowstatus==1:
+                splash.paste(uncn,(0,0))
+                display.ShowImage(splash)
+            elif nowstatus==2:
+                splash.paste(uncn,(0,0))
+                display.ShowImage(splash)
+            elif nowstatus==3:
+                splash.paste(cn,(0,0))
+                display.ShowImage(splash)
+
+
+t = threading.Thread(target=display_status)
+t.start()
+
 print('---------------')
 launch=0
 linked=0
+
 while 1:
     if button.press_b():
         exitcode=True
@@ -123,21 +151,18 @@ while 1:
     if cmd[0:6]==b'Launch':
         if launch==0:
             print('server success')
-            splash.paste(uncn,(0,0))
-            display.ShowImage(splash)
+            status=1
         launch=1
         linked=0
     elif cmd[0:6]==b'Device':
+        status=2
         print('disconnect')
-        splash.paste(uncn,(0,0))
-        display.ShowImage(splash)
         launch=1
         linked=0
     elif cmd[0:12]==b'Successfully':
         if linked==0:
+            status=3
             print('linked!')
-            splash.paste(cn,(0,0))
-            display.ShowImage(splash)
         linked=1
         launch=1
 

@@ -23,6 +23,7 @@ color_white=(255,255,255)
 splash_theme_color = (15,21,46)
 #display init
 display = LCD_2inch.LCD_2inch()
+display.Init()
 display.clear()
 #button
 button=Button()
@@ -175,6 +176,7 @@ def draw_item(row, type, realindex):
         display_cjk_string(draw, MENU_TEXT_COORD[row][0]+im, MENU_TEXT_COORD[row][1], MENU_ITEMS[realindex][3], font_size=font1,color=color_unselect, background_color=color_bg)
 
 def clear_page():
+    print('clear page')
     lcd_rect(0,36,320,240, color=color_bg, thickness=-1)
 
 
@@ -232,6 +234,7 @@ while True:
     if (key_state_left == 1):
         MENU_CURRENT_SELECT -= 1
         if MENU_CURRENT_SELECT <0:
+            clear_page()
             MENU_CURRENT_SELECT = MENU_TOTAL_ITEMS
             MENU_PAGE_SWAP_COUNT += 1
 
@@ -239,19 +242,20 @@ while True:
 
         if (MENU_CURRENT_SELECT % 12 >= 0) and (MENU_CURRENT_SELECT % 12 < 11) and (MENU_PAGE_SWAP_COUNT == 0): 
             draw_item(MENU_CURRENT_SELECT % 12, "cleardown", MENU_CURRENT_SELECT+1)
-        elif (MENU_CURRENT_SELECT % 12 >= 0) and (MENU_CURRENT_SELECT % 12 < 8) and (MENU_PAGE_SWAP_COUNT == 1): 
+        elif (MENU_CURRENT_SELECT % 12 >= 0) and (MENU_CURRENT_SELECT % 12 < 10) and (MENU_PAGE_SWAP_COUNT == 1): 
             draw_item(MENU_CURRENT_SELECT % 12, "cleardown", MENU_CURRENT_SELECT+1)
+
             
-        draw_item(MENU_CURRENT_SELECT % 12, 'selected', MENU_CURRENT_SELECT)
+        #draw_item(MENU_CURRENT_SELECT % 12, 'selected', MENU_CURRENT_SELECT)
 
         if ((MENU_CURRENT_SELECT % 12) == 11) and (MENU_CURRENT_SELECT != 0):
             clear_page()
             MENU_PAGE_SWAP_COUNT -= 1 
             for i in range(MENU_CURRENT_SELECT-11,MENU_CURRENT_SELECT+1,1):
                 draw_item(i % 12, 'unselected', i)
-        elif ((MENU_CURRENT_SELECT % 12) == 8) and (MENU_CURRENT_SELECT > 11):
+        elif ((MENU_CURRENT_SELECT % 12) == 10) and (MENU_CURRENT_SELECT > 11):
                clear_page()
-               for i in range(MENU_CURRENT_SELECT-8,MENU_TOTAL_ITEMS+1,1):
+               for i in range(MENU_CURRENT_SELECT-10,MENU_TOTAL_ITEMS+1,1):
                    draw_item(i % 12, 'unselected', i)
                
         draw_item(MENU_CURRENT_SELECT % 12, 'selected', MENU_CURRENT_SELECT)

@@ -350,7 +350,7 @@ check_button = threading.Thread(target=action, args=(0,))
 check_button.start()
     
 def actions(act):
-    commandlist=['前进','后退','左转','右转','左平移','右平移','跳舞','俯卧撑','撒尿','坐下','挥手','伸懒腰','握手','祈祷','觅食','鸡头']
+    commandlist=['前进','后退','左转','右转','左平移','右平移','跳舞','俯卧撑','撒尿','坐下','挥手','伸懒腰','握手','祈祷','找食物','鸡头','趴下','匍匐前进','转圈','摇摆','张望','调皮','向上抓取','中间抓取','向下抓取','波浪','乞讨']
     mincmd=0
     minindex=len(commandlist)
     mark=False
@@ -417,6 +417,40 @@ def actions(act):
         elif mincmd==16:
             dog.action(20)
             time.sleep(3)
+        elif mincmd==17:
+            dog.action(1)
+            time.sleep(3)
+        elif mincmd==18:
+            dog.action(3)
+            time.sleep(3)
+        elif mincmd==19:
+            dog.action(4)
+            time.sleep(3)
+        elif mincmd==20:
+            dog.action(16)
+            time.sleep(3)
+        elif mincmd==21:
+            dog.action(22)
+            time.sleep(3)
+        elif mincmd==22:
+            dog.action(24)
+            time.sleep(3)
+        elif mincmd==23:
+            dog.action(128)
+            time.sleep(3)
+        elif mincmd==24:
+            dog.action(129)
+            time.sleep(3)
+        elif mincmd==25:
+            dog.action(130)
+            time.sleep(3)
+        elif mincmd==26:
+            dog.action(15)
+            time.sleep(3)
+        elif mincmd==27:
+            dog.action(17)
+            time.sleep(3)
+
         time.sleep(3)
     else:
         time.sleep(1)
@@ -443,11 +477,11 @@ if net:
     #draw.line((2,98,318,98), fill=(255,255,255), width=2)
     draw.rectangle((20,30,300,100), splash_theme_color, 'white',width=3)
     lcd_draw_string(draw,57,100, "请说以下关键词", color=(255,255,255), scale=font2, mono_space=False)
-    lcd_draw_string(draw,10,130, "前进|后退|左转|右转", color=(0,255,255), scale=font2, mono_space=False)
-    lcd_draw_string(draw,10,150, "左平移|右平移|跳舞", color=(0,255,255), scale=font2, mono_space=False)
-    lcd_draw_string(draw,10,170, "俯卧撑|撒尿|坐下|招手", color=(0,255,255), scale=font2, mono_space=False)
-    lcd_draw_string(draw,10,190, "伸懒腰|握手|祈祷", color=(0,255,255), scale=font2, mono_space=False)
-    lcd_draw_string(draw,10,210, "觅食|鸡头", color=(0,255,255), scale=font2, mono_space=False)
+    lcd_draw_string(draw,10,130, "前进|后退|左转|右转|趴下|匍匐前进", color=(0,255,255), scale=font2, mono_space=False)
+    lcd_draw_string(draw,10,150, "左平移|右平移|跳舞|转圈|摇摆", color=(0,255,255), scale=font2, mono_space=False)
+    lcd_draw_string(draw,10,170, "俯卧撑|撒尿|坐下|招手|张望|调皮", color=(0,255,255), scale=font2, mono_space=False)
+    lcd_draw_string(draw,10,190, "伸懒腰|握手|祈祷|波浪|乞讨", color=(0,255,255), scale=font2, mono_space=False)
+    lcd_draw_string(draw,10,210, "找食物|鸡头|向上抓取|中间抓取|向下抓取", color=(0,255,255), scale=font2, mono_space=False)
     display.ShowImage(splash)
         
     #time.sleep(2)
@@ -461,7 +495,7 @@ if net:
                             AudioFile='test.wav')
             lcd_rect(30,40,320,90,splash_theme_color,-1)
             draw.rectangle((20,30,300,100), splash_theme_color, 'white',width=3)
-            lcd_draw_string(draw,35,48, "等待星火大模型", color=(255,0,0), scale=font3, mono_space=False)
+            lcd_draw_string(draw,35,48, "正在识别", color=(255,0,0), scale=font3, mono_space=False)
             display.ShowImage(splash)
             websocket.enableTrace(False)
             wsUrl = wsParam.create_url()

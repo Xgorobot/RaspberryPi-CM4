@@ -30,9 +30,9 @@ from scipy import fftpack
 
 import openai
 
-# os.environ["http_proxy"] = "http://192.168.214.203:7890"
-# os.environ["https_proxy"] = "http://192.168.214.203:7890"
-openai.api_key = "********"
+os.environ["http_proxy"] = "http://192.168.214.203:7890"
+os.environ["https_proxy"] = "http://192.168.214.203:7890"
+openai.api_key = "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"
 
 STATUS_FIRST_FRAME = 0  
 STATUS_CONTINUE_FRAME = 1  
@@ -468,7 +468,7 @@ if net:
             xunfei=''
             lcd_rect(30,40,320,90,splash_theme_color,-1)
             draw.rectangle((20,30,300,100), splash_theme_color, 'white',width=3)
-            lcd_draw_string(draw,35,48, "Waiting for chatGPT", color=(255,0,0), scale=font3, mono_space=False)
+            lcd_draw_string(draw,35,48, "Waiting for identifying", color=(255,0,0), scale=font3, mono_space=False)
             display.ShowImage(splash)
             try:
                 speech_text=SpeechRecognition()

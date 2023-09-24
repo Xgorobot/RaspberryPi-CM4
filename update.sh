@@ -22,6 +22,7 @@ echo "sudo python3 main.py" >> "$startup_file"
 fi
 
 git config --global init.defaultBranch main
+git config --global user.email "xgo@update.com"
 
 if ! command -v git &> /dev/null; then
 echo "Git is not installed. Please install Git and try again."

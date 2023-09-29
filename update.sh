@@ -42,7 +42,7 @@ elif [ ! -d "$target_dir/.git" ]; then
     git add .
     git commit -m 'importing local files'
     git remote add main https://github.com/Xgorobot/RaspberryPi-CM4.git
-    git fetch main
+    git fetch main --depth 1
     git checkout main
     git branch -D temp-branch
 else

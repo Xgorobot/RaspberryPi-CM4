@@ -55,7 +55,7 @@ class Button:
 
 def load_language():
     #返回当前的目录
-    current_dir = os.getcwd()
+    current_dir = os.path.dirname(os.path.abspath(__file__))
     #test
     print(current_dir)
     #用于路径拼接文件路径

@@ -19,7 +19,6 @@ else:
     dog_type='L'
 dog.reset()
 
-path=os.getcwd()
 # Raspberry Pi pin configuration:
 RST = 27
 DC = 25
@@ -190,12 +189,14 @@ def main_program():
     display.ShowImage(splash)
 
 #-------------------------init UI---------------------------------
-logo = Image.open("./pics/luwu@3x.png")
+current_dir = os.path.dirname(os.path.abspath(__file__))
+
+logo = Image.open(os.path.join(current_dir, "pics", "luwu@3x.png"))
 draw.bitmap((74,49),logo)
 lcd_draw_string(draw,210,133, firmware_info, color=color_white, scale=font1)
-wifiy = Image.open("./pics/wifi@2x.png")
-wifin = Image.open("./pics/wifi-un@2x.png")
-bat = Image.open("./pics/battery.png")
+wifiy = Image.open(os.path.join(current_dir, "pics", "wifi@2x.png"))
+wifin = Image.open(os.path.join(current_dir, "pics", "wifi-un@2x.png"))
+bat = Image.open(os.path.join(current_dir, "pics", "battery.png"))
 
 show_battery()
 current_selection = 1

@@ -146,4 +146,3 @@ while 1:
         change_color()
 
 cap.release()
-cv2.destroyAllWindows() 

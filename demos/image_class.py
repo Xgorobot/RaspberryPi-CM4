@@ -116,8 +116,6 @@ def run(model: str, max_results: int, score_threshold: float, num_threads: int,
       break
 
   cap.release()
-  cv2.destroyAllWindows()
-
 
 def main():
   parser = argparse.ArgumentParser(

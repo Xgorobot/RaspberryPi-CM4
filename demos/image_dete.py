@@ -108,8 +108,6 @@ def run(model: str, camera_id: int, width: int, height: int, num_threads: int,
       break
 
   cap.release()
-  cv2.destroyAllWindows()
-
 
 def main():
   parser = argparse.ArgumentParser(

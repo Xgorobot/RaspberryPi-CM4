@@ -1,4 +1,4 @@
-import os,socket,sys,time,math
+import os, socket, sys, time
 import spidev as SPI
 import xgoscreen.LCD_2inch as LCD_2inch
 from PIL import Image,ImageDraw,ImageFont
@@ -129,15 +129,9 @@ MENU_PIC_COORD = [
 MENU_TOTAL_ITEMS = len(MENU_ITEMS) - 1
 MENU_CURRENT_SELECT = 0
 MENU_PAGE_SWAP_COUNT = 0
-MENU_PAGES_TOTAL = math.ceil((MENU_TOTAL_ITEMS+1) / 12)
 
-if isinstance((MENU_TOTAL_ITEMS+1) / 12, int) == True:
-    print("Total page "+ str((MENU_TOTAL_ITEMS+1) / 9)  +" is integer!")
-elif isinstance((MENU_TOTAL_ITEMS+1) / 12, int) == False:
-    print("Total page "+ str((MENU_TOTAL_ITEMS+1) / 12)  +" is not integer!")
-    print(MENU_PAGES_TOTAL*12 - (MENU_TOTAL_ITEMS+1))
-    for i in range(0,MENU_PAGES_TOTAL*12 - (MENU_TOTAL_ITEMS+1)+1,1):
-        MENU_ITEMS.append(("","null",MENU_ITEM_PARENT_PATH + "" + ".py"))
+while(len(MENU_ITEMS) % 12 != 0):
+    MENU_ITEMS.append(("", "", "", ""))
 
 def draw_item(row, type, realindex):
     if type == "unselected":
@@ -262,7 +256,7 @@ while True:
                
         draw_item(MENU_CURRENT_SELECT % 12, 'selected', MENU_CURRENT_SELECT)
         
-        print("Key A Pressed, Current Selection: " + str(MENU_CURRENT_SELECT) + ", \t"+ str(MENU_CURRENT_SELECT % 12) + ", "+ str(MENU_PAGE_SWAP_COUNT) + ", "+ str(MENU_PAGES_TOTAL))
+        print("Key A Pressed, Current Selection: " + str(MENU_CURRENT_SELECT) + ", \t"+ str(MENU_CURRENT_SELECT % 12) + ", "+ str(MENU_PAGE_SWAP_COUNT))
 
     if (key_state_right == 1):
         MENU_CURRENT_SELECT += 1
@@ -291,7 +285,7 @@ while True:
                   
         draw_item(MENU_CURRENT_SELECT % 12, 'selected', MENU_CURRENT_SELECT)
 
-        print("Key B Pressed, Current Selection: " + str(MENU_CURRENT_SELECT) + ", \t"+ str(MENU_CURRENT_SELECT % 12) + ", "+ str(MENU_PAGE_SWAP_COUNT) + ", "+ str(MENU_PAGES_TOTAL))
+        print("Key B Pressed, Current Selection: " + str(MENU_CURRENT_SELECT) + ", \t"+ str(MENU_CURRENT_SELECT % 12) + ", "+ str(MENU_PAGE_SWAP_COUNT))
 
     if (key_state_down == 1):
         try:

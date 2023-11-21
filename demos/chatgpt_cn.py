@@ -9,6 +9,15 @@ from key import Button
 import threading
 import json,base64
 
+import time
+import os
+import argparse
+import sys
+import datetime
+
+from libnyumaya import AudioRecognition, FeatureExtractor
+from auto_platform import AudiostreamSource, play_command,default_libpath
+
 import SparkApi
 #以下密钥信息从控制台获取
 appid = "7582fa81"     #填写控制台中获取的 APPID 信息
@@ -343,6 +352,40 @@ def start_audio(timel = 3,save_file="test.wav"):
         break_luyin = False
         data_list =[0]*endlast
         sum_vol=0
+        audio_stream = AudiostreamSource()
+
+        libpath='./demos/libnyumaya_premium.so.3.1.0'
+        extractor = FeatureExtractor(libpath)
+        detector = AudioRecognition(libpath)
+
+        extactor_gain = 1.0
+
+        #Add one or more keyword models
+        keywordIdlulu = detector.addModel('./demos/src/lulu_v3.1.907.premium',0.6)
+
+        bufsize = detector.getInputDataSize()
+
+        audio_stream.start()
+        while not break_luyin:
+            if not automark:
+                break_luyin=True
+            if quitmark==1:
+                print('main quit')
+                break
+            frame = audio_stream.read(bufsize*2,bufsize*2)
+            if(not frame):
+                time.sleep(0.01)
+                continue
+
+            features = extractor.signalToMel(frame,extactor_gain)
+            prediction = detector.runDetection(features)
+            if(prediction != 0):
+                now = datetime.now().strftime("%d.%b %Y %H:%M:%S")
+                if(prediction == keywordIdlulu):
+                    print("lulu detected:" + now)
+                os.system(play_command + " ./demos/src/ding.wav")
+                break
+        audio_stream.stop()
         while not break_luyin:
             if not automark:
                 break_luyin=True

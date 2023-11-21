@@ -111,4 +111,3 @@ if __name__ == '__main__':
         if k == 27 or k == ord('q'):
             break
     del camera
-    cv.destroyAllWindows()

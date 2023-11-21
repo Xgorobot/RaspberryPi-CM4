@@ -1,3 +1,5 @@
+# scirpt needs to be run from home/pi
+
 #!/bin/bash
 
 #! Exit immediately if any command fails
@@ -33,7 +35,8 @@ fi
 if [ ! -d "$target_dir" ]; then
     # If it doesn't exist, clone the repository
     git clone "$repo_url" "$target_dir"
-elif [ ! -d "$target_dir/.git" ]; then
+    sudo chown -R pi:pi RaspberryPi-CM4-main/
+    elif [ ! -d "$target_dir/.git" ]; then
     # if the directory exist but not a git clone
     cd "$target_dir"
     echo "init"

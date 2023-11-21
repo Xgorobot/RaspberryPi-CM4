@@ -130,11 +130,10 @@ def detection(session, img, input_width, input_height, thresh):
     except:
       return None
 
-
+input_width, input_height = 352, 352
+session = onnxruntime.InferenceSession('/home/pi/model/Model.onnx')
 while 1:
     success, image = cap.read()
-    input_width, input_height = 352, 352
-    session = onnxruntime.InferenceSession('/home/pi/model/Model.onnx')
     start = time.perf_counter()
     bboxes = detection(session, image, input_width, input_height, 0.65)
     end = time.perf_counter()

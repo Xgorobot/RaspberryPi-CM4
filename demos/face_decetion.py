@@ -6,6 +6,19 @@ from PIL import Image,ImageDraw,ImageFont
 from key import Button
 from xgolib import XGO
 dog = XGO(port='/dev/ttyAMA0',version="xgolite")
+fm=dog.read_firmware()
+if fm[0]=='M':
+    print('XGO-MINI')
+    dog = XGO(port='/dev/ttyAMA0',version="xgomini")
+    dog_type='M'
+elif fm[0]=='L':
+    print('XGO-LITE')
+    dog_type='L'
+elif fm[0]=='R':
+    print('XGO-RIDER')
+    dog = XGO(port='/dev/ttyAMA0',version="xgorider")
+    dog_type='R'
+dog.reset()
 
 display = LCD_2inch.LCD_2inch()
 display.clear()
@@ -70,6 +83,7 @@ with mp_face_detection.FaceDetection(
         face_y=xy.y*240
         value_x = face_x - 160
         value_y = face_y - 120
+        rider_x=value_x
         print(face_x,face_y)
         if value_x > 55:
           value_x = 55
@@ -81,10 +95,23 @@ with mp_face_detection.FaceDetection(
           value_y = -75
           
     else:
-      value_x=0
-      value_y=0
+      value_x=value_y=face_x=face_y=0
+      rider_x=9999
     print(['y','p'],[value_x/9, value_y/15])
-    dog.attitude(['y','p'],[value_x/9, value_y/15])
+    if dog_type=='L' or dog_type=='M':
+      dog.attitude(['y','p'],[value_x/9, value_y/15])
+    elif dog_type=='R':
+      print(value_x,value_y)
+      dog.rider_height(75+int((190-face_y)/70*40))
+      if rider_x==9999:
+        dog.rider_turn(0)
+      else:
+        if rider_x > 35:
+          dog.rider_turn(20)
+        elif rider_x < -35:
+          dog.rider_turn(-20)
+        else:
+          dog.rider_turn(0)
     b,g,r = cv2.split(image)
     image = cv2.merge((r,g,b))
     image = cv2.flip(image, 1)

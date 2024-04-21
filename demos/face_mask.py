@@ -8,6 +8,21 @@ import math
 import numpy as np
 from xgolib import XGO
 dog = XGO(port='/dev/ttyAMA0',version="xgolite")
+fm=dog.read_firmware()
+if fm[0]=='M':
+    print('XGO-MINI')
+    dog = XGO(port='/dev/ttyAMA0',version="xgomini")
+    dog_type='M'
+elif fm[0]=='L':
+    print('XGO-LITE')
+    dog_type='L'
+elif fm[0]=='R':
+    print('XGO-RIDER')
+    dog = XGO(port='/dev/ttyAMA0',version="xgorider")
+    dog_type='R'
+dog.reset()
+
+pic_path = "./demos/expression/"
 
 display = LCD_2inch.LCD_2inch()
 display.clear()

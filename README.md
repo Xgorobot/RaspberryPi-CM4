@@ -23,16 +23,6 @@ sudo pip install --upgrade xgo-pythonlib
 [Xgorobot/XGO-PythonLib(github.com)](https://github.com/Xgorobot/XGO-PythonLib)
 
 ## ChangeLog
-### [xgo0914] - 2023-9-14
-
-#### Added
-- Speech function adapted to the language environment.
-- Added chatgpt function in English and Chinese.
-- Added RobotGpt functionality.
-#### Fixed
-- Change the password of the wireless account and switch independently without rebooting.
-- The demo menu can be switched to sequential or reverse order.
-- Fixed the problem that lcd_text could not be displayed on multiple lines in graphical programming.
 ### [xgo0627] - 2023-6-27
 
 #### Fixed

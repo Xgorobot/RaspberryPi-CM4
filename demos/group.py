@@ -23,6 +23,19 @@ display.ShowImage(splash)
 draw = ImageDraw.Draw(splash)
 button=Button()
 dog = XGO(port='/dev/ttyAMA0',version="xgolite")
+fm=dog.read_firmware()
+if fm[0]=='M':
+    print('XGO-MINI')
+    dog = XGO(port='/dev/ttyAMA0',version="xgomini")
+    dog_type='M'
+elif fm[0]=='L':
+    print('XGO-LITE')
+    dog_type='L'
+elif fm[0]=='R':
+    print('XGO-RIDER')
+    dog = XGO(port='/dev/ttyAMA0',version="xgorider")
+    dog_type='R'
+dog.reset()
 font = ImageFont.truetype("/home/pi/model/msyh.ttc",40)
 #-----------------------COMMON INIT----------------------- 
 boardcast=False
@@ -90,17 +103,40 @@ while 1:
               while 1:
                   if playmark==False or boardcast==False or exitmark==True:
                       break
-                  show("sad", 14)
-                  show("naughty", 14)
-                  show("boring", 14)
-                  show("angry", 13)
-                  show("shame", 11)
-                  show("surprise", 15)
-                  show("happy", 12)
-                  show("sleepy", 19)
-                  show("seek", 12)
-                  show("lookaround", 12)
-                  show("love", 13)
+                  if dog_type=='L' or dog_type=='M':
+                    show("sad", 14)
+                    show("naughty", 14)
+                    show("boring", 14)
+                    show("angry", 13)
+                    show("shame", 11)
+                    show("surprise", 15)
+                    show("happy", 12)
+                    show("sleepy", 19)
+                    show("seek", 12)
+                    show("lookaround", 12)
+                    show("love", 13)
+                    show("awkwardness", 11)
+                    show("eyes", 15)
+                    show("guffaw", 8)
+                    show("query", 7)
+                    show("Shakehead", 7)
+                    show("Stun", 8)
+                    show("wronged", 14)
+                  elif dog_type=='R':
+                    show("sad_r", 12)
+                    show("naughty_r", 12)
+                    show("angry_r", 12)
+                    show("shame_r", 10)
+                    show("surprise_r", 12)
+                    show("sleepy_r", 11)
+                    show("love_r", 11)
+                    show("awkwardness_r", 12)
+                    show("guffaw_r", 10)
+                    show("query_r", 11)
+                    show("Stun_r", 12)
+                    show("hate_r", 16)
+                    show("cute_r", 8)
+                    show("grievance_r", 12)
       else:
           try:
               proc.terminate()

@@ -1,62 +1,6 @@
 import os,socket,sys,time
-import spidev as SPI
-import xgoscreen.LCD_2inch as LCD_2inch
 from PIL import Image,ImageDraw,ImageFont
-import uiutils
-from xgolib import XGO
-
-la=uiutils.load_language()
-
-os.system("sudo chmod 777 -R /dev/ttyAMA0")
-dog = XGO(port='/dev/ttyAMA0',version="xgolite")
-fm=dog.read_firmware()
-if fm[0]=='M':
-    print('XGO-MINI')
-    dog = XGO(port='/dev/ttyAMA0',version="xgomini")
-    dog_type='M'
-else:
-    print('XGO-LITE')
-    dog_type='L'
-dog.reset()
-
-# Raspberry Pi pin configuration:
-RST = 27
-DC = 25
-BL = 18
-bus = 0 
-device = 0
-#define colors
-btn_selected = (24,47,223)
-btn_unselected = (20,30,53)
-txt_selected = (255,255,255)
-txt_unselected = (76,86,127)
-splash_theme_color = (15,21,46)
-color_black=(0,0,0)
-color_white=(255,255,255)
-color_red=(238,55,59)
-#display init
-display = LCD_2inch.LCD_2inch()
-display.Init()
-display.clear()
-#button
-button=uiutils.Button()
-#const
-if dog_type=='M':
-    firmware_info='MINI'
-elif dog_type=='L':
-    firmware_info='LITE'
-#font
-font1 = ImageFont.truetype("/home/pi/model/msyh.ttc",15)
-font2 = ImageFont.truetype("/home/pi/model/msyh.ttc",22)
-font3 = ImageFont.truetype("/home/pi/model/msyh.ttc",30)
-#init splash
-splash = Image.new("RGB", (display.height, display.width ),splash_theme_color)
-draw = ImageDraw.Draw(splash)
-#splash=splash.rotate(180)
-display.ShowImage(splash)
-#dog
-os.system('sudo chmod 777 /dev/ttyAMA0')
-dog = XGO(port='/dev/ttyAMA0',version="xgolite")
+from uiutils import *
 
 current_selection=1
 
@@ -204,4 +148,4 @@ current_selection = 1
 while True:
     main_program()
 
-display.module_exit()
+

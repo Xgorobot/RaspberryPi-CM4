@@ -18,7 +18,9 @@ from scipy import fftpack
 
 from xgoedu import XGOEDU 
 
-
+from libnyumaya import AudioRecognition, FeatureExtractor
+from auto_platform import AudiostreamSource, play_command,default_libpath
+from datetime import datetime
 
 xgo = XGOEDU()
 
@@ -62,7 +64,7 @@ XGO_edu = XGOEDU()
 代码:
 import time
 from xgolib import XGO
-xgo=XGO("xgolite")
+xgo=XGO(port='/dev/ttyAMA0',version="xgolite")
 xgo.move_x(15)
 time.sleep(5)
 xgo.move_x(0)
@@ -73,7 +75,7 @@ xgo.move_x(0)
 代码:
 import time
 from xgolib import XGO
-xgo=XGO("xgolite")
+xgo=XGO(port='/dev/ttyAMA0',version="xgolite")
 xgo.move_y(15)
 time.sleep(5)
 xgo.move_y(0)
@@ -84,7 +86,7 @@ xgo.move_y(0)
 代码:
 import time
 from xgolib import XGO
-xgo=XGO("xgolite")
+xgo=XGO(port='/dev/ttyAMA0',version="xgolite")
 xgo.turn(100)
 time.sleep(3)
 xgo.turn(0)
@@ -95,7 +97,7 @@ xgo.turn(0)
 命令:前进3秒,撒个尿,左转3秒,展示机械臂:
 import time
 from xgolib import XGO
-xgo=XGO("xgolite")
+xgo=XGO(port='/dev/ttyAMA0',version="xgolite")
 xgo.move_x(15)
 time.sleep(5)
 xgo.move_x(0)
@@ -111,7 +113,7 @@ xgo.action(20)
 import time
 from xgolib import XGO
 from xgoedu import XGOEDU
-xgo=XGO("xgolite")
+xgo=XGO(port='/dev/ttyAMA0',version="xgolite")
 XGO_edu = XGOEDU()
 xgo.action(14)
 time.sleep(3)
@@ -421,6 +423,40 @@ def start_audio(timel = 3,save_file="test.wav"):
         break_luyin = False
         data_list =[0]*endlast
         sum_vol=0
+        audio_stream = AudiostreamSource()
+
+        libpath='./demos/libnyumaya_premium.so.3.1.0'
+        extractor = FeatureExtractor(libpath)
+        detector = AudioRecognition(libpath)
+
+        extactor_gain = 1.0
+
+        #Add one or more keyword models
+        keywordIdlulu = detector.addModel('./demos/src/lulu_v3.1.907.premium',0.6)
+
+        bufsize = detector.getInputDataSize()
+
+        audio_stream.start()
+        while not break_luyin:
+            if not automark:
+                break_luyin=True
+            if quitmark==1:
+                print('main quit')
+                break
+            frame = audio_stream.read(bufsize*2,bufsize*2)
+            if(not frame):
+                time.sleep(0.01)
+                continue
+
+            features = extractor.signalToMel(frame,extactor_gain)
+            prediction = detector.runDetection(features)
+            if(prediction != 0):
+                now = datetime.now().strftime("%d.%b %Y %H:%M:%S")
+                if(prediction == keywordIdlulu):
+                    print("lulu detected:" + now)
+                os.system(play_command + " ./demos/src/ding.wav")
+                break
+        audio_stream.stop()
         while not break_luyin:
             if not automark:
                 break_luyin=True
@@ -436,7 +472,7 @@ def start_audio(timel = 3,save_file="test.wav"):
             data_list.append(vol)
             if vol>start_threshold:
                 sum_vol+=1
-                if sum_vol==2:
+                if sum_vol==1:
                     print('start recording')
                     start_luyin=True
             if start_luyin :

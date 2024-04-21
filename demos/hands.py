@@ -9,6 +9,20 @@ import mediapipe as mp
 from numpy import linalg
 from xgolib import XGO
 dog = XGO(port='/dev/ttyAMA0',version="xgolite")
+dog = XGO(port='/dev/ttyAMA0',version="xgolite")
+fm=dog.read_firmware()
+if fm[0]=='M':
+    print('XGO-MINI')
+    dog = XGO(port='/dev/ttyAMA0',version="xgomini")
+    dog_type='M'
+elif fm[0]=='L':
+    print('XGO-LITE')
+    dog_type='L'
+elif fm[0]=='R':
+    print('XGO-RIDER')
+    dog = XGO(port='/dev/ttyAMA0',version="xgorider")
+    dog_type='R'
+dog.reset
 dogtime=0
 
 display = LCD_2inch.LCD_2inch()
@@ -163,42 +177,81 @@ with mp_hands.Hands(
     if result.multi_hand_landmarks:
       cv2.putText(frame, f"{gesture_result}", (10,30), cv2.FONT_HERSHEY_COMPLEX, 1, (255 ,255, 0), 5)
     if time.time()>dogtime:
-      if gesture_result=="good":
-        dogtime=time.time()
-        dog.action(23)
-        dogtime+=3
-      elif gesture_result=="one":
-        dogtime=time.time()
-        dog.action(7)
-        dogtime+=3
-      elif gesture_result=="two":
-        dogtime=time.time()
-        dog.action(8)
-        dogtime+=3
-      elif gesture_result=="three":
-        dogtime=time.time()
-        dog.action(9)
-        dogtime+=3
-      elif gesture_result=="four":
-        dogtime=time.time()
-        dog.action(22)
-        dogtime+=3
-      elif gesture_result=="five":
-        dogtime=time.time()
-        dog.action(1)
-        dogtime+=3
-      elif gesture_result=="six":
-        dogtime=time.time()
-        dog.action(24)
-        dogtime+=3
-      elif gesture_result=="OK":
-        dogtime=time.time()
-        dog.action(19)
-        dogtime+=3
-      elif gesture_result=="stone":
-        dogtime=time.time()
-        dog.action(20)
-        dogtime+=3
+      if dog_type=='L' or dog_type=='M':
+        if gesture_result=="good":
+          dogtime=time.time()
+          dog.action(23)
+          dogtime+=3
+        elif gesture_result=="one":
+          dogtime=time.time()
+          dog.action(7)
+          dogtime+=3
+        elif gesture_result=="two":
+          dogtime=time.time()
+          dog.action(8)
+          dogtime+=3
+        elif gesture_result=="three":
+          dogtime=time.time()
+          dog.action(9)
+          dogtime+=3
+        elif gesture_result=="four":
+          dogtime=time.time()
+          dog.action(22)
+          dogtime+=3
+        elif gesture_result=="five":
+          dogtime=time.time()
+          dog.action(1)
+          dogtime+=3
+        elif gesture_result=="six":
+          dogtime=time.time()
+          dog.action(24)
+          dogtime+=3
+        elif gesture_result=="OK":
+          dogtime=time.time()
+          dog.action(19)
+          dogtime+=3
+        elif gesture_result=="stone":
+          dogtime=time.time()
+          dog.action(20)
+          dogtime+=3
+      elif dog_type=='R':
+        if gesture_result=="good":
+          dogtime=time.time()
+          dog.action(1,Tr)
+          dogtime+=5
+        elif gesture_result=="one":
+          dogtime=time.time()
+          dog.action(1)
+          dogtime+=5
+        elif gesture_result=="two":
+          dogtime=time.time()
+          dog.action(2)
+          dogtime+=5
+        elif gesture_result=="three":
+          dogtime=time.time()
+          dog.action(3)
+          dogtime+=5
+        elif gesture_result=="four":
+          dogtime=time.time()
+          dog.action(2)
+          dogtime+=5
+        elif gesture_result=="five":
+          dogtime=time.time()
+          dog.action(5)
+          dogtime+=5
+        elif gesture_result=="six":
+          dogtime=time.time()
+          dog.action(6)
+          dogtime+=5
+        elif gesture_result=="OK":
+          dogtime=time.time()
+          dog.action(1)
+          dogtime+=5
+        elif gesture_result=="stone":
+          dogtime=time.time()
+          dog.action(20)
+          dogtime+=5
+         
     
     imgok = Image.fromarray(frame)
     display.ShowImage(imgok)

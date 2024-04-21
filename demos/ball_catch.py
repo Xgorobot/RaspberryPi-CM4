@@ -95,6 +95,7 @@ def Image_Processing():
             time.sleep(9)
             dog.attitude('p', 15)
             dog.translation('z', 75)
+
     cv2.putText(image, "x:" + format(mx, ".1f"), (20, 20), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 255), 2)
     cv2.putText(image, "y:" + format(my, ".1f"), (20, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 255), 2)
     cv2.putText(image, "r:" + format(mr, ".1f"), (20, 80), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (255, 255, 255), 2)
@@ -104,15 +105,15 @@ def Image_Processing():
     image = cv2.merge((r1, g, b))
     imgok = Image.fromarray(image)
     display.ShowImage(imgok)
-    # if x != 0 and y != 0 and r != 0:
-    #     print(x, y, r)
 
 
 dog.attitude('p', 15)
 dog.translation('z', 75)
 while camera.isOpened():
     if button.press_b():
+        dog.reset()
         camera.release()
         cv2.destroyAllWindows()
         sys.exit()
     Image_Processing()
+

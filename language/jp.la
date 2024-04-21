@@ -48,7 +48,7 @@
     "LANGUAGE":{
         "NOW":"現の言語:",
         "SET":"言語の設定:",
-        "SAVED":"成功しました,再起動してください"
+        "SAVED":"成功しました,5秒後に再起動します"
     },
     "DEMOEN":{
         "SHOW":"デモモード",
@@ -77,6 +77,13 @@
         "FAIL":"失敗する",
         "DEVICE":"デバイス",
         "CHATGPT":"ChatGPT",
-        "GPTCMD":"RobotGPT"
+        "CATCH":"取りです",
+        "FOLLOWPERSON":"人体はついてくる",
+        "FOLLOWLINE":"ラインをパトロールする",
+        "GPTDRAW":"GPT描く",
+        "GPTREC":"GPT地図認識",
+        "GPTCMD":"RobotGPT",
+        "GPTCMD":"GPTCHAT",
+        "GPTFREE":"Q&A"
     }
 }

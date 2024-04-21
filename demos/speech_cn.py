@@ -28,6 +28,9 @@ import wave
 import numpy as np
 from scipy import fftpack
 
+from libnyumaya import AudioRecognition, FeatureExtractor
+from auto_platform import AudiostreamSource, play_command,default_libpath
+
 
 STATUS_FIRST_FRAME = 0  
 STATUS_CONTINUE_FRAME = 1  
@@ -161,7 +164,7 @@ def start_audio(timel = 3,save_file="test.wav"):
         print("正在聆听")
         lcd_rect(30,40,320,90,splash_theme_color,-1)
         draw.rectangle((20,30,300,100), splash_theme_color, 'white',width=3)
-        lcd_draw_string(draw,35,48, "正在聆听", color=(255,0,0), scale=font3, mono_space=False)
+        lcd_draw_string(draw,35,40, "正在聆听", color=(255,0,0), scale=font3, mono_space=False)
         display.ShowImage(splash)
         
         
@@ -175,6 +178,40 @@ def start_audio(timel = 3,save_file="test.wav"):
         break_luyin = False
         data_list =[0]*endlast
         sum_vol=0
+        audio_stream = AudiostreamSource()
+
+        libpath='./demos/libnyumaya_premium.so.3.1.0'
+        extractor = FeatureExtractor(libpath)
+        detector = AudioRecognition(libpath)
+
+        extactor_gain = 1.0
+
+        #Add one or more keyword models
+        keywordIdlulu = detector.addModel('./demos/src/lulu_v3.1.907.premium',0.6)
+
+        bufsize = detector.getInputDataSize()
+
+        audio_stream.start()
+        while not break_luyin:
+            if not automark:
+                break_luyin=True
+            if quitmark==1:
+                print('main quit')
+                break
+            frame = audio_stream.read(bufsize*2,bufsize*2)
+            if(not frame):
+                time.sleep(0.01)
+                continue
+
+            features = extractor.signalToMel(frame,extactor_gain)
+            prediction = detector.runDetection(features)
+            if(prediction != 0):
+                now = datetime.now().strftime("%d.%b %Y %H:%M:%S")
+                if(prediction == keywordIdlulu):
+                    print("lulu detected:" + now)
+                os.system(play_command + " ./demos/src/ding.wav")
+                break
+        audio_stream.stop()
         while not break_luyin:
             if not automark:
                 break_luyin=True
@@ -190,7 +227,7 @@ def start_audio(timel = 3,save_file="test.wav"):
             data_list.append(vol)
             if vol>start_threshold:
                 sum_vol+=1
-                if sum_vol==2:
+                if sum_vol==1:
                     print('start recording')
                     start_luyin=True
             if start_luyin :
@@ -208,8 +245,8 @@ def start_audio(timel = 3,save_file="test.wav"):
         p = pyaudio.PyAudio()   
         print("录音中...")
         lcd_rect(30,40,320,90,splash_theme_color,-1)
-        draw.rectangle((20,30,300,100), splash_theme_color, 'white',width=3)
-        lcd_draw_string(draw,35,48, "按B键开始", color=(255,0,0), scale=font3, mono_space=False)
+        draw.rectangle((20,30,300,80), splash_theme_color, 'white',width=3)
+        lcd_draw_string(draw,35,40, "按B键开始", color=(255,0,0), scale=font3, mono_space=False)
         display.ShowImage(splash)
         
         
@@ -231,8 +268,8 @@ def start_audio(timel = 3,save_file="test.wav"):
                 break
             if button.press_d():
                 lcd_rect(30,40,320,90,splash_theme_color,-1)
-                draw.rectangle((20,30,300,100), splash_theme_color, 'white',width=3)
-                lcd_draw_string(draw,35,48, "正在聆听，按B健停止", color=(255,0,0), scale=font3, mono_space=False)
+                draw.rectangle((20,30,300,80), splash_theme_color, 'white',width=3)
+                lcd_draw_string(draw,35,40, "正在聆听，按B健停止", color=(255,0,0), scale=font3, mono_space=False)
                 display.ShowImage(splash)
                 print('start recording')
                 while 1:

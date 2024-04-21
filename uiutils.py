@@ -1,9 +1,12 @@
 import RPi.GPIO as GPIO
 import time,os,json
+from xgolib import XGO
+import spidev as SPI
+import xgoscreen.LCD_2inch as LCD_2inch
+from PIL import Image,ImageDraw,ImageFont
 
 GPIO.setwarnings(False)
 GPIO.setmode(GPIO.BCM)
-
 
 
 class Button:
@@ -90,5 +93,65 @@ def language():
         print(language)
     return language
 
+def check_type():
+    os.system("sudo chmod 777 -R /dev/ttyAMA0")
+    dog = XGO(port='/dev/ttyAMA0',version="xgorider")
+    fm=dog.read_firmware()
+    print(fm)
+    if fm[0]=='M':
+        print('XGO-MINI')
+        dog = XGO(port='/dev/ttyAMA0',version="xgomini")
+        dog_type='M'
+    elif fm[0]=='L':
+        print('XGO-LITE')
+        dog_type='L'
+    elif fm[0]=='R':
+        print('XGO-RIDER')
+        dog_type='R'
+    dog.reset()
+    return dog_type
+
+
+la=load_language()
+dog_type=check_type()
+print(dog_type)
+
+#define colors
+btn_selected = (24,47,223)
+btn_unselected = (20,30,53)
+txt_selected = (255,255,255)
+txt_unselected = (76,86,127)
+splash_theme_color = (15,21,46)
+color_black=(0,0,0)
+color_white=(255,255,255)
+color_red=(238,55,59)
+#display init
+display = LCD_2inch.LCD_2inch()
+display.Init()
+display.clear()
+#button
+button=Button()
+#type
+if dog_type=='M':
+    firmware_info='MINI'
+    version="xgomini"
+elif dog_type=='L':
+    firmware_info='LITE'
+    version="xgolite"
+elif dog_type=='R':
+    firmware_info='RIDER'
+    version="xgorider"
+#font
+font1 = ImageFont.truetype("/home/pi/model/msyh.ttc",15)
+font2 = ImageFont.truetype("/home/pi/model/msyh.ttc",22)
+font3 = ImageFont.truetype("/home/pi/model/msyh.ttc",30)
+#init splash
+splash = Image.new("RGB", (display.height, display.width ),splash_theme_color)
+draw = ImageDraw.Draw(splash)
+#splash=splash.rotate(180)
+display.ShowImage(splash)
+#dog
+os.system('sudo chmod 777 /dev/ttyAMA0')
+dog = XGO(port='/dev/ttyAMA0',version=version)
 
     

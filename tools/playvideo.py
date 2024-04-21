@@ -52,6 +52,7 @@ def PlayVideo(video_path):
 
 
     video.release()
+    cv2.destroyAllWindows()
 
 PlayVideo(video_path)
 

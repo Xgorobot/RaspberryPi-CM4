@@ -9,6 +9,19 @@ import mediapipe as mp
 from numpy import linalg
 from xgolib import XGO
 g_dog = XGO(port='/dev/ttyAMA0',version="xgolite")
+fm=g_dog.read_firmware()
+if fm[0]=='M':
+    print('XGO-MINI')
+    g_dog = XGO(port='/dev/ttyAMA0',version="xgomini")
+    dog_type='M'
+elif fm[0]=='L':
+    print('XGO-LITE')
+    dog_type='L'
+elif fm[0]=='R':
+    print('XGO-RIDER')
+    g_dog = XGO(port='/dev/ttyAMA0',version="xgorider")
+    dog_type='R'
+g_dog.reset()
 
 red=(255,0,0)
 green=(0,255,0)
@@ -76,6 +89,7 @@ while 1:
                 cv2.circle(frame,(int(color_x),int(color_y)),int(color_radius),(255,0,255),2)  
                 value_x = color_x - 160
                 value_y = color_y - 120
+                rider_x=value_x
                 if value_x > 55:
                     value_x = 55
                 elif value_x < -55:
@@ -84,10 +98,24 @@ while 1:
                     value_y = 75
                 elif value_y < -75:
                     value_y = -75
-                g_dog.attitude(['y','p'],[-value_x/15, value_y/15])
+                if dog_type=='L' or dog_type=='M':
+                    g_dog.attitude(['y','p'],[-value_x/15, value_y/15])
+                elif dog_type=='R':
+                    print(color_y,75+int((190-color_y)/160*40))
+                    g_dog.rider_height(75+int((190-color_y)/160*40))
+                    if rider_x==9999:
+                        g_dog.rider_turn(0)
+                    else:
+                        if rider_x > 35:
+                            g_dog.rider_turn(-20)
+                        elif rider_x < -35:
+                            g_dog.rider_turn(20)
+                        else:
+                            g_dog.rider_turn(0)
         else:
             color_x = 0
             color_y = 0
+            rider_x=9999
         cv2.putText(frame, "X:%d, Y%d" % (int(color_x), int(color_y)), (40,40), cv2.FONT_HERSHEY_SIMPLEX, 0.8, (0,255,255), 3)
         t_start = time.time()
         fps = 0

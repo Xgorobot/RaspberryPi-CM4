@@ -48,7 +48,7 @@
      "LANGUAGE":{
         "NOW":"当前语言:",
         "SET":"语言设置:",
-        "SAVED":"设置成功，请重启机器人"
+        "SAVED":"设置成功，5秒后系统自动重启"
     },
     "DEMOEN":{
         "SHOW":"表演模式",
@@ -76,7 +76,13 @@
         "OPENING":"打开中",
         "FAIL":"失败",
         "CHATGPT":"ChatGPT",
-        "GPTCMD":"具身智能"
+        "CATCH":"小球抓取",
+        "FOLLOWPERSON":"人体跟随",
+        "FOLLOWLINE":"自动巡线",
+        "GPTDRAW":"由文生图",
+        "GPTREC":"看图生文",
+        "GPTCMD":"具身智能",
+        "GPTFREE":"自由问答"
 
     }
 }

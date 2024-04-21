@@ -59,46 +59,53 @@ lcd_draw_string(draw,70,200, la['DOG_VISION_SHOW']['PRESSD'], color=(255,255,255
 display.ShowImage(splash)
 
 lcd_rect(0,0,320,240,color=color_black,thickness=-1)
-data = [[],[],[],[],[],[],[],[],[],[],[],[]]
 
+start_time=0
+time_list=[]
+action_num=0
 while True:    
     
-    if button.press_c():
+    if button.press_d(): #TEACH
         lcd_rect(0,0,320,240,color=color_black,thickness=-1)
-        dog.unload_allmotor()
-        data[n] = dog.read_motor()
-        print(data)
-        lcd_draw_string(draw,110,100, la['DOG_VISION_SHOW']['ACTION']+(str(n+1)), color=(255,255,255), scale=font2, mono_space=False)
+        dog.teach('record',action_num)
+        dog.teach_arm('record',action_num)
+        action_num+=1
+        time_list.append(time.time()-start_time)
+        lcd_draw_string(draw,110,100, la['DOG_VISION_SHOW']['ACTION']+(str(action_num+1)), color=(255,255,255), scale=font2, mono_space=False)
         lcd_draw_string(draw,20,150,la['DOG_VISION_SHOW']['MAX'], color=(255,255,255), scale=font2, mono_space=False)
         display.ShowImage(splash)
-        time.sleep(0.02)
-        lcd_rect(0,0,320,240,color=color_black,thickness=-1)
-        n = n + 1
-        print(n)
-        if n > 12:
-                break                
-    if button.press_d():
-        lcd_rect(0,0,320,240,color=color_black,thickness=-1)
+        lcd_rect(0,0,320,240,color=color_black,thickness=-1)   
+        start_time=time.time() 
+    if button.press_c():  #READY START
         dog.load_allmotor()
+        dog.reset()
+        time.sleep(2)
+        time_list=[]
+        action_num=0
+        start_time=time.time()
+        lcd_rect(0,0,320,240,color=color_black,thickness=-1)
+        dog.unload_allmotor()
         lcd_draw_string(draw,40,100, la['DOG_VISION_SHOW']['READY'], color=(255,255,255), scale=font2, mono_space=False)
         display.ShowImage(splash)
         time.sleep(0.02)
         lcd_rect(0,0,320,240,color=color_black,thickness=-1)
-    if button.press_a():
+    if button.press_a():  #ACTION
         lcd_rect(0,0,320,240,color=color_black,thickness=-1)
         lcd_draw_string(draw,66,100, la['DOG_VISION_SHOW']['EXECUTING'], color=(255,255,255), scale=font2, mono_space=False)
         display.ShowImage(splash)
-        time.sleep(0.02)
+        dog.load_allmotor()
+        dog.reset()
+        time.sleep(2)
+        print(time_list)
         lcd_rect(0,0,320,240,color=color_black,thickness=-1)  
-        for d in data:
-            if d!=[]:
-                dog.motor(servo,d)
-                print(d)
-                time.sleep(0.8)
+        for i in range(action_num):
+            dog.teach('play',i)
+            dog.teach_arm('play',i)
+            time.sleep(time_list[i])
         print('action done!')
         lcd_draw_string(draw,100,100, la['DOG_VISION_SHOW']['DONE'], color=(255,255,255), scale=font2, mono_space=False)
         display.ShowImage(splash)
-    if button.press_b():
+    if button.press_b():  #QUIT 
         dog.load_allmotor()
         dog.reset()
         break

@@ -89,6 +89,3 @@ def language():
         #test
         print(language)
     return language
-
-
-    

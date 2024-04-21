@@ -18,15 +18,12 @@ cap=cv2.VideoCapture(0)
 cap.set(3,320)
 cap.set(4,240)
 
-# sigmoid函数
 def sigmoid(x):
     return 1. / (1 + np.exp(-x))
 
-# tanh函数
 def tanh(x):
     return 2. / (1 + np.exp(-2 * x)) - 1
 
-# 数据预处理
 def preprocess(src_img, size):
     output = cv2.resize(src_img,(size[0], size[1]),interpolation=cv2.INTER_AREA)
     output = output.transpose(2,0,1)

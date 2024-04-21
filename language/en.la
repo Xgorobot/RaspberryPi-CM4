@@ -48,7 +48,8 @@
     "LANGUAGE":{
         "NOW":"Current language:",
         "SET":"Language setting:",
-        "SAVED":"Success,Please restart the robot"
+        "NoneType":"Language setting:",
+        "SAVED":"Success,robot will restart in 5s"
     },
     "DEMOEN":{
         "SHOW":"Show",
@@ -77,6 +78,12 @@
         "FAIL":"FAIL",
         "DEVICE":"Device",
         "CHATGPT":"ChatGPT",
-        "GPTCMD":"RobotGPT"
+        "CATCH":"BallCatch",
+        "FOLLOWPERSON":"FollowPerson",
+        "FOLLOWLINE":"FollowLine",
+        "GPTDRAW":"GPTDraw",
+        "GPTREC":"GPTRec",
+        "GPTCMD":"RobotGPT",
+        "GPTFREE":"Q&A"
     }
 }

@@ -1,48 +1,174 @@
-import os,math
-from xgolib import XGO
-import cv2
-import os,socket,sys,time
-import spidev as SPI
-import xgoscreen.LCD_2inch as LCD_2inch
-from PIL import Image,ImageDraw,ImageFont
-from key import Button
-import threading
-import json,base64
-
-import time
-import os
-import argparse
-import sys
+#星火图片理解demo
+import _thread as thread
+import base64
 import datetime
-
-from libnyumaya import AudioRecognition, FeatureExtractor
-from auto_platform import AudiostreamSource, play_command,default_libpath
-
-
-#20240523 AI升级至星火3.5max 版本
-from sparkai.llm.llm import ChatSparkLLM, ChunkPrintHandler
-from sparkai.core.messages import ChatMessage
-
-SPARKAI_URL = 'wss://spark-api.xf-yun.com/v3.5/chat'
-SPARKAI_APP_ID = '204e2232'
-SPARKAI_API_SECRET = 'MDJjYzQ3NmJmODY2MmVlMDdhMDdlMjA2'
-SPARKAI_API_KEY = '1896d14df5cd043b25a7bc6bee426092'
-SPARKAI_DOMAIN = 'generalv3.5'
+import hashlib
+import hmac
+import json
+from urllib.parse import urlparse
+import ssl
+from datetime import datetime
+from time import mktime
+from urllib.parse import urlencode
+from wsgiref.handlers import format_date_time
+import websocket  # 使用websocket_client
 
 
-spark = ChatSparkLLM(
-    spark_api_url=SPARKAI_URL,
-    spark_app_id=SPARKAI_APP_ID,
-    spark_api_key=SPARKAI_API_KEY,
-    spark_api_secret=SPARKAI_API_SECRET,
-    spark_llm_domain=SPARKAI_DOMAIN,
-    streaming=False,
-)
+class Ws_Param_Pic(object):
+    # 初始化
+    def __init__(self, APPID, APIKey, APISecret, imageunderstanding_url):
+        self.APPID = APPID
+        self.APIKey = APIKey
+        self.APISecret = APISecret
+        self.host = urlparse(imageunderstanding_url).netloc
+        self.path = urlparse(imageunderstanding_url).path
+        self.ImageUnderstanding_url = imageunderstanding_url
 
-xunfei='' 
-text=[]
+    # 生成url
+    def create_url(self):
+        # 生成RFC1123格式的时间戳
+        now = datetime.now()
+        date = format_date_time(mktime(now.timetuple()))
+
+        # 拼接字符串
+        signature_origin = "host: " + self.host + "\n"
+        signature_origin += "date: " + date + "\n"
+        signature_origin += "GET " + self.path + " HTTP/1.1"
+
+        # 进行hmac-sha256进行加密
+        signature_sha = hmac.new(self.APISecret.encode('utf-8'), signature_origin.encode('utf-8'),
+                                 digestmod=hashlib.sha256).digest()
+
+        signature_sha_base64 = base64.b64encode(signature_sha).decode(encoding='utf-8')
+
+        authorization_origin = f'api_key="{self.APIKey}", algorithm="hmac-sha256", headers="host date request-line", signature="{signature_sha_base64}"'
+
+        authorization = base64.b64encode(authorization_origin.encode('utf-8')).decode(encoding='utf-8')
+
+        # 将请求的鉴权参数组合为字典
+        v = {
+            "authorization": authorization,
+            "date": date,
+            "host": self.host
+        }
+        # 拼接鉴权参数，生成url
+        url = self.ImageUnderstanding_url + '?' + urlencode(v)
+        #print(url)
+        # 此处打印出建立连接时候的url,参考本demo的时候可取消上方打印的注释，比对相同参数时生成的url与自己代码生成的url是否一致
+        return url
 
 
+# 收到websocket错误的处理
+def on_error_pic(ws, error):
+    print("### error:", error)
+
+
+# 收到websocket关闭的处理
+def on_close_pic(ws,one,two):
+    print(" ")
+
+
+# 收到websocket连接建立的处理
+def on_open_pic(ws):
+    thread.start_new_thread(run, (ws,))
+
+
+def run(ws, *args):
+    data = json.dumps(gen_params(appid=ws.appid, question= ws.question ))
+    ws.send(data)
+
+
+# 收到websocket消息的处理
+def on_message_pic(ws, message):
+    #print(message)
+    data = json.loads(message)
+    code = data['header']['code']
+    if code != 0:
+        print(f'请求错误: {code}, {data}')
+        ws.close()
+    else:
+        choices = data["payload"]["choices"]
+        status = choices["status"]
+        content = choices["text"][0]["content"]
+        print(content,end ="")
+        global answer
+        answer += content
+        # print(1)
+        if status == 2:
+            ws.close()
+
+
+def gen_params(appid, question):
+    """
+    通过appid和用户的提问来生成请参数
+    """
+
+    data = {
+        "header": {
+            "app_id": appid
+        },
+        "parameter": {
+            "chat": {
+                "domain": "image",
+                "temperature": 0.5,
+                "top_k": 4,
+                "max_tokens": 2028,
+                "auditing": "default"
+            }
+        },
+        "payload": {
+            "message": {
+                "text": question
+            }
+        }
+}
+
+    return data
+
+
+def main(appid, api_key, api_secret, imageunderstanding_url,question):
+    print('understanding')
+    print(appid, api_key, api_secret)
+    imageunderstanding_url = "wss://spark-api.cn-huabei-1.xf-yun.com/v2.1/image"#云端环境的服务地址
+    imagedata = open("/home/pi/xgoPictures/rec.jpg",'rb').read()
+    texturl =[{"role": "user", "content": str(base64.b64encode(imagedata), 'utf-8'), "content_type":"image"}]
+
+    wsParam = Ws_Param_Pic(appid, api_key, api_secret, imageunderstanding_url)
+    websocket.enableTrace(False)
+    wsUrl = wsParam.create_url()
+    ws = websocket.WebSocketApp(wsUrl, on_message=on_message_pic, on_error=on_error_pic, on_close=on_close_pic, on_open=on_open_pic)
+    ws.appid = appid
+    #ws.imagedata = imagedata
+    ws.question = question
+    ws.run_forever(sslopt={"cert_reqs": ssl.CERT_NONE})
+
+
+def getText(role, content):
+    imagedata = open("/home/pi/xgoPictures/rec.jpg",'rb').read()
+    texturl =[{"role": "user", "content": str(base64.b64encode(imagedata), 'utf-8'), "content_type":"image"}]
+    jsoncon = {}
+    jsoncon["role"] = role
+    jsoncon["content"] = content
+    texturl.append(jsoncon)
+    return texturl
+
+
+def getlength(text):
+    length = 0
+    for content in text:
+        temp = content["content"]
+        leng = len(temp)
+        length += leng
+    return length
+
+
+def checklen(text):
+    #print("text-content-tokens:", getlength(text[1:]))
+    while (getlength(text[1:])> 8000):
+        del text[1]
+    return text
+
+#星火语音识别demo
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 import websocket
 import datetime
@@ -113,6 +239,7 @@ class Ws_Param(object):
 # 收到websocket消息的处理
 def on_message(ws, message):
     global xunfei
+    print('on message')
     try:
         code = json.loads(message)["code"]
         sid = json.loads(message)["sid"]
@@ -131,6 +258,7 @@ def on_message(ws, message):
             for r in data:
                 tx+=r['cw'][0]['w']
             xunfei+=tx
+            print(xunfei)
 
             #textshow=sid.split(" ")[1]
 
@@ -195,6 +323,27 @@ def on_open(ws):
         ws.close()
 
     thread.start_new_thread(run, ())
+#--------------------------------------
+
+import sys
+sys.path.append("/home/pi/RaspberryPi-CM4-main/demos")
+import os,math
+from xgolib import XGO
+import cv2
+import os,socket,sys,time
+import spidev as SPI
+import xgoscreen.LCD_2inch as LCD_2inch
+from PIL import Image,ImageDraw,ImageFont
+from key import Button
+import threading
+import json,base64
+from subprocess import Popen
+
+from libnyumaya import AudioRecognition, FeatureExtractor
+from auto_platform import AudiostreamSource, play_command,default_libpath
+from datetime import datetime
+from face.eye_mouth_controller import start_speaking, stop_speaking
+
 
 import pyaudio
 import wave
@@ -205,7 +354,6 @@ from scipy import fftpack
 from xgoedu import XGOEDU 
 
 xgo = XGOEDU()
-
 
 btn_selected = (24,47,223)
 btn_unselected = (20,30,53)
@@ -245,31 +393,10 @@ def action(num):
         if button.press_b():
             quitmark=1
 
-def mode(num):
-    start=130
-    lcd_rect(start,0,200,19,splash_theme_color,-1)
-    lcd_draw_string(draw,start,0, "自动模式", color=(255,0,0), scale=font2, mono_space=False)
-    display.ShowImage(splash)
-    global automark,quitmark
-    while quitmark==0:
-        time.sleep(0.01)
-        if button.press_c():
-            automark=not automark
-            if automark:
-                lcd_rect(start,0,200,19,splash_theme_color,-1)
-                lcd_draw_string(draw,start,0, "自动模式", color=(255,0,0), scale=font2, mono_space=False)
-                display.ShowImage(splash)
-            else:
-                lcd_rect(start,0,200,19,splash_theme_color,-1)
-                lcd_draw_string(draw,start,0, "手动模式", color=(255,0,0), scale=font2, mono_space=False)
-                display.ShowImage(splash)
-            print(automark)
-
-mode_button = threading.Thread(target=mode, args=(0,))
-mode_button.start()
 
 check_button = threading.Thread(target=action, args=(0,))
 check_button.start()
+
 
 def scroll_text_on_lcd(text, x, y, max_lines, delay):
     lines = text.split('\n')
@@ -286,26 +413,22 @@ def scroll_text_on_lcd(text, x, y, max_lines, delay):
         display.ShowImage(splash)
         time.sleep(delay)
 
-def get_wav_duration():
-    filename='test.wav'
-    with wave.open(filename, 'rb') as wav_file:
-        # 获取帧数和采样率
-        n_frames = wav_file.getnframes()
-        frame_rate = wav_file.getframerate()
-        
-        # 计算持续时间
-        duration = n_frames / frame_rate
-        return duration
-
 
 def gpt(speech_text):
-    messages = [ChatMessage(
-    role="user",
-    content=speech_text
-    )]
-    handler = ChunkPrintHandler()
-    a = spark.generate([messages], callbacks=[handler])
-    return a.generations[0][0].text
+    global answer
+    appid = "204e2232"    #填写控制台中获取的 APPID 信息
+    api_secret = "MDJjYzQ3NmJmODY2MmVlMDdhMDdlMjA2"   #填写控制台中获取的 APISecret 信息
+    api_key ="1896d14df5cd043b25a7bc6bee426092"    #填写控制台中获取的 APIKey 信息
+    
+    imageunderstanding_url = "wss://spark-api.cn-huabei-1.xf-yun.com/v2.1/image"#云端环境的服务地址
+    imagedata = open("/home/pi/xgoPictures/rec.jpg",'rb').read()
+    texturl =[{"role": "user", "content": str(base64.b64encode(imagedata), 'utf-8'), "content_type":"image"}]
+    question = checklen(getText("user",speech_text))
+    answer = ""
+    main(appid, api_key, api_secret, imageunderstanding_url, question)
+    getText("assistant", answer)
+    print(answer)
+    return answer
 
 
 def start_audio(timel = 3,save_file="test.wav"):
@@ -374,6 +497,26 @@ def start_audio(timel = 3,save_file="test.wav"):
                 os.system(play_command + " ./demos/src/ding.wav")
                 break
         audio_stream.stop()
+        time.sleep(0.5)
+        cap =cv2.VideoCapture(0)
+        cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+        cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+        path="/home/pi/xgoPictures/"
+        success,image = cap.read()
+        filename='rec'
+        cv2.imwrite(path+filename+'.jpg',image)
+        if not success:
+            print("Ignoring empty camera frame")
+        image = cv2.resize(image, (320, 240))
+        b,g,r = cv2.split(image)
+        image = cv2.merge((r,g,b))
+        image = cv2.flip(image,1)
+        imgok = Image.fromarray(image)
+        display.ShowImage(imgok)
+        time.sleep(1)
+        cap.release()
+        cv2.destroyAllWindows()
+        print('camera close')
         while not break_luyin:
             if not automark:
                 break_luyin=True
@@ -389,7 +532,7 @@ def start_audio(timel = 3,save_file="test.wav"):
             data_list.append(vol)
             if vol>start_threshold:
                 sum_vol+=1
-                if sum_vol==2:
+                if sum_vol==1:
                     print('start recording')
                     start_luyin=True
             if start_luyin :
@@ -459,7 +602,7 @@ def start_audio(timel = 3,save_file="test.wav"):
     if quitmark==0:
         lcd_rect(30,40,320,90,splash_theme_color,-1)
         draw.rectangle((20,30,300,80), splash_theme_color, 'white',width=3)
-        lcd_draw_string(draw,35,40, "录音完毕!", color=(255,0,0), scale=font3, mono_space=False)
+        lcd_draw_string(draw,35,40, "Record done!", color=(255,0,0), scale=font3, mono_space=False)
         display.ShowImage(splash)
         try:
             stream_a.stop_stream()
@@ -550,6 +693,7 @@ try:
 except:
     net=False
 
+textrul=''
 if net:
     dog = XGO(port='/dev/ttyAMA0',version="xgolite")
     draw.rectangle((20,30,300,80), splash_theme_color, 'white',width=3)
@@ -572,6 +716,9 @@ if net:
             ws.on_open = on_open
             ws.run_forever(sslopt={"cert_reqs": ssl.CERT_NONE})
             speech_text=xunfei
+            #speech_text='图片里是什么内容？'
+            print('rec result-----------------------------------')
+            print(xunfei)
             if speech_text!='':
               speech_list=split_string(speech_text)
               print(speech_list)
@@ -579,7 +726,7 @@ if net:
                   lcd_rect(0,40,320,290,splash_theme_color,-1)
                   draw.rectangle((20,30,300,80), splash_theme_color, 'white',width=3)
                   lcd_draw_string(draw,35,40,sp, color=(255,0,0), scale=font3, mono_space=False)
-                  lcd_draw_string(draw,27,90, "等待星火大模型", color=(255,255,255), scale=font2, mono_space=False)
+                  lcd_draw_string(draw,27,90, "正在等待星火大模型", color=(255,255,255), scale=font2, mono_space=False)
                   display.ShowImage(splash)
                   time.sleep(1.5)
               re=gpt(speech_text)
@@ -593,16 +740,17 @@ if net:
               tick=0.3
               if lines>6:
                   scroll_text_on_lcd(re_e, 10, 90, 7, tick)
-            
-            
+              #tts(re)
+              time.sleep(2)
+
             
         if quitmark==1:
             print('main quit')
             break
 
 else:
-    lcd_draw_string(draw,57,70, "XGO没有联网，请检查网络设置", color=(255,255,255), scale=font2, mono_space=False)
-    lcd_draw_string(draw,57,120, "按C键退出", color=(255,255,255), scale=font2, mono_space=False)
+    lcd_draw_string(draw,57,70, "无法在没有网络的环境中运行!", color=(255,255,255), scale=font2, mono_space=False)
+    lcd_draw_string(draw,57,120, "按C键退出。", color=(255,255,255), scale=font2, mono_space=False)
     display.ShowImage(splash)
     while 1:
         if button.press_b():

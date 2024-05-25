@@ -24,7 +24,7 @@ from datetime import datetime
 
 xgo = XGOEDU()
 
-Input='''
+prompt='''
 【角色】请扮演一个资深的机器人开发者，你精通树莓派，机器人和python开发。
 【任务】根据命令词让机器狗按照提供的python库自动生成python代码。
 【要求】根据命令词语自动生成的python代码，必须输出md格式的文档。
@@ -122,42 +122,29 @@ XGO_edu.xgoSpeaker(like)
 示例结束了，请根据命令返回python代码，把注释写在返回的代码里面，最后一句是xgo.reset()让其复位，用到随机的画不要忘了加入import random，你必须输出md格式的文档。
 '''
 
+#20240523 AI升级至星火3.5max 版本
+from sparkai.llm.llm import ChatSparkLLM, ChunkPrintHandler
+from sparkai.core.messages import ChatMessage
 
-import SparkApi
-#以下密钥信息从控制台获取
-appid = "7582fa81"     #填写控制台中获取的 APPID 信息
-api_secret = "NzIyYzFkY2NiMzBiMTY1ZjUwYTg4MTFm"   #填写控制台中获取的 APISecret 信息
-api_key ="924c1939fdffc06651a49289e2fc17f4"    #填写控制台中获取的 APIKey 信息
+SPARKAI_URL = 'wss://spark-api.xf-yun.com/v3.5/chat'
+SPARKAI_APP_ID = '204e2232'
+SPARKAI_API_SECRET = 'MDJjYzQ3NmJmODY2MmVlMDdhMDdlMjA2'
+SPARKAI_API_KEY = '1896d14df5cd043b25a7bc6bee426092'
+SPARKAI_DOMAIN = 'generalv3.5'
 
-#用于配置大模型版本，默认“general/generalv2”
-#domain = "general"   # v1.5版本
-domain = "generalv2"    # v2.0版本
-#云端环境的服务地址
-#Spark_url = "ws://spark-api.xf-yun.com/v1.1/chat"  # v1.5环境的地址
-Spark_url = "ws://spark-api.xf-yun.com/v2.1/chat"  # v2.0环境的地址
+
+spark = ChatSparkLLM(
+    spark_api_url=SPARKAI_URL,
+    spark_app_id=SPARKAI_APP_ID,
+    spark_api_key=SPARKAI_API_KEY,
+    spark_api_secret=SPARKAI_API_SECRET,
+    spark_llm_domain=SPARKAI_DOMAIN,
+    streaming=False,
+)
 
 xunfei='' 
 text=[]
 
-def getText(role,content):
-    jsoncon = {}
-    jsoncon["role"] = role
-    jsoncon["content"] = content
-    text.append(jsoncon)
-    return text
-
-def getlength(text):
-    length = 0
-    for content in text:
-        temp = content["content"]
-        leng = len(temp)
-        length += leng
-    return length
-
-def checklen(text):
-    while (getlength(text) > 8000):
-        del text[0]
-    return text
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 import websocket
@@ -381,15 +368,10 @@ check_button.start()
 
 
 def gpt(speech_text):
-    text=[]
-    text.clear
-    print(speech_text)
-    question = checklen(getText("user",Input+speech_text))
-    SparkApi.answer =""
-    SparkApi.main(appid,api_key,api_secret,Spark_url,domain,question)
-    ans=getText("assistant",SparkApi.answer)
-    print('\n---------------------------\n')
-    return SparkApi.answer
+    messages = [ChatMessage(role="system",content=prompt),ChatMessage(role="user",content=speech_text)]
+    handler = ChunkPrintHandler()
+    a = spark.generate([messages], callbacks=[handler])
+    return a.generations[0][0].text
 
 def start_audio(timel = 3,save_file="test.wav"):
     global automark,quitmark

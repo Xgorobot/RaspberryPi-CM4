@@ -1,3 +1,5 @@
+import sys
+sys.path.append("/home/pi/RaspberryPi-CM4-main/demos")
 import os,math
 from xgolib import XGO
 import cv2
@@ -8,193 +10,19 @@ from PIL import Image,ImageDraw,ImageFont
 from key import Button
 import threading
 import json,base64
-
-import time
-import os
-import argparse
-import sys
-import datetime
+from openai import OpenAI
+from subprocess import Popen
 
 from libnyumaya import AudioRecognition, FeatureExtractor
 from auto_platform import AudiostreamSource, play_command,default_libpath
-
-
-#20240523 AI升级至星火3.5max 版本
-from sparkai.llm.llm import ChatSparkLLM, ChunkPrintHandler
-from sparkai.core.messages import ChatMessage
-
-SPARKAI_URL = 'wss://spark-api.xf-yun.com/v3.5/chat'
-SPARKAI_APP_ID = '204e2232'
-SPARKAI_API_SECRET = 'MDJjYzQ3NmJmODY2MmVlMDdhMDdlMjA2'
-SPARKAI_API_KEY = '1896d14df5cd043b25a7bc6bee426092'
-SPARKAI_DOMAIN = 'generalv3.5'
-
-
-spark = ChatSparkLLM(
-    spark_api_url=SPARKAI_URL,
-    spark_app_id=SPARKAI_APP_ID,
-    spark_api_key=SPARKAI_API_KEY,
-    spark_api_secret=SPARKAI_API_SECRET,
-    spark_llm_domain=SPARKAI_DOMAIN,
-    streaming=False,
-)
-
-xunfei='' 
-text=[]
-
-
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-import websocket
-import datetime
-import hashlib
-import base64
-import hmac
-import json
-from urllib.parse import urlencode
-import time
-import ssl
-from wsgiref.handlers import format_date_time
 from datetime import datetime
-from time import mktime
-import _thread as thread
+from face.eye_mouth_controller import start_speaking, stop_speaking
 
-STATUS_FIRST_FRAME = 0  # 第一帧的标识
-STATUS_CONTINUE_FRAME = 1  # 中间帧标识
-STATUS_LAST_FRAME = 2  # 最后一帧的标识
+clash_port = os.getenv("CLASH_PORT")
 
-
-class Ws_Param(object):
-    # 初始化
-    def __init__(self, APPID, APIKey, APISecret, AudioFile):
-        self.APPID = APPID
-        self.APIKey = APIKey
-        self.APISecret = APISecret
-        self.AudioFile = AudioFile
-
-        # 公共参数(common)
-        self.CommonArgs = {"app_id": self.APPID}
-        # 业务参数(business)，更多个性化参数可在官网查看
-        self.BusinessArgs = {"domain": "iat", "language": "zh_cn", "accent": "mandarin", "vinfo":1,"vad_eos":10000}
-
-    # 生成url
-    def create_url(self):
-        url = 'wss://ws-api.xfyun.cn/v2/iat'
-        # 生成RFC1123格式的时间戳
-        now = datetime.now()
-        date = format_date_time(mktime(now.timetuple()))
-
-        # 拼接字符串
-        signature_origin = "host: " + "ws-api.xfyun.cn" + "\n"
-        signature_origin += "date: " + date + "\n"
-        signature_origin += "GET " + "/v2/iat " + "HTTP/1.1"
-        # 进行hmac-sha256进行加密
-        signature_sha = hmac.new(self.APISecret.encode('utf-8'), signature_origin.encode('utf-8'),
-                                 digestmod=hashlib.sha256).digest()
-        signature_sha = base64.b64encode(signature_sha).decode(encoding='utf-8')
-
-        authorization_origin = "api_key=\"%s\", algorithm=\"%s\", headers=\"%s\", signature=\"%s\"" % (
-            self.APIKey, "hmac-sha256", "host date request-line", signature_sha)
-        authorization = base64.b64encode(authorization_origin.encode('utf-8')).decode(encoding='utf-8')
-        # 将请求的鉴权参数组合为字典
-        v = {
-            "authorization": authorization,
-            "date": date,
-            "host": "ws-api.xfyun.cn"
-        }
-        # 拼接鉴权参数，生成url
-        url = url + '?' + urlencode(v)
-        # print("date: ",date)
-        # print("v: ",v)
-        # 此处打印出建立连接时候的url,参考本demo的时候可取消上方打印的注释，比对相同参数时生成的url与自己代码生成的url是否一致
-        # print('websocket url :', url)
-        return url
-
-
-# 收到websocket消息的处理
-def on_message(ws, message):
-    global xunfei
-    try:
-        code = json.loads(message)["code"]
-        sid = json.loads(message)["sid"]
-        if code != 0:
-            errMsg = json.loads(message)["message"]
-            print("sid:%s call error:%s code is:%s" % (sid, errMsg, code))
-
-        else:
-            data = json.loads(message)["data"]["result"]["ws"]
-            result = ""
-            for i in data:
-                for w in i["cw"]:
-                    result += w["w"]
-            result=json.dumps(data, ensure_ascii=False)
-            tx=''
-            for r in data:
-                tx+=r['cw'][0]['w']
-            xunfei+=tx
-
-            #textshow=sid.split(" ")[1]
-
-
-    except Exception as e:
-        print("receive msg,but parse exception:", e)
-
-
-
-# 收到websocket错误的处理
-def on_error(ws, error):
-    print("### error:", error)
-
-
-# 收到websocket关闭的处理
-def on_close(ws,a,b):
-    print("### closed ###")
-
-
-# 收到websocket连接建立的处理
-def on_open(ws):
-    def run(*args):
-        frameSize = 8000  # 每一帧的音频大小
-        intervel = 0.04  # 发送音频间隔(单位:s)
-        status = STATUS_FIRST_FRAME  # 音频的状态信息，标识音频是第一帧，还是中间帧、最后一帧
-
-        with open(wsParam.AudioFile, "rb") as fp:
-            while True:
-                buf = fp.read(frameSize)
-                # 文件结束
-                if not buf:
-                    status = STATUS_LAST_FRAME
-                # 第一帧处理
-                # 发送第一帧音频，带business 参数
-                # appid 必须带上，只需第一帧发送
-                if status == STATUS_FIRST_FRAME:
-
-                    d = {"common": wsParam.CommonArgs,
-                         "business": wsParam.BusinessArgs,
-                         "data": {"status": 0, "format": "audio/L16;rate=16000",
-                                  "audio": str(base64.b64encode(buf), 'utf-8'),
-                                  "encoding": "raw"}}
-                    d = json.dumps(d)
-                    ws.send(d)
-                    status = STATUS_CONTINUE_FRAME
-                # 中间帧处理
-                elif status == STATUS_CONTINUE_FRAME:
-                    d = {"data": {"status": 1, "format": "audio/L16;rate=16000",
-                                  "audio": str(base64.b64encode(buf), 'utf-8'),
-                                  "encoding": "raw"}}
-                    ws.send(json.dumps(d))
-                # 最后一帧处理
-                elif status == STATUS_LAST_FRAME:
-                    d = {"data": {"status": 2, "format": "audio/L16;rate=16000",
-                                  "audio": str(base64.b64encode(buf), 'utf-8'),
-                                  "encoding": "raw"}}
-                    ws.send(json.dumps(d))
-                    time.sleep(1)
-                    break
-                # 模拟音频采样间隔
-                time.sleep(intervel)
-        ws.close()
-
-    thread.start_new_thread(run, ())
+if clash_port is not None:
+    os.environ["http_proxy"] = clash_port
+    os.environ["https_proxy"] = clash_port
 
 import pyaudio
 import wave
@@ -205,7 +33,6 @@ from scipy import fftpack
 from xgoedu import XGOEDU 
 
 xgo = XGOEDU()
-
 
 btn_selected = (24,47,223)
 btn_unselected = (20,30,53)
@@ -245,31 +72,10 @@ def action(num):
         if button.press_b():
             quitmark=1
 
-def mode(num):
-    start=130
-    lcd_rect(start,0,200,19,splash_theme_color,-1)
-    lcd_draw_string(draw,start,0, "自动模式", color=(255,0,0), scale=font2, mono_space=False)
-    display.ShowImage(splash)
-    global automark,quitmark
-    while quitmark==0:
-        time.sleep(0.01)
-        if button.press_c():
-            automark=not automark
-            if automark:
-                lcd_rect(start,0,200,19,splash_theme_color,-1)
-                lcd_draw_string(draw,start,0, "自动模式", color=(255,0,0), scale=font2, mono_space=False)
-                display.ShowImage(splash)
-            else:
-                lcd_rect(start,0,200,19,splash_theme_color,-1)
-                lcd_draw_string(draw,start,0, "手动模式", color=(255,0,0), scale=font2, mono_space=False)
-                display.ShowImage(splash)
-            print(automark)
-
-mode_button = threading.Thread(target=mode, args=(0,))
-mode_button.start()
 
 check_button = threading.Thread(target=action, args=(0,))
 check_button.start()
+
 
 def scroll_text_on_lcd(text, x, y, max_lines, delay):
     lines = text.split('\n')
@@ -286,26 +92,57 @@ def scroll_text_on_lcd(text, x, y, max_lines, delay):
         display.ShowImage(splash)
         time.sleep(delay)
 
-def get_wav_duration():
-    filename='test.wav'
-    with wave.open(filename, 'rb') as wav_file:
-        # 获取帧数和采样率
-        n_frames = wav_file.getnframes()
-        frame_rate = wav_file.getframerate()
-        
-        # 计算持续时间
-        duration = n_frames / frame_rate
-        return duration
 
 
 def gpt(speech_text):
-    messages = [ChatMessage(
-    role="user",
-    content=speech_text
-    )]
-    handler = ChunkPrintHandler()
-    a = spark.generate([messages], callbacks=[handler])
-    return a.generations[0][0].text
+    # OpenAI API Key
+    api_key = os.getenv("OPENAI_API_KEY")
+
+    # Function to encode the image
+    def encode_image(image_path):
+        with open(image_path, "rb") as image_file:
+            return base64.b64encode(image_file.read()).decode('utf-8')
+
+    # Path to your image
+    image_path = "/home/pi/xgoPictures/rec.jpg"
+
+    # Getting the base64 string
+    base64_image = encode_image(image_path)
+
+    headers = {
+        "Content-Type": "application/json",
+        "Authorization": f"Bearer {api_key}"
+    }
+
+    payload = {
+        "model": "gpt-4-vision-preview",
+        "messages": [
+        {
+            "role": "user",
+            "content": [
+            {
+                "type": "text",
+                "text": speech_text
+            },
+            {
+                "type": "image_url",
+                "image_url": {
+                "url": f"data:image/jpeg;base64,{base64_image}"
+                }
+            }
+            ]
+        }
+        ],
+        "max_tokens": 300
+    }
+
+    response = requests.post("https://api.openai.com/v1/chat/completions", headers=headers, json=payload)
+
+    re=response.json()
+    print(re)
+    #print(type(re))
+    result=re['choices'][0]['message']['content']
+    return result
 
 
 def start_audio(timel = 3,save_file="test.wav"):
@@ -374,6 +211,26 @@ def start_audio(timel = 3,save_file="test.wav"):
                 os.system(play_command + " ./demos/src/ding.wav")
                 break
         audio_stream.stop()
+        time.sleep(0.5)
+        cap =cv2.VideoCapture(0)
+        cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
+        cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
+        path="/home/pi/xgoPictures/"
+        success,image = cap.read()
+        filename='rec'
+        cv2.imwrite(path+filename+'.jpg',image)
+        if not success:
+            print("Ignoring empty camera frame")
+        image = cv2.resize(image, (320, 240))
+        b,g,r = cv2.split(image)
+        image = cv2.merge((r,g,b))
+        image = cv2.flip(image,1)
+        imgok = Image.fromarray(image)
+        display.ShowImage(imgok)
+        time.sleep(1)
+        cap.release()
+        cv2.destroyAllWindows()
+        print('camera close')
         while not break_luyin:
             if not automark:
                 break_luyin=True
@@ -389,7 +246,7 @@ def start_audio(timel = 3,save_file="test.wav"):
             data_list.append(vol)
             if vol>start_threshold:
                 sum_vol+=1
-                if sum_vol==2:
+                if sum_vol==1:
                     print('start recording')
                     start_luyin=True
             if start_luyin :
@@ -459,7 +316,7 @@ def start_audio(timel = 3,save_file="test.wav"):
     if quitmark==0:
         lcd_rect(30,40,320,90,splash_theme_color,-1)
         draw.rectangle((20,30,300,80), splash_theme_color, 'white',width=3)
-        lcd_draw_string(draw,35,40, "录音完毕!", color=(255,0,0), scale=font3, mono_space=False)
+        lcd_draw_string(draw,35,40, "Record done!", color=(255,0,0), scale=font3, mono_space=False)
         display.ShowImage(splash)
         try:
             stream_a.stop_stream()
@@ -479,6 +336,32 @@ def start_audio(timel = 3,save_file="test.wav"):
         wf.setframerate(RATE)
         wf.writeframes(b''.join(frames))
         wf.close()
+
+def SpeechRecognition():
+    client = OpenAI()
+    audio_file = open("test.wav", "rb")
+    transcript = client.audio.transcriptions.create(
+        model="whisper-1", 
+        file=audio_file, 
+        response_format="text"
+    )
+
+    print(transcript)
+    return transcript
+
+def tts(content):
+    client = OpenAI()
+    speech_file_path = "speech.mp3"
+    response = client.audio.speech.create(
+    model="tts-1",
+    voice="nova",
+    input=content
+    )
+    response.stream_to_file(speech_file_path)
+    proc=Popen("mplayer speech.mp3", shell=True)
+    time.sleep(0.5)
+    thread = start_speaking(content)
+    stop_speaking(thread)
 
 
 def line_break(line):
@@ -550,6 +433,7 @@ try:
 except:
     net=False
 
+
 if net:
     dog = XGO(port='/dev/ttyAMA0',version="xgolite")
     draw.rectangle((20,30,300,80), splash_theme_color, 'white',width=3)
@@ -559,19 +443,11 @@ if net:
         start_audio()
         if quitmark==0:
             xunfei=''
-            wsParam = Ws_Param(APPID='7582fa81', APISecret='NzIyYzFkY2NiMzBiMTY1ZjUwYTg4MTFm',
-                            APIKey='924c1939fdffc06651a49289e2fc17f4',
-                            AudioFile='test.wav')
             lcd_rect(30,40,320,90,splash_theme_color,-1)
             draw.rectangle((20,30,300,80), splash_theme_color, 'white',width=3)
-            lcd_draw_string(draw,35,40, "正在识别", color=(255,0,0), scale=font3, mono_space=False)
+            lcd_draw_string(draw,35,40, "Recognizing", color=(255,0,0), scale=font3, mono_space=False)
             display.ShowImage(splash)
-            websocket.enableTrace(False)
-            wsUrl = wsParam.create_url()
-            ws = websocket.WebSocketApp(wsUrl, on_message=on_message, on_error=on_error, on_close=on_close)
-            ws.on_open = on_open
-            ws.run_forever(sslopt={"cert_reqs": ssl.CERT_NONE})
-            speech_text=xunfei
+            speech_text=SpeechRecognition()
             if speech_text!='':
               speech_list=split_string(speech_text)
               print(speech_list)
@@ -579,7 +455,7 @@ if net:
                   lcd_rect(0,40,320,290,splash_theme_color,-1)
                   draw.rectangle((20,30,300,80), splash_theme_color, 'white',width=3)
                   lcd_draw_string(draw,35,40,sp, color=(255,0,0), scale=font3, mono_space=False)
-                  lcd_draw_string(draw,27,90, "等待星火大模型", color=(255,255,255), scale=font2, mono_space=False)
+                  lcd_draw_string(draw,27,90, "Waiting for chatGPT", color=(255,255,255), scale=font2, mono_space=False)
                   display.ShowImage(splash)
                   time.sleep(1.5)
               re=gpt(speech_text)
@@ -593,6 +469,7 @@ if net:
               tick=0.3
               if lines>6:
                   scroll_text_on_lcd(re_e, 10, 90, 7, tick)
+              tts(re)
             
             
             
@@ -601,8 +478,8 @@ if net:
             break
 
 else:
-    lcd_draw_string(draw,57,70, "XGO没有联网，请检查网络设置", color=(255,255,255), scale=font2, mono_space=False)
-    lcd_draw_string(draw,57,120, "按C键退出", color=(255,255,255), scale=font2, mono_space=False)
+    lcd_draw_string(draw,57,70, "XGO is offline,please check your network settings", color=(255,255,255), scale=font2, mono_space=False)
+    lcd_draw_string(draw,57,120, "Press C to exit", color=(255,255,255), scale=font2, mono_space=False)
     display.ShowImage(splash)
     while 1:
         if button.press_b():

@@ -154,4 +154,132 @@ display.ShowImage(splash)
 os.system('sudo chmod 777 /dev/ttyAMA0')
 dog = XGO(port='/dev/ttyAMA0',version=version)
 
+#----------------------------SOUND UI----------------------------------
+import random
+import time
+
+def draw_wave(ch):
+    start_x = 40
+    start_y = 42
+    width, height = 80, 50
+    y_center = height // 2
+    current_y = y_center
+    previous_point = (0 + start_x, y_center + start_y)
+    draw.rectangle(
+        [(start_x - 1, start_y), (start_x + width, start_y + height)],
+        fill=splash_theme_color,
+    )
+
+    x = 0
+    while x < width:
+        segment_length = random.randint(7, 25)
+        gap_length = random.randint(4, 20)
+
+        for _ in range(segment_length):
+            if x >= width:
+                break
+
+            amplitude_change = ch
+            current_y += amplitude_change
+
+            if current_y < 0:
+                current_y = 0
+            elif current_y > height - 1:
+                current_y = height - 1
+
+            current_point = (x + start_x, current_y + start_y)
+            draw.line([previous_point, current_point], fill="white")
+            previous_point = current_point
+            x += 1
+
+        for _ in range(gap_length):
+            if x >= width:
+                break
+
+            current_point = (x + start_x, y_center + start_y)
+            draw.line([previous_point, current_point], fill="white", width=2)
+            previous_point = current_point
+            x += 1
+
+    start_x = 210
+    start_y = 42
+    width, height = 80, 50
+    y_center = height // 2
+    current_y = y_center
+    previous_point = (0 + start_x, y_center + start_y)
+    draw.rectangle(
+        [(start_x - 1, start_y), (start_x + width, start_y + height)],
+        fill=splash_theme_color,
+    )
+
+    x = 0
+    while x < width:
+        segment_length = random.randint(7, 25)
+        gap_length = random.randint(4, 20)
+
+        for _ in range(segment_length):
+            if x >= width:
+                break
+
+            amplitude_change = ch
+            current_y += amplitude_change
+
+            if current_y < 0:
+                current_y = 0
+            elif current_y > height - 1:
+                current_y = height - 1
+
+            current_point = (x + start_x, current_y + start_y)
+            draw.line([previous_point, current_point], fill="white")
+            previous_point = current_point
+            x += 1
+
+        for _ in range(gap_length):
+            if x >= width:
+                break
+
+            current_point = (x + start_x, y_center + start_y)
+            draw.line([previous_point, current_point], fill="white", width=2)
+            previous_point = current_point
+            x += 1
+
+
+def draw_cir(ch):
+    draw.rectangle([(55, 40), (120, 100)], fill=splash_theme_color)
+    draw.rectangle([(205, 40), (270, 100)], fill=splash_theme_color)
+    radius = 4
+    cy = 70
+
+    # 定义6个圆的中心坐标
+    centers = [(62, cy), (87, cy), (112, cy), (210, cy), (235, cy), (260, cy)]
+
+    for center in centers:
+        random_offset = ch
+        new_y = center[1] + random_offset
+        new_y2 = center[1] - random_offset
+
+        # 绘制轨迹
+        draw.line([center[0], new_y2, center[0], new_y], fill="white", width=11)
+
+        # 绘制填充的白色圆
+        top_left = (center[0] - radius, new_y - radius)
+        bottom_right = (center[0] + radius, new_y + radius)
+        draw.ellipse([top_left, bottom_right], fill="white")
+        top_left = (center[0] - radius, new_y2 - radius)
+        bottom_right = (center[0] + radius, new_y2 + radius)
+        draw.ellipse([top_left, bottom_right], fill="white")
+
+
+mic_logo = Image.open("/home/pi/RaspberryPi-CM4-main/pics/mic.png")
+# draw.bitmap((130, 40), nav_up)
+# while 1:
+#     draw_cir(2)
+#     display.ShowImage(splash)
+#     time.sleep(0.03)
+
+# while 1:
+#     draw_wave(40, 42)
+#     draw_wave(210, 42)
+#     display.ShowImage(splash)
+#     time.sleep(0.03)
     

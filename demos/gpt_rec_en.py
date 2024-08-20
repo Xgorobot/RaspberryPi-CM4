@@ -1,487 +1,76 @@
 import sys
+
 sys.path.append("/home/pi/RaspberryPi-CM4-main/demos")
-import os,math
-from xgolib import XGO
-import cv2
-import os,socket,sys,time
-import spidev as SPI
-import xgoscreen.LCD_2inch as LCD_2inch
-from PIL import Image,ImageDraw,ImageFont
-from key import Button
-import threading
-import json,base64
-from openai import OpenAI
-from subprocess import Popen
 
-from libnyumaya import AudioRecognition, FeatureExtractor
-from auto_platform import AudiostreamSource, play_command,default_libpath
-from datetime import datetime
-from face.eye_mouth_controller import start_speaking, stop_speaking
-
-clash_port = os.getenv("CLASH_PORT")
-
-if clash_port is not None:
-    os.environ["http_proxy"] = clash_port
-    os.environ["https_proxy"] = clash_port
-
-import pyaudio
-import wave
-
-import numpy as np
-from scipy import fftpack
-
-from xgoedu import XGOEDU 
-
-xgo = XGOEDU()
-
-btn_selected = (24,47,223)
-btn_unselected = (20,30,53)
-txt_selected = (255,255,255)
-txt_unselected = (76,86,127)
-splash_theme_color = (15,21,46)
-color_black=(0,0,0)
-color_white=(255,255,255)
-color_red=(238,55,59)
-#display init
-display = LCD_2inch.LCD_2inch()
-#display.Init()
-display.clear()
-
-#font
-font1 = ImageFont.truetype("/home/pi/model/msyh.ttc",15)
-font2 = ImageFont.truetype("/home/pi/model/msyh.ttc",16)
-font3 = ImageFont.truetype("/home/pi/model/msyh.ttc",18)
-splash = Image.new("RGB", (display.height, display.width ),splash_theme_color)
-draw = ImageDraw.Draw(splash)
-display.ShowImage(splash)
-
-def lcd_draw_string(splash,x, y, text, color=(255,255,255), font_size=1, scale=1, mono_space=False, auto_wrap=True, background_color=(0,0,0)):
-    splash.text((x,y),text,fill =color,font = scale) 
-
-def lcd_rect(x,y,w,h,color,thickness):
-    draw.rectangle([(x,y),(w,h)],fill=color,width=thickness)
-
-quitmark=0
-automark=True
-button=Button()
-
-def action(num):
-    global quitmark
-    while quitmark==0:
-        time.sleep(0.01)
-        if button.press_b():
-            quitmark=1
-
-
-check_button = threading.Thread(target=action, args=(0,))
-check_button.start()
-
-
-def scroll_text_on_lcd(text, x, y, max_lines, delay):
-    lines = text.split('\n')
-    total_lines = len(lines)
-    for i in range(total_lines - max_lines):
-        lcd_rect(0,90,320,290,splash_theme_color,-1)
-        visible_lines = lines[i:i + max_lines - 1]
-        last_line = lines[i + max_lines - 1]
-
-        for j in range(max_lines - 1):
-            lcd_draw_string(draw,x, y + j*20,visible_lines[j],color=(255,255,255), scale=font2, mono_space=False)
-        lcd_draw_string(draw, x, y + (max_lines - 1)*20,last_line,color=(255,255,255), scale=font2, mono_space=False)
-
-        display.ShowImage(splash)
-        time.sleep(delay)
-
-
-
-def gpt(speech_text):
-    # OpenAI API Key
-    api_key = os.getenv("OPENAI_API_KEY")
-
-    # Function to encode the image
-    def encode_image(image_path):
-        with open(image_path, "rb") as image_file:
-            return base64.b64encode(image_file.read()).decode('utf-8')
-
-    # Path to your image
-    image_path = "/home/pi/xgoPictures/rec.jpg"
-
-    # Getting the base64 string
-    base64_image = encode_image(image_path)
-
-    headers = {
-        "Content-Type": "application/json",
-        "Authorization": f"Bearer {api_key}"
-    }
-
-    payload = {
-        "model": "gpt-4-vision-preview",
-        "messages": [
-        {
-            "role": "user",
-            "content": [
-            {
-                "type": "text",
-                "text": speech_text
-            },
-            {
-                "type": "image_url",
-                "image_url": {
-                "url": f"data:image/jpeg;base64,{base64_image}"
-                }
-            }
-            ]
-        }
-        ],
-        "max_tokens": 300
-    }
-
-    response = requests.post("https://api.openai.com/v1/chat/completions", headers=headers, json=payload)
-
-    re=response.json()
-    print(re)
-    #print(type(re))
-    result=re['choices'][0]['message']['content']
-    return result
-
-
-def start_audio(timel = 3,save_file="test.wav"):
-    global automark,quitmark
-    start_threshold=60000
-    end_threshold=40000
-    endlast=10     
-    CHUNK = 1024
-    FORMAT = pyaudio.paInt16
-    CHANNELS = 1
-    RATE = 16000
-    RECORD_SECONDS = timel
-    WAVE_OUTPUT_FILENAME = save_file  
-
-    
-    if automark:
-        p = pyaudio.PyAudio()   
-        print("正在聆听")
-        lcd_rect(30,40,320,90,splash_theme_color,-1)
-        draw.rectangle((20,30,300,80), splash_theme_color, 'white',width=3)
-        lcd_draw_string(draw,35,40, "正在聆听", color=(255,0,0), scale=font3, mono_space=False)
-        display.ShowImage(splash)
-        
-        
-        stream_a = p.open(format=FORMAT,
-                        channels=CHANNELS,
-                        rate=RATE,
-                        input=True,
-                        frames_per_buffer=CHUNK)
-        frames = []
-        start_luyin = False
-        break_luyin = False
-        data_list =[0]*endlast
-        sum_vol=0
-        audio_stream = AudiostreamSource()
-
-        libpath='./demos/libnyumaya_premium.so.3.1.0'
-        extractor = FeatureExtractor(libpath)
-        detector = AudioRecognition(libpath)
-
-        extactor_gain = 1.0
-
-        #Add one or more keyword models
-        keywordIdlulu = detector.addModel('./demos/src/lulu_v3.1.907.premium',0.6)
-
-        bufsize = detector.getInputDataSize()
-
-        audio_stream.start()
-        while not break_luyin:
-            if not automark:
-                break_luyin=True
-            if quitmark==1:
-                print('main quit')
-                break
-            frame = audio_stream.read(bufsize*2,bufsize*2)
-            if(not frame):
-                time.sleep(0.01)
-                continue
-
-            features = extractor.signalToMel(frame,extactor_gain)
-            prediction = detector.runDetection(features)
-            if(prediction != 0):
-                now = datetime.now().strftime("%d.%b %Y %H:%M:%S")
-                if(prediction == keywordIdlulu):
-                    print("lulu detected:" + now)
-                os.system(play_command + " ./demos/src/ding.wav")
-                break
-        audio_stream.stop()
-        time.sleep(0.5)
-        cap =cv2.VideoCapture(0)
-        cap.set(cv2.CAP_PROP_FRAME_WIDTH, 640)
-        cap.set(cv2.CAP_PROP_FRAME_HEIGHT, 480)
-        path="/home/pi/xgoPictures/"
-        success,image = cap.read()
-        filename='rec'
-        cv2.imwrite(path+filename+'.jpg',image)
-        if not success:
-            print("Ignoring empty camera frame")
-        image = cv2.resize(image, (320, 240))
-        b,g,r = cv2.split(image)
-        image = cv2.merge((r,g,b))
-        image = cv2.flip(image,1)
-        imgok = Image.fromarray(image)
-        display.ShowImage(imgok)
-        time.sleep(1)
-        cap.release()
-        cv2.destroyAllWindows()
-        print('camera close')
-        while not break_luyin:
-            if not automark:
-                break_luyin=True
-            if quitmark==1:
-                print('main quit')
-                break
-            data = stream_a.read(CHUNK,exception_on_overflow=False)
-            rt_data = np.frombuffer(data,dtype=np.int16)
-            fft_temp_data = fftpack.fft(rt_data, rt_data.size, overwrite_x=True)
-            fft_data = np.abs(fft_temp_data)[0:fft_temp_data.size // 2 + 1]
-            vol=sum(fft_data) // len(fft_data)
-            data_list.pop(0)
-            data_list.append(vol)
-            if vol>start_threshold:
-                sum_vol+=1
-                if sum_vol==1:
-                    print('start recording')
-                    start_luyin=True
-            if start_luyin :
-                kkk= lambda x:float(x)<end_threshold
-                if all([kkk(i) for i in data_list]):
-                    break_luyin =True
-                    frames=frames[:-5]
-            if start_luyin:
-                frames.append(data)
-            print(start_threshold)
-            print(vol)
-        
-        print('auto end')
-    else:
-        p = pyaudio.PyAudio()   
-        print("录音中...")
-        lcd_rect(30,40,320,90,splash_theme_color,-1)
-        draw.rectangle((20,30,300,80), splash_theme_color, 'white',width=3)
-        lcd_draw_string(draw,35,40, "按B键开始", color=(255,0,0), scale=font3, mono_space=False)
-        display.ShowImage(splash)
-        
-        
-        stream_m = p.open(format=FORMAT,
-                        channels=CHANNELS,
-                        rate=RATE,
-                        input=True,
-                        frames_per_buffer=CHUNK)
-        frames = []
-        start_luyin = False
-        break_luyin = False
-        data_list =[0]*endlast
-        sum_vol=0
-        while not break_luyin:
-            if automark:
-                break
-            if quitmark==1:
-                print('main quit')
-                break
-            if button.press_d():
-                lcd_rect(30,40,320,90,splash_theme_color,-1)
-                draw.rectangle((20,30,300,80), splash_theme_color, 'white',width=3)
-                lcd_draw_string(draw,35,40, "正在聆听，按B健停止", color=(255,0,0), scale=font3, mono_space=False)
-                display.ShowImage(splash)
-                print('start recording')
-                while 1:
-                    data = stream_m.read(CHUNK,exception_on_overflow=False)
-                    rt_data = np.frombuffer(data,dtype=np.int16)
-                    fft_temp_data = fftpack.fft(rt_data, rt_data.size, overwrite_x=True)
-                    fft_data = np.abs(fft_temp_data)[0:fft_temp_data.size // 2 + 1]
-                    vol=sum(fft_data) // len(fft_data)
-                    data_list.pop(0)
-                    data_list.append(vol)
-                    frames.append(data)
-                    print(start_threshold)
-                    print(vol)
-                    if button.press_d():
-                        break_luyin =True
-                        frames=frames[:-5]
-                        break
-                    if automark:
-                        break
-                
-            
-        time.sleep(0.3)
-        print('manual end')
-
-    if quitmark==0:
-        lcd_rect(30,40,320,90,splash_theme_color,-1)
-        draw.rectangle((20,30,300,80), splash_theme_color, 'white',width=3)
-        lcd_draw_string(draw,35,40, "Record done!", color=(255,0,0), scale=font3, mono_space=False)
-        display.ShowImage(splash)
-        try:
-            stream_a.stop_stream()
-            stream_a.close()
-        except:
-            pass
-        try:
-            stream_m.stop_stream()
-            stream_m.close()
-        except:
-            pass
-        p.terminate()
-
-        wf = wave.open(WAVE_OUTPUT_FILENAME, 'wb')  
-        wf.setnchannels(CHANNELS)
-        wf.setsampwidth(p.get_sample_size(FORMAT))
-        wf.setframerate(RATE)
-        wf.writeframes(b''.join(frames))
-        wf.close()
-
-def SpeechRecognition():
-    client = OpenAI()
-    audio_file = open("test.wav", "rb")
-    transcript = client.audio.transcriptions.create(
-        model="whisper-1", 
-        file=audio_file, 
-        response_format="text"
-    )
-
-    print(transcript)
-    return transcript
-
-def tts(content):
-    client = OpenAI()
-    speech_file_path = "speech.mp3"
-    response = client.audio.speech.create(
-    model="tts-1",
-    voice="nova",
-    input=content
-    )
-    response.stream_to_file(speech_file_path)
-    proc=Popen("mplayer speech.mp3", shell=True)
-    time.sleep(0.5)
-    thread = start_speaking(content)
-    stop_speaking(thread)
-
-
-def line_break(line):
-    LINE_CHAR_COUNT = 19*2  
-    CHAR_SIZE = 20
-    TABLE_WIDTH = 4
-    ret = ''
-    width = 0
-    for c in line:
-        if len(c.encode('utf8')) == 3:  
-            if LINE_CHAR_COUNT == width + 1: 
-                width = 2
-                ret += '\n' + c
-            else: 
-                width += 2
-                ret += c
-        else:
-            if c == '\t':
-                space_c = TABLE_WIDTH - width % TABLE_WIDTH  
-                ret += ' ' * space_c
-                width += space_c
-            elif c == '\n':
-                width = 0
-                ret += c
-            else:
-                width += 1
-                ret += c
-        if width >= LINE_CHAR_COUNT:
-            ret += '\n'
-            width = 0
-    if ret.endswith('\n'):
-        return ret
-    return ret + '\n'
-
-def split_string(text):
-    import re
-    seg=30
-    result = []
-    current_segment = ""
-    current_length = 0
-
-    for char in text:
-        is_chinese = bool(re.match(r'[\u4e00-\u9fa5]', char))
-
-        if is_chinese:
-            char_length = 2
-        else:
-            char_length = 1
-
-        if current_length + char_length <= seg:
-            current_segment += char
-            current_length += char_length
-        else:
-            result.append(current_segment)
-            current_segment = char
-            current_length = char_length
-    
-    if current_segment:
-        result.append(current_segment)
-
-    return result
-
+from gpt_utils import *
 
 import requests
-net=False
+
+net = False
 try:
-    html = requests.get("http://www.baidu.com",timeout=2)
-    net=True
+    html = requests.get("http://www.baidu.com", timeout=2)
+    net = True
 except:
-    net=False
+    net = False
 
 
 if net:
-    dog = XGO(port='/dev/ttyAMA0',version="xgolite")
-    draw.rectangle((20,30,300,80), splash_theme_color, 'white',width=3)
-    display.ShowImage(splash)
-        
+    dog = XGO(port="/dev/ttyAMA0", version="xgolite")
     while 1:
-        start_audio()
-        if quitmark==0:
-            xunfei=''
-            lcd_rect(30,40,320,90,splash_theme_color,-1)
-            draw.rectangle((20,30,300,80), splash_theme_color, 'white',width=3)
-            lcd_draw_string(draw,35,40, "Recognizing", color=(255,0,0), scale=font3, mono_space=False)
-            display.ShowImage(splash)
-            speech_text=SpeechRecognition()
-            if speech_text!='':
-              speech_list=split_string(speech_text)
-              print(speech_list)
-              for sp in speech_list:
-                  lcd_rect(0,40,320,290,splash_theme_color,-1)
-                  draw.rectangle((20,30,300,80), splash_theme_color, 'white',width=3)
-                  lcd_draw_string(draw,35,40,sp, color=(255,0,0), scale=font3, mono_space=False)
-                  lcd_draw_string(draw,27,90, "Waiting for chatGPT", color=(255,255,255), scale=font2, mono_space=False)
-                  display.ShowImage(splash)
-                  time.sleep(1.5)
-              re=gpt(speech_text)
-              re_e=line_break(re)
-              print(re_e)
-              lcd_rect(0,40,320,290,splash_theme_color,-1)
-              draw.rectangle((20,30,300,80), splash_theme_color, 'white',width=3)
-              lcd_draw_string(draw,10,90, re_e, color=(255,255,255), scale=font2, mono_space=False)
-              display.ShowImage(splash)
-              lines=len(re_e.split('\n'))
-              tick=0.3
-              if lines>6:
-                  scroll_text_on_lcd(re_e, 10, 90, 7, tick)
-              tts(re)
-            
-            
-            
-        if quitmark==1:
-            print('main quit')
+        play_anmi = True
+        start_audio_camera()
+        if quitmark == 0:
+            xunfei = ""
+            speech_text = SpeechRecognition()
+            if speech_text != "":
+                speech_list = line_break(speech_text)
+                print(speech_list)
+                lcd_draw_string(
+                    draw,
+                    10,
+                    111,
+                    speech_list,
+                    color=(255, 255, 255),
+                    scale=font2,
+                    mono_space=False,
+                )
+                display.ShowImage(splash)
+                lines = len(speech_list.split("\n"))
+                tick = 0.3
+                if lines > 6:
+                    scroll_text_on_lcd(re_e, 10, 111, 6, tick)
+                time.sleep(2.5)
+                lcd_rect(0, 0, 320, 240, splash_theme_color, -1)
+                display.ShowImage(splash)
+                re = gpt_rec(speech_text)
+                re_e = line_break(re)
+                print(re_e)
+                lcd_rect(0, 110, 320, 240, splash_theme_color, -1)
+                display.ShowImage(splash)
+                lcd_draw_string(
+                    draw,
+                    10,
+                    111,
+                    re_e,
+                    color=(255, 255, 255),
+                    scale=font2,
+                    mono_space=False,
+                )
+                display.ShowImage(splash)
+                lines = len(re_e.split("\n"))
+                tick = 0.3
+                if lines > 6:
+                    scroll_text_on_lcd(re_e, 10, 111, 6, tick)
+                tts(re)
+                lcd_rect(0, 0, 320, 240, splash_theme_color, -1)
+                display.ShowImage(splash)
+
+        if quitmark == 1:
+            print("main quit")
             break
 
 else:
-    lcd_draw_string(draw,57,70, "XGO is offline,please check your network settings", color=(255,255,255), scale=font2, mono_space=False)
-    lcd_draw_string(draw,57,120, "Press C to exit", color=(255,255,255), scale=font2, mono_space=False)
-    display.ShowImage(splash)
+    draw_offline()
     while 1:
         if button.press_b():
             break
-

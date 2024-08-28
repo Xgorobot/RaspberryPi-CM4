@@ -4,6 +4,21 @@ sys.path.append("/home/pi/RaspberryPi-CM4-main/demos")
 
 from gpt_utils import *
 
+quitmark = 0
+
+
+def action(num):
+    global quitmark
+    while quitmark == 0:
+        time.sleep(0.01)
+        if button.press_b():
+            print("quit!!!!!!!!!!!!!!!!!!!!!!!!!")
+            quitmark = 1
+
+
+check_button = threading.Thread(target=action, args=(0,))
+check_button.start()
+
 import requests
 
 net = False

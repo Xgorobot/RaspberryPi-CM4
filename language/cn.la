@@ -1,6 +1,6 @@
 {
     "MAIN":{
-        "PROGRAM":"编程模式",
+        "PROGRAM":" -------",
         "RC":"遥控模式",
         "TRYDEMO":"示例模式",
         "OPENING":"打开中"
@@ -75,7 +75,7 @@
         "EXAMPLES":"示例程序",
         "OPENING":"打开中",
         "FAIL":"失败",
-        "CHATGPT":"ChatGPT",
+        "CHATGPT":"讯飞星火",
         "CATCH":"小球抓取",
         "FOLLOWPERSON":"人体跟随",
         "FOLLOWLINE":"自动巡线",

@@ -64,7 +64,7 @@ def recog_anmi(t):
     print("recog_anmi", play_anmi)
     while 1:
         free_anmi("recog")
-        time.sleep(0.02)
+        time.sleep(0.03)
         if play_anmi == False:
             break
 
@@ -78,9 +78,9 @@ def speak_anmi(t):
         elif rn == 2:
             free_anmi("speak2")
         elif rn == 3:
-            free_anmi("speak2")
+            free_anmi("speak3")
         elif rn == 4:
-            free_anmi("speak2")
+            free_anmi("speak4")
         time.sleep(0.02)
         if play_anmi == False:
             break
@@ -148,9 +148,9 @@ def start_audio(timel=3, save_file="test.wav"):
             print(start_threshold, vol)
             free_anmi("before")
         audio_stream.stop()
-        for i in range(0, 30):
+        for i in range(0, 10):
             free_anmi("after")
-            time.sleep(0.03)
+            time.sleep(0.02)
         while not break_luyin:
             if not automark:
                 break_luyin = True
@@ -262,16 +262,11 @@ def gpt(speech_text):
         ],
     )
     re = response.choices[0].message.content
-    play_anmi = False
     return re
 
 
 def tts(content):
     global play_anmi
-    play_anmi = True
-    time.sleep(0.5)
-    play_wait_anmi = threading.Thread(target=recog_anmi, args=(0,))
-    play_wait_anmi.start()
     client = OpenAI()
     speech_file_path = "speech.mp3"
     response = client.audio.speech.create(model="tts-1", voice="nova", input=content)

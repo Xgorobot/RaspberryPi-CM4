@@ -888,7 +888,12 @@ def gpt_draw(scr):
     APISecret = "MDJjYzQ3NmJmODY2MmVlMDdhMDdlMjA2"
     APIKEY = "1896d14df5cd043b25a7bc6bee426092"
     desc = scr
-    res = main(desc, appid=APPID, apikey=APIKEY, apisecret=APISecret)
+    res = draw_main(
+        desc,
+        appid="204e2232",
+        apikey="1896d14df5cd043b25a7bc6bee426092",
+        apisecret="MDJjYzQ3NmJmODY2MmVlMDdhMDdlMjA2",
+    )
     parser_Message(res)
     original_image_path = "original.jpg"
     resized_image_path = "resized.jpg"
@@ -1126,7 +1131,7 @@ def getBody(appid, text):
 
 
 # 发起请求并返回结果
-def main(text, appid, apikey, apisecret):
+def draw_main(text, appid, apikey, apisecret):
     host = "http://spark-api.cn-huabei-1.xf-yun.com/v2.1/tti"
     url = assemble_ws_auth_url(
         host, method="POST", api_key=apikey, api_secret=apisecret

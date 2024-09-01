@@ -180,7 +180,6 @@ def gpt(speech_text):
     messages = [ChatMessage(role="user", content=speech_text)]
     handler = ChunkPrintHandler()
     a = spark.generate([messages], callbacks=[handler])
-    play_anmi = False
     return a.generations[0][0].text
 
 
@@ -246,7 +245,7 @@ def start_audio(timel=3, save_file="test.wav"):
             print(start_threshold, vol)
             free_anmi("before")
         audio_stream.stop()
-        for i in range(0, 30):
+        for i in range(0, 10):
             free_anmi("after")
             time.sleep(0.03)
         while not break_luyin:
@@ -414,10 +413,6 @@ def sprak_tts(content):
     with open("spark_tts.txt", "w", encoding="utf-8") as file:
         file.write(processed_s)
     global play_anmi
-    play_anmi = True
-    time.sleep(0.5)
-    play_wait_anmi = threading.Thread(target=recog_anmi, args=(0,))
-    play_wait_anmi.start()
     request_data["header"]["app_id"] = APPId
     auth_request_url = ne_utils.build_auth_request_url(
         request_url, "GET", APIKey, APISecret
@@ -667,7 +662,7 @@ def recog_anmi(t):
     print("recog_anmi", play_anmi)
     while 1:
         free_anmi("recog")
-        time.sleep(0.02)
+        time.sleep(0.03)
         if play_anmi == False:
             break
 
@@ -681,9 +676,9 @@ def speak_anmi(t):
         elif rn == 2:
             free_anmi("speak2")
         elif rn == 3:
-            free_anmi("speak2")
+            free_anmi("speak3")
         elif rn == 4:
-            free_anmi("speak2")
+            free_anmi("speak4")
         time.sleep(0.02)
         if play_anmi == False:
             break

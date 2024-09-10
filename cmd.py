@@ -1,17 +1,15 @@
 import time
 from xgolib import XGO
-from xgoedu import XGOEDU
-xgo = XGO(port='/dev/ttyAMA0', version="xgolite")
-XGO_edu = XGOEDU()
-
-# 前进三秒钟
+xgo=XGO(port='/dev/ttyAMA0',version="xgolite")
+# 让机器狗坐下5秒钟
+xgo.action(6)
+time.sleep(5)
+# 让机器狗停止坐下的动作
+xgo.action(0)
+# 让机器狗向前走10秒
 xgo.move_x(15)
-time.sleep(3)
-
-# 坐下
-xgo.action(4)
-time.sleep(180)
-
-# 过三分钟之后再站起来
-time.sleep(180)
+time.sleep(10)
+# 让机器狗停止行走
+xgo.move_x(0)
+# 复位机器狗
 xgo.reset()

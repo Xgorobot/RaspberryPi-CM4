@@ -164,7 +164,10 @@ with mp_face_mesh.FaceMesh(
                 roll = roll
         print("start")
         print("pitch,yaw,roll",pitch,yaw,roll)
-        dog.attitude(['p','y','r'],[pitch,yaw,roll])
+        if dog_type!="R":
+          dog.attitude(['p','y','r'],[pitch,yaw,roll])
+        else:
+          dog.attitude(['p','y','r'],[pitch/4,yaw/4,roll/4])
         print("end")
         time.sleep(0.1)
     else:

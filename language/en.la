@@ -35,7 +35,7 @@
     },
     "WIFISET":{
         "NOW":"Current Country:",
-        "SET":"Select your country:",
+        "SET":"5G Channel",
         "QUIT":"Quit",
         "SAVED":"Success,Please restart the robot"
     },
@@ -46,9 +46,9 @@
         "SAVED":"Success,Please restart the robot"
     },
     "LANGUAGE":{
-        "NOW":"Current language:",
-        "SET":"Language setting:",
-        "NoneType":"Language setting:",
+        "NOW":"Current language",
+        "SET":"Language setting",
+        "NoneType":"Language setting",
         "SAVED":"Success,robot will restart in 5s"
     },
     "DEMOEN":{

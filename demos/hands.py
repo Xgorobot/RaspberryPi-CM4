@@ -215,11 +215,7 @@ with mp_hands.Hands(
           dog.action(20)
           dogtime+=3
       elif dog_type=='R':
-        if gesture_result=="good":
-          dogtime=time.time()
-          dog.action(1,Tr)
-          dogtime+=5
-        elif gesture_result=="one":
+        if gesture_result=="one":
           dogtime=time.time()
           dog.action(1)
           dogtime+=5
@@ -233,7 +229,7 @@ with mp_hands.Hands(
           dogtime+=5
         elif gesture_result=="four":
           dogtime=time.time()
-          dog.action(2)
+          dog.action(4)
           dogtime+=5
         elif gesture_result=="five":
           dogtime=time.time()
@@ -242,14 +238,6 @@ with mp_hands.Hands(
         elif gesture_result=="six":
           dogtime=time.time()
           dog.action(6)
-          dogtime+=5
-        elif gesture_result=="OK":
-          dogtime=time.time()
-          dog.action(1)
-          dogtime+=5
-        elif gesture_result=="stone":
-          dogtime=time.time()
-          dog.action(20)
           dogtime+=5
          
     

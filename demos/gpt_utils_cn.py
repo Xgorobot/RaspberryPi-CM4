@@ -1021,6 +1021,7 @@ def on_close_tts(ws, a, b):
 
 
 def sprak_tts(content):
+    print('tts_where')
     processed_s = "\n".join(
         line.strip() for line in content.splitlines() if line.strip()
     )
@@ -1032,6 +1033,7 @@ def sprak_tts(content):
     play_wait_anmi2 = threading.Thread(target=wait_anmi, args=(0,))
     play_wait_anmi2.start()
     request_data["header"]["app_id"] = APPId
+    print(APPId,APIKey,APISecret)
     auth_request_url = ne_utils.build_auth_request_url(
         request_url, "GET", APIKey, APISecret
     )

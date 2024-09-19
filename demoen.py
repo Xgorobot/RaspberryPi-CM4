@@ -52,6 +52,7 @@ if dog_type == "M" or dog_type == "L":
     MENU_ITEMS = [
         # pic kinds program show
         ("dog_show", "1movement", "dog_show", la["DEMOEN"]["SHOW"]),
+        ("qrcode", "9vision", "qrcode", la["DEMOEN"]["QRCODE"]),
         ("gpt_free", "10voice", "gpt_free", la["DEMOEN"]["GPTFREE"]),
         ("chatgpt", "10voice", "chatgpt", la["DEMOEN"]["CHATGPT"]),
         ("speech", "10voice", "speech", la["DEMOEN"]["SPEECH"]),
@@ -64,11 +65,10 @@ if dog_type == "M" or dog_type == "L":
         ("pose", "8vision", "pose_dog", la["DEMOEN"]["POSE"]),
         ("follow_person", "10voice", "follow_person", la["DEMOEN"]["FOLLOWPERSON"]),
         ("color", "11vision", "color", la["DEMOEN"]["COLOR"]),
-        ("qrcode", "9vision", "qrcode", la["DEMOEN"]["QRCODE"]),
         ("group", "2vision", "group", la["DEMOEN"]["GROUP"]),
-        ("ball_trace", "2vision", "ball_catch", la["DEMOEN"]["CATCH"]),
-        ("vision", "5movement", "vision", la["DEMOEN"]["TEACH"]),
-        ("follow_line", "10voice", "follow_line", la["DEMOEN"]["FOLLOWLINE"]),
+        # ("ball_trace", "2vision", "ball_catch", la["DEMOEN"]["CATCH"]),
+        # ("vision", "5movement", "vision", la["DEMOEN"]["TEACH"]),
+        # ("follow_line", "10voice", "follow_line", la["DEMOEN"]["FOLLOWLINE"]),
         ("wifi_set", "15vision", "wifi_set", la["DEMOEN"]["WIFISET"]),
         ("wpa_set", "16vision", "wpa_set", la["DEMOEN"]["WAPSET"]),
         ("network", "18vision", "network", la["DEMOEN"]["NETWORK"]),
@@ -85,6 +85,7 @@ elif dog_type == "R":
     MENU_ITEMS = [
         # pic kinds program show
         ("dog_show", "1movement", "dog_show", la["DEMOEN"]["SHOW"]),
+        ("qrcode", "9vision", "qrcode", la["DEMOEN"]["QRCODE"]),
         ("gpt_free", "10voice", "gpt_free", la["DEMOEN"]["GPTFREE"]),
         ("chatgpt", "10voice", "chatgpt", la["DEMOEN"]["CHATGPT"]),
         ("speech", "10voice", "speech", la["DEMOEN"]["SPEECH"]),
@@ -95,9 +96,8 @@ elif dog_type == "R":
         ("hands", "4vision", "hands", la["DEMOEN"]["HANDS"]),
         ("height", "13vision", "handh", la["DEMOEN"]["HEIGHT"]),
         ("pose", "8vision", "pose_dog", la["DEMOEN"]["POSE"]),
-        ("follow_person", "10voice", "follow_person", la["DEMOEN"]["FOLLOWPERSON"]),
+        # ("follow_person", "10voice", "follow_person", la["DEMOEN"]["FOLLOWPERSON"]),
         ("color", "11vision", "color", la["DEMOEN"]["COLOR"]),
-        ("qrcode", "9vision", "qrcode", la["DEMOEN"]["QRCODE"]),
         ("wifi_set", "15vision", "wifi_set", la["DEMOEN"]["WIFISET"]),
         ("wpa_set", "16vision", "wpa_set", la["DEMOEN"]["WAPSET"]),
         ("network", "18vision", "network", la["DEMOEN"]["NETWORK"]),

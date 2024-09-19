@@ -23,6 +23,7 @@ color_unselect = (89, 99, 149)
 color_select = (24, 47, 223)
 color_white = (255, 255, 255)
 splash_theme_color = (15, 21, 46)
+purple = (24, 47, 223)
 # display init
 display = LCD_2inch.LCD_2inch()
 display.clear()
@@ -32,8 +33,11 @@ draw = ImageDraw.Draw(splash)
 # splash=splash.rotate(180)
 display.ShowImage(splash)
 # font
-font1 = ImageFont.truetype("/home/pi/model/msyh.ttc", 12)
-font2 = ImageFont.truetype("/home/pi/model/msyh.ttc", 20)
+font1 = ImageFont.truetype("/home/pi/model/msyh.ttc", 16)
+font2 = ImageFont.truetype("/home/pi/model/msyh.ttc", 18)
+
+lan_logo = Image.open("/home/pi/RaspberryPi-CM4-main/pics/L@2x.png")
+arrow_logo = Image.open("/home/pi/RaspberryPi-CM4-main/pics/C@2x.png")
 
 
 # -----------------------COMMON INIT-----------------------
@@ -63,20 +67,15 @@ language_ini_path = os.path.join(current_dir, "language", "language.ini")
 with open(language_ini_path, "r") as f:
     content = f.read()
 
+print(content)
+splash.paste(lan_logo, (133, 25), lan_logo)
 
+text_width = draw.textlength(la["LANGUAGE"]["SET"], font=font2)
+title_x = (320 - text_width) / 2
 display_cjk_string(
     draw,
-    15,
-    17,
-    la["LANGUAGE"]["NOW"] + content,
-    font_size=font2,
-    color=color_white,
-    background_color=color_bg,
-)
-display_cjk_string(
-    draw,
-    15,
-    77,
+    title_x,
+    90,
     la["LANGUAGE"]["SET"],
     font_size=font2,
     color=color_white,
@@ -87,51 +86,53 @@ display.ShowImage(splash)
 country_list = [
     ["English", "en"],
     ["中文", "cn"],
-    # ['日本語','jp'],
 ]
 select = 0
 while 1:
-    lcd_rect(0, 70, 320, 120, (255, 0, 0), -1)
+    draw.rectangle([(20, 145), (300, 180)], fill=purple)
+    if content == "cn":
+        draw.rectangle([(160, 146), (299, 179)], fill=color_unselect)
+    else:
+        draw.rectangle([(21, 146), (160, 179)], fill=color_unselect)
     display_cjk_string(
         draw,
-        15,
-        77,
-        la["LANGUAGE"]["SET"] + country_list[select][0],
+        80,
+        150,
+        "CN",
         font_size=font2,
         color=color_white,
         background_color=color_bg,
     )
+    display_cjk_string(
+        draw,
+        220,
+        150,
+        "EN",
+        font_size=font2,
+        color=color_white,
+        background_color=color_bg,
+    )
+    splash.paste(arrow_logo, (148, 150), arrow_logo)
     display.ShowImage(splash)
     if button.press_c():
-        if select == 0:
-            select = len(country_list) - 1
-        else:
-            select -= 1
+        content = "cn"
     elif button.press_d():
-        if select == len(country_list) - 1:
-            select = 0
-        else:
-            select += 1
+        content = "en"
     elif button.press_a():
         break
     elif button.press_b():
-        time.sleep(0.5)
-        sys.exit()
-
-
-content = country_list[select][1]
-print(content)
-print("write ini")
-
+        os._exit(0)
 
 with open(language_ini_path, "w") as f:
     f.write(content)
 
-
+print("ini wroted")
+text_width = draw.textlength(la["LANGUAGE"]["SAVED"], font=font2)
+title_x = (320 - text_width) / 2
 display_cjk_string(
     draw,
-    15,
-    157,
+    title_x,
+    200,
     la["LANGUAGE"]["SAVED"],
     font_size=font2,
     color=color_white,

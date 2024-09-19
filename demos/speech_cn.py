@@ -433,6 +433,7 @@ def actions_rider(act):
             time.sleep(1)
         elif mincmd == 8:
             dog.rider_action(5, True)
+            print("生姜旋转")
             time.sleep(1)
         time.sleep(3)
     else:

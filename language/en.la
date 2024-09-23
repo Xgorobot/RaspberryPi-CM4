@@ -6,7 +6,7 @@
         "OPENING":"opening..."
     },
     "DEVICE":{
-        "DEVICEINFO":"DevicesInformation"
+        "DEVICEINFO":"About"
     },
     "EDUBLOCK":{
         "NONET":"No net!"

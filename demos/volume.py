@@ -98,8 +98,9 @@ while 1:
     elif button.press_b():
         os._exit(0)
 
-
-os.system("pactl set-sink-volume 1 " + str(volume) + "%")
+oscmd = "sudo -u pi -i pactl set-sink-volume 1 " + str(volume) + "%"
+print(oscmd)
+os.system(oscmd)
 text_width = draw.textlength(la["VOLUME"]["SAVED"], font=font2)
 title_x = (320 - text_width) / 2
 display_cjk_string(

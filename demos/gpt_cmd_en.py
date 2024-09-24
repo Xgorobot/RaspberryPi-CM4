@@ -28,6 +28,20 @@ clash_port = os.getenv("CLASH_PORT")
 if clash_port is not None:
     os.environ["http_proxy"] = clash_port
     os.environ["https_proxy"] = clash_port
+    
+import threading
+def action(num):
+    global quitmark
+    while quitmark == 0:
+        time.sleep(0.01)
+        if button.press_b():
+            print("quit!!!!!!!!!!!!!!!!!!!!!!!!!")
+            quitmark = 1
+            os._exit(0)
+
+
+check_button = threading.Thread(target=action, args=(0,))
+check_button.start()
 
 xgo = XGOEDU()
 

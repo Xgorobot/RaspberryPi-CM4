@@ -2,6 +2,20 @@ from gpt_utils import *
 
 import os
 
+import threading
+def action(num):
+    global quitmark
+    while quitmark == 0:
+        time.sleep(0.01)
+        if button.press_b():
+            print("quit!!!!!!!!!!!!!!!!!!!!!!!!!")
+            quitmark = 1
+            os._exit(0)
+
+
+check_button = threading.Thread(target=action, args=(0,))
+check_button.start()
+
 
 def check_type():
     os.system("sudo chmod 777 -R /dev/ttyAMA0")

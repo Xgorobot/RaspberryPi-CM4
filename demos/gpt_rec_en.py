@@ -7,6 +7,7 @@ from gpt_utils import *
 quitmark = 0
 
 
+import threading
 def action(num):
     global quitmark
     while quitmark == 0:
@@ -14,6 +15,7 @@ def action(num):
         if button.press_b():
             print("quit!!!!!!!!!!!!!!!!!!!!!!!!!")
             quitmark = 1
+            os._exit(0)
 
 
 check_button = threading.Thread(target=action, args=(0,))

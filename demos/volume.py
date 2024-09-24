@@ -98,9 +98,13 @@ while 1:
     elif button.press_b():
         os._exit(0)
 
-oscmd = "sudo -u pi -i pactl set-sink-volume 1 " + str(volume) + "%"
+oscmd="amixer set 'Master' " + str(volume) + "%"
 print(oscmd)
 os.system(oscmd)
+# import alsaaudio
+# mixer = alsaaudio.Mixer('Master')
+# mixer.setvolume(volume)
+
 text_width = draw.textlength(la["VOLUME"]["SAVED"], font=font2)
 title_x = (320 - text_width) / 2
 display_cjk_string(

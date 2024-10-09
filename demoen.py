@@ -63,23 +63,13 @@ if dog_type == "M" or dog_type == "L":
         ("hands", "4vision", "hands", la["DEMOEN"]["HANDS"]),
         ("height", "13vision", "handh", la["DEMOEN"]["HEIGHT"]),
         ("pose", "8vision", "pose_dog", la["DEMOEN"]["POSE"]),
-        # ("follow_person", "10voice", "follow_person", la["DEMOEN"]["FOLLOWPERSON"]),
         ("color", "11vision", "color", la["DEMOEN"]["COLOR"]),
         ("qrcode", "9vision", "qrcode", la["DEMOEN"]["QRCODE"]),
         ("group", "2vision", "group", la["DEMOEN"]["GROUP"]),
-        # ("ball_trace", "2vision", "ball_catch", la["DEMOEN"]["CATCH"]),
-        # ("vision", "5movement", "vision", la["DEMOEN"]["TEACH"]),
-        # ("follow_line", "10voice", "follow_line", la["DEMOEN"]["FOLLOWLINE"]),
         ("wifi_set", "15vision", "wifi_set", la["DEMOEN"]["WIFISET"]),
-        # ("wpa_set", "16vision", "wpa_set", la["DEMOEN"]["WAPSET"]),
         ("language", "20vision", "language", la["DEMOEN"]["LANGUAGE"]),
         ("volume", "21vision", "volume", la["DEMOEN"]["VOLUME"]),
         ("device", "19vision", "device", la["DEMOEN"]["DEVICE"]),
-        # ("sound", "12vision", "sound", la["DEMOEN"]["SOUND"]),
-        # ("segmentation", "6vision", "segmentation", la["DEMOEN"]["SEGMENT"]),
-        # ("yolo", "14vision", "yolofast", la["DEMOEN"]["YOLO"]),
-        # ("burn", "17vision", "burn", la["DEMOEN"]["BURN"]),
-        # ("gpt_cmd", "10voice", "gpt_cmd", la["DEMOEN"]["GPTCMD"]),
     ]
 elif dog_type == "R":
     MENU_ITEMS = [
@@ -96,19 +86,12 @@ elif dog_type == "R":
         ("hands", "4vision", "hands", la["DEMOEN"]["HANDS"]),
         ("height", "13vision", "handh", la["DEMOEN"]["HEIGHT"]),
         ("pose", "8vision", "pose_dog", la["DEMOEN"]["POSE"]),
-        # ("follow_person", "10voice", "follow_person", la["DEMOEN"]["FOLLOWPERSON"]),
         ("color", "11vision", "color", la["DEMOEN"]["COLOR"]),
         ("qrcode", "9vision", "qrcode", la["DEMOEN"]["QRCODE"]),
         ("wifi_set", "15vision", "wifi_set", la["DEMOEN"]["WIFISET"]),
-        ("wpa_set", "16vision", "wpa_set", la["DEMOEN"]["WAPSET"]),
         ("language", "20vision", "language", la["DEMOEN"]["LANGUAGE"]),
         ("volume", "21vision", "volume", la["DEMOEN"]["VOLUME"]),
         ("device", "19vision", "device", la["DEMOEN"]["DEVICE"]),
-        # ("group", "2vision", "group", la["DEMOEN"]["GROUP"]),
-        # ("sound", "12vision", "sound", la["DEMOEN"]["SOUND"]),
-        # ("segmentation", "6vision", "segmentation", la["DEMOEN"]["SEGMENT"]),
-        # ("yolo", "14vision", "yolofast", la["DEMOEN"]["YOLO"]),
-        # ("burn", "17vision", "burn", la["DEMOEN"]["BURN"]),
     ]
 
 SELECT_BOX = [80, 68]

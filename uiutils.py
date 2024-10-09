@@ -59,40 +59,28 @@ class Button:
 
 
 def load_language():
-    # 返回当前的目录
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    # test
     print(current_dir)
-    # 用于路径拼接文件路径
     language_ini_path = os.path.join(current_dir, "language", "language.ini")
-    # test
     print(language_ini_path)
     with open(language_ini_path, "r") as f:  # r为标识符，表示只读
         language = f.read()
-        # test
         print(language)
     language_pack = os.path.join(current_dir, "language", language + ".la")
-    # test
     print(language_pack)
     with open(language_pack, "r") as f:  # r为标识符，表示只读
         language_json = f.read()
-    # 读取到这个文件中的所有内容，并且读取的结果返回为python的dict对象
     language_dict = json.loads(language_json)
     return language_dict
 
 
 def language():
-    # 返回当前的目录
     current_dir = os.getcwd()
-    # test
     print(current_dir)
-    # 用于路径拼接文件路径
     language_ini_path = os.path.join(current_dir, "language", "language.ini")
-    # test
     print(language_ini_path)
     with open(language_ini_path, "r") as f:  # r为标识符，表示只读
         language = f.read()
-        # test
         print(language)
     return language
 
@@ -112,7 +100,6 @@ def check_type():
     elif fm[0] == "R":
         print("XGO-RIDER")
         dog_type = "R"
-    dog.reset()
     return dog_type
 
 
@@ -149,6 +136,7 @@ elif dog_type == "R":
 font1 = ImageFont.truetype("/home/pi/model/msyh.ttc", 15)
 font2 = ImageFont.truetype("/home/pi/model/msyh.ttc", 22)
 font3 = ImageFont.truetype("/home/pi/model/msyh.ttc", 30)
+font4 = ImageFont.truetype("/home/pi/model/msyh.ttc", 40)
 # init splash
 splash = Image.new("RGB", (display.height, display.width), splash_theme_color)
 draw = ImageDraw.Draw(splash)
@@ -255,7 +243,6 @@ def draw_cir(ch):
     radius = 4
     cy = 70
 
-    # 定义6个圆的中心坐标
     centers = [(62, cy), (87, cy), (112, cy), (210, cy), (235, cy), (260, cy)]
 
     for center in centers:
@@ -263,10 +250,8 @@ def draw_cir(ch):
         new_y = center[1] + random_offset
         new_y2 = center[1] - random_offset
 
-        # 绘制轨迹
         draw.line([center[0], new_y2, center[0], new_y], fill="white", width=11)
 
-        # 绘制填充的白色圆
         top_left = (center[0] - radius, new_y - radius)
         bottom_right = (center[0] + radius, new_y + radius)
         draw.ellipse([top_left, bottom_right], fill="white")
@@ -276,14 +261,3 @@ def draw_cir(ch):
 
 
 mic_logo = Image.open("/home/pi/RaspberryPi-CM4-main/pics/mic.png")
-# draw.bitmap((130, 40), nav_up)
-# while 1:
-#     draw_cir(2)
-#     display.ShowImage(splash)
-#     time.sleep(0.03)
-
-# while 1:
-#     draw_wave(40, 42)
-#     draw_wave(210, 42)
-#     display.ShowImage(splash)
-#     time.sleep(0.03)

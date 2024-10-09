@@ -4,6 +4,8 @@ from uiutils import *
 
 current_selection = 1
 
+import socket
+
 
 def show_battery():
     lcd_rect(200, 0, 320, 25, color=splash_theme_color, thickness=-1)
@@ -75,14 +77,9 @@ def main_program():
         key_state_right = 1
     elif button.press_b():
         print("b button,but nothing to quit")
-    # print(key_state_down,key_state_left,key_state_right)
 
     if key_state_left == 1:
         show_battery()
-        # if current_selection==1:
-        #     current_selection=1
-        # else:
-        #     current_selection-=1
         if current_selection == 1:
             current_selection = 3
         else:
@@ -90,10 +87,6 @@ def main_program():
 
     if key_state_right == 1:
         show_battery()
-        # if current_selection==3:
-        #     current_selection=3
-        # else:
-        #     current_selection+=1
         if current_selection == 1:
             current_selection = 3
         else:
@@ -176,15 +169,29 @@ def main_program():
     display.ShowImage(splash)
 
 
-# -------------------------init UI---------------------------------
+def is_connected(host="8.8.8.8", port=53, timeout=3):
+    try:
+        socket.setdefaulttimeout(timeout)
+        socket.socket(socket.AF_INET, socket.SOCK_STREAM).connect((host, port))
+        return True
+    except socket.error as ex:
+        print(f"网络连接错误: {ex}")
+        return False
+
+
 current_dir = os.path.dirname(os.path.abspath(__file__))
 
 logo = Image.open(os.path.join(current_dir, "pics", "luwu@3x.png"))
-draw.bitmap((74, 49), logo)
-lcd_draw_string(draw, 210, 133, firmware_info, color=color_white, scale=font1)
 wifiy = Image.open(os.path.join(current_dir, "pics", "wifi@2x.png"))
-wifin = Image.open(os.path.join(current_dir, "pics", "wifi-un@2x.png"))
 bat = Image.open(os.path.join(current_dir, "pics", "battery.png"))
+
+if is_connected():
+    draw.bitmap((10, 0), wifiy)
+    draw.bitmap((74, 49), logo)
+else:
+    draw.bitmap((74, 49), logo)
+
+lcd_draw_string(draw, 210, 133, firmware_info, color=color_white, scale=font1)
 
 show_battery()
 current_selection = 1

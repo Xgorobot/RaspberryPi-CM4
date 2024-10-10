@@ -1,5 +1,23 @@
-import os, socket, sys, time
+import os, socket, sys, time, locale
 from PIL import Image, ImageDraw, ImageFont
+
+current_locale = locale.getdefaultlocale()
+
+language_directory = 'language'
+language_file_path = os.path.join(language_directory, 'language.ini')
+
+if current_locale:
+    language_code = current_locale[0][:2]
+    
+    if language_code in ['en', 'ch', 'jp']:
+        with open(language_file_path, 'w') as configfile:
+            configfile.write(language_code)
+        print(f"Language code '{language_code}' written to \language\language.ini")
+    else:
+        print("Language code does not match 'en' or 'ch' or 'jp'")
+else:
+    print("Locale not set")
+
 from uiutils import *
 
 current_selection = 1

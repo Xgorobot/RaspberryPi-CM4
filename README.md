@@ -23,6 +23,19 @@ sudo pip install --upgrade xgo-pythonlib
 [Xgorobot/XGO-PythonLib(github.com)](https://github.com/Xgorobot/XGO-PythonLib)
 
 ## ChangeLog
+### [xgoV2.0] - 2024-10-10
+
+#### Fixed
+- Optimized and removed the examples from the XGO Raspberry Pi demo.
+- Added a new UI for improved interaction.
+- Removed Edublocks.
+- Removed d the robot firmware upgrade feature, as it may cause upgrade failures.
+- Modified the QR code scanning feature for network connection, adding more prompts to help users successfully connect to the network.
+#### Added
+- Added example programs for XGORider, incorporating more engaging AI features based on the Spark model and ChatGPT.
+- Enhanced the XGORider with a more engaging UI interaction interface.
+
+
 ### [xgo0627] - 2023-6-27
 
 #### Fixed

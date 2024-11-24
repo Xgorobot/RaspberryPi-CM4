@@ -6,24 +6,41 @@ current_locale = locale.getdefaultlocale()
 language_directory = 'language'
 language_file_path = os.path.join(language_directory, 'language.ini')
 
+# Get the current locale
+current_locale = locale.getdefaultlocale()
+
 if current_locale:
     language_code = current_locale[0][:2]
     
+   # Check if the language code is one of the allowed options
     if language_code in ['en', 'ch', 'jp']:
-        with open(language_file_path, 'w') as configfile:
-            configfile.write(language_code)
-        print(f"Language code '{language_code}' written to \language\language.ini")
+        # Read the existing language code from the file if it exists
+        if os.path.exists(language_file_path):
+            with open(language_file_path, 'r') as configfile:
+                current_code_in_file = configfile.read().strip()
+        else:
+            current_code_in_file = None
+        
+        # Only write to the file if the code is different from what's already there
+        if current_code_in_file != language_code:
+            # Ensure the language directory exists
+            os.makedirs(language_directory, exist_ok=True)
+            # Write the new language code to the file
+            with open(language_file_path, 'w') as configfile:
+                configfile.write(language_code)
+            print(f"Language code '{language_code}' written to language.ini")
+        else:
+            print(f"Language code '{language_code}' already matches the file, no need to overwrite.")
     else:
-        print("Language code does not match 'en' or 'ch' or 'jp'")
+        print(f"Language code '{language_code}' is not in the allowed list ('en', 'ch', 'jp').")
 else:
-    print("Locale not set")
+    print("Locale not set")  
 
 from uiutils import *
 
 current_selection = 1
 
 import socket
-
 
 def show_battery():
     lcd_rect(200, 0, 320, 25, color=splash_theme_color, thickness=-1)

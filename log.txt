@@ -1,8 +1,0 @@
-Mon Jan 29 18:39:41 2024 count: 1 cals: 3
-Mon Jan 29 18:40:05 2024 count: 2 cals: 6
-Mon Jan 29 18:43:58 2024 count: 1 cals: 3
-Wed Feb 21 18:58:12 2024 count: 1 cals: 2
-Wed Feb 21 18:59:03 2024 count: 2 cals: 4
-Sun Feb 25 18:36:05 2024 count: 1 cals: 4
-Tue Apr  2 16:46:55 2024 count: 1 cals: 5
-Tue Apr  2 16:47:39 2024 count: 2 cals: 9

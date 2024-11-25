@@ -1,4 +1,5 @@
 # scirpt needs to be run from home/pi
+cd /home/pi
 
 #!/bin/bash
 
@@ -25,6 +26,7 @@ fi
 
 git config --global init.defaultBranch main
 git config --global user.email "xgo@update.com"
+git config --global user.name "no name"
 
 if ! command -v git &> /dev/null; then
     echo "Git is not installed. Please install Git and try again."

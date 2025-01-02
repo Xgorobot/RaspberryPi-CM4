@@ -7,7 +7,7 @@ This repository contains the following components:
 
 - [app/](https://github.com/Xgorobot/RaspberryPi-CM4/tree/main/RaspberryPi-CM4-main/app) -- Raspberry Pi server for controlling a xgo2 using a mobile application.
 - [demos/](https://github.com/Xgorobot/RaspberryPi-CM4/tree/main/RaspberryPi-CM4-main/demos) -- Officially created demos that can be run directly.
-- [extra_demos/](https://github.com/Xgorobot/RaspberryPi-CM4/tree/main/extra_demos) -- Some immature demo programs are provided for learning and reference purposes only. 
+- [extra_demos/](https://github.com/Xgorobot/RaspberryPi-CM4/tree/main/RaspberryPi-CM4-main/extra_demos) -- Some immature demo programs are provided for learning and reference purposes only. 
 - [pics/](https://github.com/Xgorobot/RaspberryPi-CM4/tree/main/RaspberryPi-CM4-main/pics) -- Image resources used in the built-in program..
 - [tools/](https://github.com/Xgorobot/RaspberryPi-CM4/tree/main/RaspberryPi-CM4-main/tools) --
 - [volume/](https://github.com/Xgorobot/RaspberryPi-CM4/tree/main/RaspberryPi-CM4-main/volume) -- Volume configuration file.

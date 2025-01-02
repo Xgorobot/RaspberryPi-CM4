@@ -24,10 +24,9 @@ sudo pip install --upgrade xgo-pythonlib
 
 ## ChangeLog
 ### [XGOV2] - 2024-10
+- Updated the UI interaction interfaces of some programs.
+- Integrated the AI interfaces of iFLYTEK Spark and ChatGPT, and furnished corresponding interaction exemplars.
+- Connected to the motion interface of the XGO-Rider bipedal-wheeled robot.
+- Deleted the programming mode. 
 
-#### Fixed
-- 
-#### Added
-
-- 
 

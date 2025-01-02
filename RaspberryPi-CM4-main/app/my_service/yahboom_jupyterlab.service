@@ -1,0 +1,12 @@
+[Unit]
+Description=jupyter lab start service
+After=multi-user.target
+
+[Service]
+Type=idle
+User=pi
+ExecStart=/bin/sh -c "/home/pi/.local/bin/jupyter lab"
+WorkingDirectory=/home/pi
+
+[Install]
+WantedBy=multi-user.target

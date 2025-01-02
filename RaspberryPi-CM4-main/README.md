@@ -10,7 +10,7 @@ This repository contains the following components:
 - [extra_demos/](https://github.com/Xgorobot/RaspberryPi-CM4/tree/main/extra_demos) -- Some immature demo programs are provided for learning and reference purposes only. There is no guarantee that they will function properly.
 - [pics/](https://github.com/Xgorobot/RaspberryPi-CM4/tree/main/pics) -- Image resources used in the built-in program..
 - [tools/](https://github.com/Xgorobot/RaspberryPi-CM4/tree/main/tools) --
-- - [volume/](https://github.com/Xgorobot/RaspberryPi-CM4/tree/main/volume) -- Volume configuration file.
+- [volume/](https://github.com/Xgorobot/RaspberryPi-CM4/tree/main/volume) -- Volume configuration file.
 Some testing and compilation tools.
 
 If you want to upgrade xgo-pythonlib,please run these two commands:

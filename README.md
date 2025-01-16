@@ -3,3 +3,4 @@
 -  xgoPicture：The pictures required by the sample program.
 -  xgoVideos：Test video.
 -  start1.sh：Startup script file.
+-  update.sh: Installs/updates from Git repo.

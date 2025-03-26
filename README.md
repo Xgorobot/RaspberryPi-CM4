@@ -1,3 +1,4 @@
+
 -  RaspberryPi-CM4-main:The main program folder.
     - demos:sample program
       - expression：Emoji file
@@ -25,3 +26,5 @@
     - (Note: As noise reduction and other features have not yet been realized, please operate this function in a relatively quiet environment, otherwise it may not be able to recognize the wake-up word correctly.)
   - Addition and deletion of sample functions
   
+
+

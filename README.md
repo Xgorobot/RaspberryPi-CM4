@@ -14,9 +14,6 @@
 -  xgoVideos：Test video.
 -  start1.sh：Startup script file.
 
-- Latest Mirror Web Address：
-  Link: https://pan.baidu.com/s/1dIKp7QI4w3-7Ipe2Jrm00w?pwd=nne6 Withdrawal Code: nne6
-
 - Functional Description：
   - Added graphic transfer mode for graphic transfer and robot control by means of IP access
     - ![image](https://github.com/user-attachments/assets/7f088c27-4d61-48b0-96c5-166f1bafd264)

@@ -1,32 +1,42 @@
-from robot import *
+import os, socket, sys, time
+import spidev as SPI
+import xgoscreen.LCD_2inch as LCD_2inch
+from PIL import Image, ImageDraw, ImageFont
+from key import Button
 import numpy as np
 from numpy import linalg
+from xgolib import XGO
+
+import sys
 
 sys.path.append("..")
-#Language Loading
-la = load_language()
-#Init Key
-button = Button()
+import uiutils
 
-#Colors Define
+la = uiutils.load_language()
+
+button = Button()
+# define colors
 color_bg = (8, 10, 26)
 color_unselect = (89, 99, 149)
 color_select = (24, 47, 223)
 color_white = (255, 255, 255)
 splash_theme_color = (15, 21, 46)
 purple = (24, 47, 223)
+# display init
+display = LCD_2inch.LCD_2inch()
+display.clear()
+# splash
+splash = Image.new("RGB", (display.height, display.width), splash_theme_color)
+draw = ImageDraw.Draw(splash)
 
-#Font Loading
+# font
 font1 = ImageFont.truetype("/home/pi/model/msyh.ttc", 16)
 font2 = ImageFont.truetype("/home/pi/model/msyh.ttc", 18)
 
-#PiC Loading
 wifi_logo = Image.open("/home/pi/RaspberryPi-CM4-main/pics/5G@2x.png")
 arrow_logo = Image.open("/home/pi/RaspberryPi-CM4-main/pics/J@2x.png")
 
-'''
-    Display CJK String
-'''
+
 def display_cjk_string(
     splash,
     x,
@@ -41,13 +51,11 @@ def display_cjk_string(
 ):
     splash.text((x, y), text, fill=color, font=font_size)
 
-'''
-    LCD_Rect
-'''
+
 def lcd_rect(x, y, w, h, color, thickness):
     draw.rectangle([(x, y), (w, h)], fill=color, width=thickness)
 
-#Wifi Path
+
 wifi1 = "/etc/default/crda"
 wifi2 = "/etc/wpa_supplicant/wpa_supplicant.conf"
 
@@ -64,7 +72,6 @@ with open(wifi2, "r") as f:
 splash.paste(wifi_logo, (133, 25), wifi_logo)
 text_width = draw.textlength(la["WIFISET"]["SET"], font=font2)
 title_x = (320 - text_width) / 2
-
 display_cjk_string(
     draw,
     title_x,

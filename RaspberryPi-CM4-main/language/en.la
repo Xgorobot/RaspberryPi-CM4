@@ -1,7 +1,7 @@
 {
     "MAIN":{
-        "PROGRAM":"Hotspot",
-        "RC":"VTM",
+        "PROGRAM":" <---->",
+        "RC":"R.C",
         "TRYDEMO":"Try demo",
         "OPENING":"opening..."
     },
@@ -84,7 +84,6 @@
         "GPTDRAW":"GPTDraw",
         "GPTREC":"GPTRec",
         "GPTCMD":"RobotGPT",
-        "GPTFREE":"Q&A",
-        "XIAOZHI":"XIAOZHI"
+        "GPTFREE":"Q&A"
     }
 }

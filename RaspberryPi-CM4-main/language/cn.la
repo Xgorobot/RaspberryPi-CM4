@@ -1,7 +1,7 @@
 {
     "MAIN":{
-        "PROGRAM":" 热点模式",
-        "RC":"图传模式",
+        "PROGRAM":" <---->",
+        "RC":"遥控模式",
         "TRYDEMO":"示例模式",
         "OPENING":"打开中"
     },
@@ -82,8 +82,7 @@
         "GPTDRAW":"由文生图",
         "GPTREC":"看图生文",
         "GPTCMD":"具身智能",
-        "GPTFREE":"自由问答",
-        "XIAOZHI":"小智"
+        "GPTFREE":"自由问答"
 
     }
 }

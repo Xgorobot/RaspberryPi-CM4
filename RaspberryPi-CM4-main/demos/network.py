@@ -1,12 +1,28 @@
-from robot import *
+import os
+import socket
+import sys
+import time
+import spidev as SPI
+import xgoscreen.LCD_2inch as LCD_2inch
+from PIL import Image, ImageDraw, ImageFont
+from key import Button
 import numpy as np
+import sys
+
+sys.path.append("..")
+import uiutils
+
+la = uiutils.load_language()
+
+display = LCD_2inch.LCD_2inch()
+display.clear()
+splash = Image.new("RGB", (display.height, display.width), "black")
+display.ShowImage(splash)
+button = Button()
+
 import pyzbar.pyzbar as pyzbar
 import cv2
 
-# Init Key
-button = Button()
-# Language Loading
-la = load_language()
 
 def cv2AddChineseText(img, text, position, textColor=(200, 0, 200), textSize=10):
     if isinstance(img, np.ndarray):
@@ -39,7 +55,6 @@ font = cv2.FONT_HERSHEY_SIMPLEX
 cap = cv2.VideoCapture(0)
 cap.set(3, 320)
 cap.set(4, 240)
-
 if not cap.isOpened():
     print("[camera.py:cam]:can't open this camera")
 
@@ -101,6 +116,8 @@ while True:
                 display.ShowImage(imgok)
                 time.sleep(4)
                 sys.exit()
+                #os.system("sudo wpa_cli -i wlan0 enable_network0") # Restart WiFi after configuration update
+                #break
     print('end')
     b, g, r = cv2.split(img)
     img = cv2.merge((r, g, b))

@@ -1,18 +1,18 @@
 import cv2
-from uiutils import *
+import os,socket,sys,time
+import spidev as SPI
+import xgoscreen.LCD_2inch as LCD_2inch
+from PIL import Image,ImageDraw,ImageFont
+from key import Button
 import numpy as np
+
+display = LCD_2inch.LCD_2inch()
+display.clear()
+splash = Image.new("RGB", (display.height, display.width ),"black")
+display.ShowImage(splash)
+button=Button()
+#-----------------------COMMON INIT-----------------------
 import pyzbar.pyzbar as pyzbar
-
-button = Button()
-
-fm = get_dog_type_cache()
-result = fm[0]
-dog_type = result
-
-font = cv2.FONT_HERSHEY_SIMPLEX 
-cap=cv2.VideoCapture(0)
-cap.set(3,320)
-cap.set(4,240)
 
 def cv2AddChineseText(img, text, position, textColor=(0, 255, 0), textSize=30):
     if (isinstance(img, np.ndarray)):  
@@ -24,6 +24,10 @@ def cv2AddChineseText(img, text, position, textColor=(0, 255, 0), textSize=30):
     return cv2.cvtColor(np.asarray(img), cv2.COLOR_RGB2BGR)
 
  
+font = cv2.FONT_HERSHEY_SIMPLEX 
+cap=cv2.VideoCapture(0)
+cap.set(3,320)
+cap.set(4,240)
 if(not cap.isOpened()):
     print("[camera.py:cam]:can't open this camera")
 
@@ -38,6 +42,7 @@ while(True):
         img=cv2AddChineseText(img,text, (10, 30),(0, 255, 0), 30)
         print("[INFO] Found {} barcode: {}".format(barcodeType, barcodeData))
 
+    
     b,g,r = cv2.split(img)
     img = cv2.merge((r,g,b))
     imgok = Image.fromarray(img)
@@ -46,4 +51,5 @@ while(True):
         break
     if button.press_b():
         break
+
 cap.release()

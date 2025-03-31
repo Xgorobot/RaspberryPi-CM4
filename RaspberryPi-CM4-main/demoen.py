@@ -1,10 +1,10 @@
-from demos.uiutils import *
+import os, socket, sys, time
+import spidev as SPI
+import xgoscreen.LCD_2inch as LCD_2inch
+from PIL import Image, ImageDraw, ImageFont
+from key import Button
 
-# Init Key
-button = Button()
-
-# Language Loading
-la = load_language()
+from uiutils import *
 
 path = os.getcwd()
 
@@ -15,6 +15,10 @@ color_select = (24, 47, 223)
 
 # const
 firmware_info = "v1.0"
+# font
+font1 = ImageFont.truetype("/home/pi/model/msyh.ttc", 12)
+font2 = ImageFont.truetype("/home/pi/model/msyh.ttc", 20)
+
 
 # draw methods
 def display_cjk_string(
@@ -43,24 +47,68 @@ lcd_rect(0, 0, 320, 240, color=color_bg, thickness=-1)
 display.ShowImage(splash)
 
 MENU_ITEM_PARENT_PATH = "./pics/"
-MENU_ITEMS = [
+
+if dog_type == "M" or dog_type == "L":
+    MENU_ITEMS = [
         # pic kinds program show
         ("dog_show", "1movement", "dog_show", la["DEMOEN"]["SHOW"]),
-        ("network", "2vision", "network", la["DEMOEN"]["NETWORK"]),
-        ("xiaozhi","20vision","xiaozhi",la["DEMOEN"]["XIAOZHI"]),
-        ("speech", "5voice", "speech", la["DEMOEN"]["SPEECH"]),
-        ("face_mask", "8vision", "face_mask", la["DEMOEN"]["MASK"]),
-        ("face_decetion", "9vision", "face_decetion", la["DEMOEN"]["FACETRACK"]),
-        ("hands", "10vision", "hands", la["DEMOEN"]["HANDS"]),
-        ("height", "11vision", "handh", la["DEMOEN"]["HEIGHT"]),
-        ("pose", "12vision", "pose_dog", la["DEMOEN"]["POSE"]),
-        ("color", "13vision", "color", la["DEMOEN"]["COLOR"]),
-        ("qrcode", "14vision", "qrcode", la["DEMOEN"]["QRCODE"]),
-        ("group", "15vision", "group", la["DEMOEN"]["GROUP"]),
-        ("wifi_set", "16vision", "wifi_set", la["DEMOEN"]["WIFISET"]),
-        ("language", "17vision", "language", la["DEMOEN"]["LANGUAGE"]),
-        ("volume", "18vision", "volume", la["DEMOEN"]["VOLUME"]),
-        ("device", "19vision", "device", la["DEMOEN"]["DEVICE"])
+        ("network", "18vision", "network", la["DEMOEN"]["NETWORK"]),
+        ("gpt_free", "10voice", "gpt_free", la["DEMOEN"]["GPTFREE"]),
+        ("chatgpt", "10voice", "chatgpt", la["DEMOEN"]["CHATGPT"]),
+        ("speech", "10voice", "speech", la["DEMOEN"]["SPEECH"]),
+        ("gpt_draw", "10voice", "gpt_draw", la["DEMOEN"]["GPTDRAW"]),
+        ("gpt_rec", "10voice", "gpt_rec", la["DEMOEN"]["GPTREC"]),
+        ("face_mask", "3vision", "face_mask", la["DEMOEN"]["MASK"]),
+        ("face_decetion", "7vision", "face_decetion", la["DEMOEN"]["FACETRACK"]),
+        ("hands", "4vision", "hands", la["DEMOEN"]["HANDS"]),
+        ("height", "13vision", "handh", la["DEMOEN"]["HEIGHT"]),
+        ("pose", "8vision", "pose_dog", la["DEMOEN"]["POSE"]),
+        # ("follow_person", "10voice", "follow_person", la["DEMOEN"]["FOLLOWPERSON"]),
+        ("color", "11vision", "color", la["DEMOEN"]["COLOR"]),
+        ("qrcode", "9vision", "qrcode", la["DEMOEN"]["QRCODE"]),
+        ("group", "2vision", "group", la["DEMOEN"]["GROUP"]),
+        # ("ball_trace", "2vision", "ball_catch", la["DEMOEN"]["CATCH"]),
+        # ("vision", "5movement", "vision", la["DEMOEN"]["TEACH"]),
+        # ("follow_line", "10voice", "follow_line", la["DEMOEN"]["FOLLOWLINE"]),
+        ("wifi_set", "15vision", "wifi_set", la["DEMOEN"]["WIFISET"]),
+        # ("wpa_set", "16vision", "wpa_set", la["DEMOEN"]["WAPSET"]),
+        ("language", "20vision", "language", la["DEMOEN"]["LANGUAGE"]),
+        ("volume", "21vision", "volume", la["DEMOEN"]["VOLUME"]),
+        ("device", "19vision", "device", la["DEMOEN"]["DEVICE"]),
+        # ("sound", "12vision", "sound", la["DEMOEN"]["SOUND"]),
+        # ("segmentation", "6vision", "segmentation", la["DEMOEN"]["SEGMENT"]),
+        # ("yolo", "14vision", "yolofast", la["DEMOEN"]["YOLO"]),
+        # ("burn", "17vision", "burn", la["DEMOEN"]["BURN"]),
+        # ("gpt_cmd", "10voice", "gpt_cmd", la["DEMOEN"]["GPTCMD"]),
+    ]
+elif dog_type == "R":
+    MENU_ITEMS = [
+        # pic kinds program show
+        ("dog_show", "1movement", "dog_show", la["DEMOEN"]["SHOW"]),
+        ("network", "18vision", "network", la["DEMOEN"]["NETWORK"]),
+        ("gpt_free", "10voice", "gpt_free", la["DEMOEN"]["GPTFREE"]),
+        ("chatgpt", "10voice", "chatgpt", la["DEMOEN"]["CHATGPT"]),
+        ("speech", "10voice", "speech", la["DEMOEN"]["SPEECH"]),
+        ("gpt_draw", "10voice", "gpt_draw", la["DEMOEN"]["GPTDRAW"]),
+        ("gpt_rec", "10voice", "gpt_rec", la["DEMOEN"]["GPTREC"]),
+        ("face_mask", "3vision", "face_mask", la["DEMOEN"]["MASK"]),
+        ("face_decetion", "7vision", "face_decetion", la["DEMOEN"]["FACETRACK"]),
+        ("hands", "4vision", "hands", la["DEMOEN"]["HANDS"]),
+        ("height", "13vision", "handh", la["DEMOEN"]["HEIGHT"]),
+        ("pose", "8vision", "pose_dog", la["DEMOEN"]["POSE"]),
+        # ("follow_person", "10voice", "follow_person", la["DEMOEN"]["FOLLOWPERSON"]),
+        ("color", "11vision", "color", la["DEMOEN"]["COLOR"]),
+        ("qrcode", "9vision", "qrcode", la["DEMOEN"]["QRCODE"]),
+        ("wifi_set", "15vision", "wifi_set", la["DEMOEN"]["WIFISET"]),
+        #("wpa_set", "16vision", "wpa_set", la["DEMOEN"]["WAPSET"]),
+        ("language", "20vision", "language", la["DEMOEN"]["LANGUAGE"]),
+        ("volume", "21vision", "volume", la["DEMOEN"]["VOLUME"]),
+        ("device", "19vision", "device", la["DEMOEN"]["DEVICE"]),
+        # ("group", "2vision", "group", la["DEMOEN"]["GROUP"]),
+        # ("sound", "12vision", "sound", la["DEMOEN"]["SOUND"]),
+        # ("segmentation", "6vision", "segmentation", la["DEMOEN"]["SEGMENT"]),
+        # ("yolo", "14vision", "yolofast", la["DEMOEN"]["YOLO"]),
+        # ("burn", "17vision", "burn", la["DEMOEN"]["BURN"]),
     ]
 
 SELECT_BOX = [80, 68]
@@ -304,6 +352,7 @@ while True:
         os.system("pkill mplayer")
         break
 
+    # -----------------------------
     if key_state_left == 1:
         clear_page()
         if MENU_CURRENT_SELECT % 12 == 0:
@@ -317,7 +366,8 @@ while True:
             MENU_CURRENT_SELECT -= 1
 
         print(
-            str(MENU_CURRENT_SELECT)
+            "Key A Pressed, MENU_CURRENT_SELECT_ROW_MENU_PAGE_SWAP_COUNT: "
+            + str(MENU_CURRENT_SELECT)
             + ", \t"
             + str(MENU_CURRENT_SELECT % 12)
             + ", "
@@ -351,7 +401,8 @@ while True:
             MENU_CURRENT_SELECT += 1
 
         print(
-            str(MENU_CURRENT_SELECT)
+            "Key B Pressed, MENU_CURRENT_SELECT_ROW_MENU_PAGE_SWAP_COUNT: "
+            + str(MENU_CURRENT_SELECT)
             + ", \t"
             + str(MENU_CURRENT_SELECT % 12)
             + ", "
@@ -384,38 +435,64 @@ while True:
                 os.system("python3 ./demos/face_mask.py")
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2] == "hands":
                 os.system(" python3 ./demos/hands.py")
+            elif MENU_ITEMS[MENU_CURRENT_SELECT][2] == "vision":
+                os.system("python3 ./demos/dog_vision_show.py")
+            elif MENU_ITEMS[MENU_CURRENT_SELECT][2] == "segmentation":
+                os.system("python3 ./demos/segmentation.py")
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2] == "face_decetion":
                 os.system("python3 ./demos/face_decetion.py")
+            elif MENU_ITEMS[MENU_CURRENT_SELECT][2] == "pose":
+                os.system("python3 ./demos/pose.py")
+            elif MENU_ITEMS[MENU_CURRENT_SELECT][2] == "image_class":
+                os.system("python3 ./demos/image_class.py")
+            elif MENU_ITEMS[MENU_CURRENT_SELECT][2] == "image_dete":
+                os.system("python3 ./demos/image_dete.py")
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2] == "qrcode":
                 os.system("python3 ./demos/qrcode.py")
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2] == "speech":
-                result_la = language()
-                if result_la == "cn":
-                    print("la is cn")
-                    os.system("python3 ./demos/speechCn/speech.py")
-                elif result_la == "en":
-                    print("la is en")
-                    os.system("python3 ./demos/speechEn/speech.py")
+                os.system("python3 ./demos/speech.py")
+            elif MENU_ITEMS[MENU_CURRENT_SELECT][2] == "sound":
+                os.system("python3 ./demos/sound.py")
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2] == "handh":
                 os.system("python3 ./demos/hp.py")
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2] == "color":
                 os.system("python3 ./demos/color.py")
+            elif MENU_ITEMS[MENU_CURRENT_SELECT][2] == "yolofast":
+                os.system("python3 ./demos/yolofast.py")
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2] == "wifi_set":
                 os.system("sudo python3 ./demos/wifi_set.py")
+            elif MENU_ITEMS[MENU_CURRENT_SELECT][2] == "wpa_set":
+                os.system("sudo python3 ./demos/wpa_set.py")
+            elif MENU_ITEMS[MENU_CURRENT_SELECT][2] == "burn":
+                os.system("python3 ./demos/ota.py")
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2] == "device":
                 os.system("python3 ./demos/device.py")
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2] == "network":
                 os.system("sudo python3 ./demos/network.py")
+            elif MENU_ITEMS[MENU_CURRENT_SELECT][2] == "group":
+                os.system("python3 ./demos/group.py")
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2] == "language":
                 os.system("python3 ./demos/language.py")
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2] == "volume":
                 os.system("python3 ./demos/volume.py")
-            elif MENU_ITEMS[MENU_CURRENT_SELECT][2] == "xiaozhi":
-                os.system("sudo -u pi python ./demos/xiaozhi/xiaozhi.py")
+            elif MENU_ITEMS[MENU_CURRENT_SELECT][2] == "chatgpt":
+                os.system("python3 ./demos/chatgpt.py")
+            elif MENU_ITEMS[MENU_CURRENT_SELECT][2] == "gpt_cmd":
+                os.system("python3 ./demos/gpt_cmd.py")
+            elif MENU_ITEMS[MENU_CURRENT_SELECT][2] == "ball_catch":
+                os.system("python3 ./demos/ball_catch.py")
+            elif MENU_ITEMS[MENU_CURRENT_SELECT][2] == "gpt_draw":
+                os.system("python3 ./demos/gpt_draw.py")
+            elif MENU_ITEMS[MENU_CURRENT_SELECT][2] == "gpt_rec":
+                os.system("python3 ./demos/gpt_rec.py")
+            elif MENU_ITEMS[MENU_CURRENT_SELECT][2] == "follow_person":
+                os.system("python3 ./demos/follow_person.py")
+            elif MENU_ITEMS[MENU_CURRENT_SELECT][2] == "follow_line":
+                os.system("python3 ./demos/follow_line.py")
+            elif MENU_ITEMS[MENU_CURRENT_SELECT][2] == "gpt_free":
+                os.system("python3 ./demos/gpt_free.py")
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2] == "pose_dog":
                 os.system("python3 ./demos/pose_dog.py")
-            elif MENU_ITEMS[MENU_CURRENT_SELECT][2] == "group":
-                os.system("python3 ./demos/group.py")
             print("program done")
             draw_title_bar(MENU_CURRENT_SELECT)
         except BaseException as e:

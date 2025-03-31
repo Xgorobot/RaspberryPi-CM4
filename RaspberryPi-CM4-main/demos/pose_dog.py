@@ -1,11 +1,24 @@
 import mediapipe as mp
 import numpy as np
-from uiutils import *
+
+mp_pose = mp.solutions.pose
 import cv2
+import os, socket, sys, time
+import spidev as SPI
+import xgoscreen.LCD_2inch as LCD_2inch
+from PIL import Image, ImageDraw, ImageFont
+from key import Button
 import threading
+from xgolib import XGO
 
+dog = XGO(port="/dev/ttyAMA0", version="xgolite")
+
+display = LCD_2inch.LCD_2inch()
+display.clear()
+splash = Image.new("RGB", (display.height, display.width), "black")
+display.ShowImage(splash)
 button = Button()
-
+# -----------------------COMMON INIT-----------------------
 mppose = mp.solutions.pose
 mpdraw = mp.solutions.drawing_utils
 poses = mppose.Pose()
@@ -23,14 +36,17 @@ sport = {"name": "Squat", "count": 0, "calories": 0}
 height = 115
 quitmark = 0
 
+
 def mode(num):
     global height, quitmark
     while quitmark == 0:
         dog.translation("z", height)
         time.sleep(0.1)
 
+
 mode_button = threading.Thread(target=mode, args=(0,))
 mode_button.start()
+
 
 def logger(count, cals):
     f = open("log.txt", "a")
@@ -38,17 +54,23 @@ def logger(count, cals):
     f.write(fs)
     f.close()
 
+
 def calc_angles(a, b, c):
     a = np.array(a)
     b = np.array(b)
     c = np.array(c)
+
     radians = np.arctan2(c[1] - b[1], c[0] - b[0]) - np.arctan2(
         a[1] - b[1], a[0] - b[0]
     )
+
     angle = np.abs(radians * 180.0 / np.pi)
+
     if angle > 180:
         angle = 360 - angle
+
     return angle
+
 
 def get_landmark(landmarks, part_name):
     return [
@@ -56,6 +78,7 @@ def get_landmark(landmarks, part_name):
         landmarks[mppose.PoseLandmark[part_name].value].y,
         landmarks[mppose.PoseLandmark[part_name].value].z,
     ]
+
 
 def get_visibility(landmarks):
     if (
@@ -65,6 +88,7 @@ def get_visibility(landmarks):
         return False
     else:
         return True
+
 
 def get_body_ratio(landmarks):
     r_body = abs(
@@ -89,6 +113,7 @@ def get_body_ratio(landmarks):
     else:
         return l_leg / avg_body
 
+
 def get_knee_angle(landmarks):
     r_hip = get_landmark(landmarks, "RIGHT_HIP")
     l_hip = get_landmark(landmarks, "LEFT_HIP")
@@ -108,8 +133,11 @@ def get_knee_angle(landmarks):
     m_knee = [x / 2 for x in m_knee]
     m_ankle = r_ankle + l_ankle
     m_ankle = [x / 2 for x in m_ankle]
+
     mid_angle = calc_angles(m_hip, m_knee, m_ankle)
+
     return [r_angle, l_angle, mid_angle]
+
 
 def main():
     global h, w, start_time, status, height, quitmark
@@ -119,7 +147,9 @@ def main():
         exit()
 
     tmp = f"a{sport['count']}\n"
+    # ser.write(str.encode(tmp))
     tmp = f"b{sport['calories']}\n"
+    # ser.write(str.encode(tmp))
 
     while not flag:
         ret, frame = cap.read()
@@ -138,8 +168,35 @@ def main():
             )
             knee_angles = get_knee_angle(poseoutput.pose_landmarks.landmark)
             body_ratio = get_body_ratio(poseoutput.pose_landmarks.landmark)
+            # if knee_angles[0] < 120:
+            #     cv2.putText(preview, "Left: Down {:.1f}".format(knee_angles[0]), (10, 40)
+            #                 , cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 1, cv2.LINE_AA
+            #                 )
+            # elif knee_angles[0] < 130:
+            #     cv2.putText(preview, "Left: ??? {:.1f}".format(knee_angles[0]), (10, 40)
+            #                 , cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 1, cv2.LINE_AA
+            #                 )
+            # else:
+            #     cv2.putText(preview, "Left: Up {:.1f}".format(knee_angles[0]), (10, 40)
+            #                 , cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 1, cv2.LINE_AA
+            #                 )
+
+            # if knee_angles[1] < 120:
+            #     cv2.putText(preview, "Right: Down {:.1f}".format(knee_angles[1]), (10, 80)
+            #                 , cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 1, cv2.LINE_AA
+            #                 )
+            # elif knee_angles[1] < 130:
+            #     cv2.putText(preview, "Right: ??? {:.1f}".format(knee_angles[1]), (10, 80)
+            #                 , cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 1, cv2.LINE_AA
+            #                 )
+            # else:
+            #     cv2.putText(preview, "Right: Up {:.1f}".format(knee_angles[1]), (10, 80)
+            #                 , cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 1, cv2.LINE_AA
+            #                 )
+
             avg_angle = (knee_angles[0] + knee_angles[1]) // 2
 
+            # determine the status
             if status:
                 if avg_angle > 160:
                     status = False
@@ -183,8 +240,10 @@ def main():
                 )
         else:
             start_time = 0
+            # dog.reset()
         b, g, r = cv2.split(preview)
         image = cv2.merge((r, g, b))
+        # image = cv2.flip(image, 1)
         imgok = Image.fromarray(image)
         display.ShowImage(imgok)
         if cv2.waitKey(5) & 0xFF == 27:
@@ -192,8 +251,11 @@ def main():
         if button.press_b():
             dog.reset()
             break
+
+    # release camera
     cap.release()
     quitmark = True
     dog.reset()
+
 
 main()

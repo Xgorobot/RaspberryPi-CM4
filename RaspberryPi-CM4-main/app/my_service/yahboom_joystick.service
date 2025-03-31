@@ -1,0 +1,12 @@
+[Unit]
+Description=yahboom_joystick start service
+After=multi-user.target
+
+[Service]
+Type=idle
+User=pi
+ExecStart=/bin/sh -c "python3 /home/pi/DOGZILLA/app_dogzilla/joystick_dogzilla.py"
+WorkingDirectory=/home/pi
+
+[Install]
+WantedBy=multi-user.target

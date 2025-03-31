@@ -1,16 +1,36 @@
-from uiutils import *
+import cv2
+import os,socket,sys,time
+import spidev as SPI
+import xgoscreen.LCD_2inch as LCD_2inch
+from PIL import Image,ImageDraw,ImageFont
+from key import Button
 import math
 import numpy as np
-
-
-button = Button()
-fm = get_dog_type_cache()
-print(fm[2])
+from xgolib import XGO
+dog = XGO(port='/dev/ttyAMA0',version="xgolite")
+fm=dog.read_firmware()
+if fm[0]=='M':
+    print('XGO-MINI')
+    dog = XGO(port='/dev/ttyAMA0',version="xgomini")
+    dog_type='M'
+elif fm[0]=='L':
+    print('XGO-LITE')
+    dog_type='L'
+elif fm[0]=='R':
+    print('XGO-RIDER')
+    dog = XGO(port='/dev/ttyAMA0',version="xgorider")
+    dog_type='R'
 dog.reset()
 
 pic_path = "./demos/expression/"
 
+display = LCD_2inch.LCD_2inch()
+display.clear()
+splash = Image.new("RGB", (display.height, display.width ),"black")
+display.ShowImage(splash)
+button=Button()
 
+#-----------------------COMMON INIT-----------------------
 import cv2
 import mediapipe as mp
 font = cv2.FONT_HERSHEY_SIMPLEX
@@ -62,12 +82,16 @@ with mp_face_mesh.FaceMesh(
     success, image = cap.read()
     if not success:
       print("Ignoring empty camera frame.")
+      # If loading a video, use 'break' instead of 'continue'.
       continue
 
+    # To improve performance, optionally mark the image as not writeable to
+    # pass by reference.
     image.flags.writeable = False
     image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     results = face_mesh.process(image)
 
+    # Draw the face mesh annotations on the image.
     image.flags.writeable = True
     image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
     direction=0
@@ -100,12 +124,15 @@ with mp_face_mesh.FaceMesh(
             x, y = int(lm.x * w), int(lm.y * h)
             face_coordination_in_image.append([x, y])
         face_coordination_in_image = np.array(face_coordination_in_image,dtype=np.float64)
+        # The camera matrix
         focal_length = 1 * w
         cam_matrix = np.array([[focal_length, 0, w / 2],
                                [0, focal_length, h / 2],
                                [0, 0, 1]])
+        # The Distance Matrix
         dist_matrix = np.zeros((4, 1), dtype=np.float64)
         success, rotation_vec, transition_vec = cv2.solvePnP(face_coordination_in_real_world, face_coordination_in_image,cam_matrix, dist_matrix)
+        # Use Rodrigues function to convert rotation vector to matrix
         rotation_matrix, jacobian = cv2.Rodrigues(rotation_vec)
         result = rotation_matrix_to_angles(rotation_matrix)
         print(result)
@@ -136,10 +163,16 @@ with mp_face_mesh.FaceMesh(
             else:
                 roll = roll
         print("pitch,yaw,roll",pitch,yaw,roll)
-        print(fm[2])
-        dog.attitude(['p','y','r'],[pitch,yaw,roll])
+        if dog_type!="R":
+          dog.attitude(['p','y','r'],[pitch,yaw,roll])
+        else:
+          print('rider')
+          dog.attitude(['p','y','r'],[pitch,yaw,roll])
+          #dog.attitude(['p','y','r'],[int(pitch/4),int(yaw/4),int(roll/4)])
+        time.sleep(0.1)
     else:
       pass
+    # Flip the image horizontally for a selfie-view display.
     b,g,r = cv2.split(image)
     image = cv2.merge((r,g,b))
     image = cv2.flip(image, 1)

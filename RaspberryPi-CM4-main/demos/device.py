@@ -1,40 +1,56 @@
-from uiutils import *
+import os, time, sys
+import xgolib
+import xgoscreen.LCD_2inch as LCD_2inch
+from key import Button
+from PIL import Image, ImageDraw, ImageFont
+
+import sys
 
 sys.path.append("..")
+import uiutils
 
-#Language Loading
-la = load_language()
-#Init Key
+la = uiutils.load_language()
+
+os.system("sudo chmod 777 /dev/ttyAMA0")
+xgo = xgolib.XGO(port="/dev/ttyAMA0", version="xgomini")
+
 button = Button()
 
-'''
-    LCD_Text
-'''
+display = LCD_2inch.LCD_2inch()
+display.Init()
+display.clear()
+splash = Image.new("RGB", (320, 240), "black")
+draw = ImageDraw.Draw(splash)
+display.ShowImage(splash)
+
+# 字体载入
+font1 = ImageFont.truetype("/home/pi/model/msyh.ttc", 16)
+font2 = ImageFont.truetype("/home/pi/model/msyh.ttc", 20)
+
+
 def lcd_text(x, y, content):
     draw.text((x, y), content, fill="WHITE", font=font1)
     display.ShowImage(splash)
 
-'''
-    LCD_Text_Title
-'''
+
 def lcd_text_title(x, y, content):
     draw.text((x, y), content, fill="WHITE", font=font2)
     display.ShowImage(splash)
 
-#Pic Loading
+
 fm_logo = Image.open("/home/pi/RaspberryPi-CM4-main/pics/F@2x.png")
 py_wave = Image.open("/home/pi/RaspberryPi-CM4-main/pics/P@2x.png")
 os_logo = Image.open("/home/pi/RaspberryPi-CM4-main/pics/os@2x.png")
 
-#Version Information
-fm1 = dog.read_firmware()
-fm2 = dog.read_lib_version()
-fm3 = "D-CM4"
 
-#Color Define
+# draw.bitmap((115, 20), offline_logo, "red")
+
+fm1 = xgo.read_firmware()
+fm2 = xgo.read_lib_version()
+fm3 = "V2.0"
+
 splash_theme_color = (15, 21, 46)
 purple = (24, 47, 223)
-
 draw.rectangle([(20, 90), (100, 210)], fill=splash_theme_color)
 draw.rectangle([(120, 90), (200, 210)], fill=splash_theme_color)
 draw.rectangle([(220, 90), (300, 210)], fill=splash_theme_color)

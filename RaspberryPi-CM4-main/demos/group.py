@@ -1,21 +1,46 @@
 from subprocess import Popen
 import _thread
-from uiutils import *
+#import cv2
+import os,socket,sys,time
+import spidev as SPI
+import xgoscreen.LCD_2inch as LCD_2inch
+from PIL import Image,ImageDraw,ImageFont
+from key import Button
+from xgolib import XGO
+import os
 import _thread as thread
 import signal
-from socket import *
+
+import sys
 sys.path.append("..")
+import uiutils
+la=uiutils.load_language()
 
-button = Button()
-la = load_language()
-
-fm = get_dog_type_cache()
-result = fm[0]
-dog_type = result
+display = LCD_2inch.LCD_2inch()
+display.clear()
+splash = Image.new("RGB", (display.height, display.width ),"white")
+display.ShowImage(splash)
+draw = ImageDraw.Draw(splash)
+button=Button()
+dog = XGO(port='/dev/ttyAMA0',version="xgolite")
+fm=dog.read_firmware()
+if fm[0]=='M':
+    print('XGO-MINI')
+    dog = XGO(port='/dev/ttyAMA0',version="xgomini")
+    dog_type='M'
+elif fm[0]=='L':
+    print('XGO-LITE')
+    dog_type='L'
+elif fm[0]=='R':
+    print('XGO-RIDER')
+    dog = XGO(port='/dev/ttyAMA0',version="xgorider")
+    dog_type='R'
 dog.reset()
-
+font = ImageFont.truetype("/home/pi/model/msyh.ttc",40)
+#-----------------------COMMON INIT----------------------- 
 boardcast=False
 exitmark=False
+
 
 pic_path = "/home/pi/RaspberryPi-CM4-main/demos/expression/"
 _canvas_x, _canvas_y = 0, 0
@@ -33,6 +58,7 @@ def show(expression_name_cs, pic_num):
             time.sleep(0.05)
         
 
+from socket import *
 address = ('', 6001)
 s = socket(AF_INET, SOCK_DGRAM)
 s.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
@@ -51,7 +77,6 @@ def broadcast_check(*args):
             playmark=False
         if exitmark==True:
             break
-
 def button_check(*args):
     global exitmark
     while 1:
@@ -65,7 +90,6 @@ thread.start_new_thread(broadcast_check, ())
 thread.start_new_thread(button_check, ())
 
 playmark=False
-
 while 1:
     print(boardcast)
     if exitmark==False:
@@ -75,7 +99,7 @@ while 1:
           if not playmark:
               playmark=True
               dog.perform(1)  
-              proc=Popen("mplayer ./demos/music/dog.mp3", shell=True,preexec_fn=os.setsid) 
+              proc=Popen("mplayer ./demos/dog.mp3", shell=True,preexec_fn=os.setsid) 
               while 1:
                   if playmark==False or boardcast==False or exitmark==True:
                       break
@@ -125,12 +149,12 @@ while 1:
           print('ready...')
           splash = Image.new("RGB", (display.height, display.width ),"black")
           draw = ImageDraw.Draw(splash)
-          draw.text((100,95),la['GROUP']['READY'],fill =(255,255,255),font = font4) 
+          draw.text((100,95),la['GROUP']['READY'],fill =(255,255,255),font = font) 
           display.ShowImage(splash)
     if button.press_b() or exitmark==True:
         exitmark=True
         try:
-            proc=Popen("mplayer ./demos/music/dog.mp3", shell=True) 
+            proc=Popen("mplayer ./demos/dog.mp3", shell=True) 
             proc.terminate()
             proc.kill()
         except:

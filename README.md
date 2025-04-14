@@ -25,6 +25,7 @@
     - Control the robot dog to complete the corresponding action through the wake-up word
     - (Note: As noise reduction and other features have not yet been realized, please operate this function in a relatively quiet environment, otherwise it may not be able to recognize the wake-up word correctly.)
   - Addition and deletion of sample functions
-  
+-  4-14 Revision Log
+    -  Modified the display of battery level and network connection in main.py to detect it every 3 seconds, and then display it according to the detection result.
 
 

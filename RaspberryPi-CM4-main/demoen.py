@@ -47,20 +47,20 @@ MENU_ITEMS = [
         # pic kinds program show
         ("dog_show", "1movement", "dog_show", la["DEMOEN"]["SHOW"]),
         ("network", "2vision", "network", la["DEMOEN"]["NETWORK"]),
-        ("xiaozhi","20vision","xiaozhi",la["DEMOEN"]["XIAOZHI"]),
-        ("speech", "5voice", "speech", la["DEMOEN"]["SPEECH"]),
-        ("face_mask", "8vision", "face_mask", la["DEMOEN"]["MASK"]),
-        ("face_decetion", "9vision", "face_decetion", la["DEMOEN"]["FACETRACK"]),
-        ("hands", "10vision", "hands", la["DEMOEN"]["HANDS"]),
-        ("height", "11vision", "handh", la["DEMOEN"]["HEIGHT"]),
-        ("pose", "12vision", "pose_dog", la["DEMOEN"]["POSE"]),
-        ("color", "13vision", "color", la["DEMOEN"]["COLOR"]),
-        ("qrcode", "14vision", "qrcode", la["DEMOEN"]["QRCODE"]),
-        ("group", "15vision", "group", la["DEMOEN"]["GROUP"]),
-        ("wifi_set", "16vision", "wifi_set", la["DEMOEN"]["WIFISET"]),
-        ("language", "17vision", "language", la["DEMOEN"]["LANGUAGE"]),
-        ("volume", "18vision", "volume", la["DEMOEN"]["VOLUME"]),
-        ("device", "19vision", "device", la["DEMOEN"]["DEVICE"])
+        ("xiaozhi","3vision","xiaozhi",la["DEMOEN"]["XIAOZHI"]),
+        ("speech", "4voice", "speech", la["DEMOEN"]["SPEECH"]),
+        ("face_mask", "5vision", "face_mask", la["DEMOEN"]["MASK"]),
+        ("face_decetion", "6vision", "face_decetion", la["DEMOEN"]["FACETRACK"]),
+        ("hands", "7vision", "hands", la["DEMOEN"]["HANDS"]),
+        ("height", "8vision", "handh", la["DEMOEN"]["HEIGHT"]),
+        ("pose", "9vision", "pose_dog", la["DEMOEN"]["POSE"]),
+        ("color", "10vision", "color", la["DEMOEN"]["COLOR"]),
+        ("qrcode", "11vision", "qrcode", la["DEMOEN"]["QRCODE"]),
+        ("group", "12vision", "group", la["DEMOEN"]["GROUP"]),
+        ("wifi_set", "13vision", "wifi_set", la["DEMOEN"]["WIFISET"]),
+        ("language", "14vision", "language", la["DEMOEN"]["LANGUAGE"]),
+        ("volume", "15vision", "volume", la["DEMOEN"]["VOLUME"]),
+        ("device", "16vision", "device", la["DEMOEN"]["DEVICE"])
     ]
 
 SELECT_BOX = [80, 68]

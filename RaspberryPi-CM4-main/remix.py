@@ -1,6 +1,5 @@
 from demos.uiutils import *
 import time
-time.sleep(5)
 lang=language()
 print(lang)
 if lang=='cn':

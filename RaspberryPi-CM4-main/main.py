@@ -1,4 +1,8 @@
 from demos.uiutils import *
+import time
+import os
+import socket
+from PIL import Image
 
 # Init Key
 button = Button()
@@ -7,11 +11,43 @@ button = Button()
 la = load_language()
 
 current_selection = 1
+last_battery_check_time = time.time()
+last_network_check_time = time.time()
+is_online = False
+
+# Network Connection Test
+def is_connected(host="8.8.8.8", port=53, timeout=3):
+    try:
+        socket.setdefaulttimeout(timeout)
+        socket.socket(socket.AF_INET, socket.SOCK_STREAM).connect((host, port))
+        return True
+    except socket.error as ex:
+        print(f"error connection: {ex}")
+        return False
+
+def update_status():
+    global last_battery_check_time, last_network_check_time, is_online
+    now = time.time()
+
+    if now - last_battery_check_time > 3:
+        show_battery()
+        last_battery_check_time = now
+
+    if now - last_network_check_time > 3:
+        is_online = is_connected()
+        last_network_check_time = now
+
+    if is_online:
+        draw.bitmap((10, 0), wifiy)
+    else:
+        draw.rectangle((10, 0, 50, 40), fill=0)
 
 # Main Program
 def main_program():
     global key_state_left, key_state_right, key_state_down, current_selection
-
+    
+    update_status()
+    
     key_state_left = 0
     key_state_down = 0
     key_state_right = 0
@@ -116,38 +152,18 @@ def main_program():
         print(str(current_selection) + " select")
     display.ShowImage(splash)
 
-# Network Connection Test
-def is_connected(host="8.8.8.8", port=53, timeout=3):
-    try:
-        socket.setdefaulttimeout(timeout)
-        socket.socket(socket.AF_INET, socket.SOCK_STREAM).connect((host, port))
-        return True
-    except socket.error as ex:
-        print(f"error connection: {ex}")
-        return False
-
-
-current_dir = os.path.dirname(os.path.abspath(__file__))
-
 # Image Loading
+current_dir = os.path.dirname(os.path.abspath(__file__))
 logo = Image.open(os.path.join(current_dir, "pics", "luwu@3x.png"))
 wifiy = Image.open(os.path.join(current_dir, "pics", "wifi@2x.png"))
 
-
-    
 # Product Type Display
 lcd_draw_string(draw, 210, 133, firmware_info, color=color_white, scale=font1)
 
 # Battery Display
 show_battery()
+draw.bitmap((74, 49), logo)
 
-if is_connected():
-        draw.bitmap((10, 0), wifiy)
-        draw.bitmap((74, 49), logo)
-else:
-        draw.bitmap((74, 49), logo)
-
-current_selection = 1
-
+# Main Loop
 while True:
     main_program()

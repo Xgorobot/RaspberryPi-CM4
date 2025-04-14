@@ -179,7 +179,7 @@ def show_battery():
     draw.bitmap((270, 4), bat)
     try:
         battery = dog.read_battery()
-        print(battery)
+        print(f"Battery power is {battery}")
         if str(battery) == "0":
             print("uart error")
             lcd_rect(200, 0, 320, 15, color=splash_theme_color, thickness=-1)

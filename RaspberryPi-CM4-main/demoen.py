@@ -72,7 +72,7 @@ if dog_type == "M" or dog_type == "L":
         # ("follow_line", "10voice", "follow_line", la["DEMOEN"]["FOLLOWLINE"]),
         ("wifi_set", "15vision", "wifi_set", la["DEMOEN"]["WIFISET"]),
         # ("wpa_set", "16vision", "wpa_set", la["DEMOEN"]["WAPSET"]),
-        ("language", "20vision", "language", la["DEMOEN"]["LANGUAGE"]),
+        #("language", "20vision", "language", la["DEMOEN"]["LANGUAGE"]),
         ("volume", "21vision", "volume", la["DEMOEN"]["VOLUME"]),
         ("device", "19vision", "device", la["DEMOEN"]["DEVICE"]),
         # ("sound", "12vision", "sound", la["DEMOEN"]["SOUND"]),
@@ -101,7 +101,7 @@ elif dog_type == "R":
         ("qrcode", "9vision", "qrcode", la["DEMOEN"]["QRCODE"]),
         ("wifi_set", "15vision", "wifi_set", la["DEMOEN"]["WIFISET"]),
         #("wpa_set", "16vision", "wpa_set", la["DEMOEN"]["WAPSET"]),
-        ("language", "20vision", "language", la["DEMOEN"]["LANGUAGE"]),
+        #("language", "20vision", "language", la["DEMOEN"]["LANGUAGE"]),
         ("volume", "21vision", "volume", la["DEMOEN"]["VOLUME"]),
         ("device", "19vision", "device", la["DEMOEN"]["DEVICE"]),
         # ("group", "2vision", "group", la["DEMOEN"]["GROUP"]),
@@ -471,8 +471,8 @@ while True:
                 os.system("sudo python3 ./demos/network.py")
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2] == "group":
                 os.system("python3 ./demos/group.py")
-            elif MENU_ITEMS[MENU_CURRENT_SELECT][2] == "language":
-                os.system("python3 ./demos/language.py")
+            #elif MENU_ITEMS[MENU_CURRENT_SELECT][2] == "language":
+            #    os.system("python3 ./demos/language.py")
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2] == "volume":
                 os.system("python3 ./demos/volume.py")
             elif MENU_ITEMS[MENU_CURRENT_SELECT][2] == "chatgpt":

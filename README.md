@@ -1,6 +1,6 @@
--  RaspberryPi-CM4-main:The main program folder.
--  xgoMusic：The music required by the sample program.
--  xgoPicture：The pictures required by the sample program.
--  xgoVideos：Test video.
--  start1.sh：Startup script file.
--  update.sh: Installs/updates from Git repo.
+- RaspberryPi-CM4-main: 主题程序文件夹。
+- xgoMusic: 示例程序所需的音乐。
+- xgoPicture: 示例程序所需的图片。
+- xgoVideos: 演示视频。
+- start1.sh: 启动脚本文件。
+- update.sh: 从 Git repo 安装/更新。

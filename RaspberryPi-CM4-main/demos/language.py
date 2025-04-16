@@ -126,4 +126,21 @@ display_cjk_string(
 display.ShowImage(splash)
 
 time.sleep(2)
-os.system('sudo reboot')
+
+import subprocess
+
+def kill_processes(command):
+    try:
+        pids = subprocess.check_output(["pgrep", "-f", command]).decode().strip().split('\n')
+        for pid in pids:
+            print(f"Killing Process ID for '{command}': {pid}")
+            os.system(f"kill -9 {pid}")
+    except subprocess.CalledProcessError:
+        print(f"No process found for '{command}'")
+
+kill_processes("sudo python3 main.py")
+kill_processes("python3 demoen.py")
+kill_processes("python3 main.py")
+
+print("Restarting main.py...")
+subprocess.Popen(["sudo", "python3", "main.py"])

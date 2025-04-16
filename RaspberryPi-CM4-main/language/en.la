@@ -31,7 +31,7 @@
     "NETWORK":{
         "NOQR":"No QR code detected",
         "SPACE":"QR has space",
-        "SUCCESS":"WIFI scan successful. Exit in 3S."
+        "SUCCESS":"WIFI scan successful"
     },
     "WIFISET":{
         "NOW":"Current Country:",
@@ -49,7 +49,7 @@
         "NOW":"Current language",
         "SET":"Language setting",
         "NoneType":"Language setting",
-        "SAVED":"Success,robot will restart in 3s"
+        "SAVED":"Success"
     },
     "DEMOEN":{
         "SHOW":"Show",

@@ -3,32 +3,19 @@ import time
 from enum import Enum, auto
 from PIL import Image
 
-# Assuming display_utils are in dog_app.common
-# Adjust import path if necessary based on how the project is run
+# Assuming display_utils are in dog_app.common and this script is run from dog_app directory
 try:
-    from ..common import display_utils
-    from ..common.display_utils import get_main_draw_context, get_main_splash_image, get_display_manager
-except ImportError:
-    print("EmotionManager: Could not import common.display_utils. Relative import failed.")
-    # Fallback for direct execution or different project structure
-    try:
-        import sys
-        # Temporarily add project root if running this file directly for testing
-        # This is a hack for development, not for production structure
-        CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
-        PROJECT_ROOT_TEMP = os.path.abspath(os.path.join(CURRENT_DIR, '..', '..')) # Guessing project root is two levels up
-        if PROJECT_ROOT_TEMP not in sys.path:
-            sys.path.append(PROJECT_ROOT_TEMP)
-        from dog_app.common import display_utils
-        from dog_app.common.display_utils import get_main_draw_context, get_main_splash_image, get_display_manager
-        print("EmotionManager: Successfully imported display_utils via sys.path modification.")
-    except ImportError as e:
-        print(f"EmotionManager: Critical error importing display_utils: {e}. Display functions will not work.")
-        # Define dummy functions if import fails, so the class can be instantiated
-        def get_main_draw_context(): return None
-        def get_main_splash_image(): return None
-        def get_display_manager(): return None
-        display_utils = None
+    from common import display_utils
+    from common.display_utils import get_main_draw_context, get_main_splash_image, get_display_manager
+except ImportError as e:
+    print(f"EmotionManager: Error importing display_utils: {e}. Display functions may not work.")
+    # Define dummy functions if import fails, so the class can be instantiated
+    # This helps in identifying if the issue is an import or something else downstream.
+    def get_main_draw_context(): return None
+    def get_main_splash_image(): return None
+    def get_display_manager(): return None
+    display_utils = None # So that checks like 'if display_utils:' don't cause NameError
+    print("EmotionManager: CRITICAL - display_utils import failed. Dummy objects created. Display functionality will be severely limited.")
 
 
 class Emotion(Enum):
@@ -71,70 +58,58 @@ class EmotionManager:
         # Corrected path to be dog_app/assets/expressions/
         return os.path.join(self.asset_base_path, "expressions", emotion_name_lower)
 
-    def _get_static_emotion_image_path(self, emotion_name_lower):
-        # Corrected path for static images
-        return os.path.join(self.asset_base_path, "images", "static_emotions", f"{emotion_name_lower}.png") # Assuming png, original was jpg
-
     def load_emotion_assets(self, emotion):
         self.animation_frames = []
         self.current_frame_index = 0
         emotion_name_lower = emotion.name.lower()
 
-        # Try loading animation first
         animation_dir = self._get_expression_path(emotion_name_lower)
 
-        # Check if the main "expressions" directory exists, as asset moving was problematic
-        if not os.path.exists(os.path.join(self.asset_base_path, "expressions")):
-            print(f"Warning: Main expressions directory not found at {os.path.join(self.asset_base_path, 'expressions')}")
-            # Try static image as fallback immediately
-            static_image_path = self._get_static_emotion_image_path(emotion_name_lower)
-            if os.path.exists(static_image_path):
-                try:
-                    print(f"Loading static image: {static_image_path}")
-                    self.animation_frames = [Image.open(static_image_path)]
-                except Exception as e:
-                    print(f"Error loading static image {static_image_path}: {e}")
+        if not os.path.exists(animation_dir) or not os.path.isdir(animation_dir):
+            print(f"Animation directory not found for {emotion.name} at {animation_dir}")
+            if emotion != Emotion.NEUTRAL:
+                print(f"Attempting to load NEUTRAL animation as fallback.")
+                self.load_emotion_assets(Emotion.NEUTRAL) # Fallback to NEUTRAL animation
             else:
-                print(f"Warning: Static emotion image not found: {static_image_path}")
+                # This means NEUTRAL animation itself is missing or failed to load
+                print(f"Critical: NEUTRAL animation not found at {animation_dir}. No fallback available.")
             return
 
-        if os.path.isdir(animation_dir):
-            try:
-                # Sort files numerically (1.png, 2.png, ..., 10.png)
-                frame_files = sorted(
-                    [f for f in os.listdir(animation_dir) if f.endswith(".png")],
-                    key=lambda x: int(os.path.splitext(x)[0])
-                )
-                for frame_file in frame_files:
-                    frame_path = os.path.join(animation_dir, frame_file)
-                    self.animation_frames.append(Image.open(frame_path))
-                if self.animation_frames:
-                    print(f"Loaded {len(self.animation_frames)} frames for emotion {emotion.name} from {animation_dir}")
-                    return # Successfully loaded animation
-            except Exception as e:
-                print(f"Error loading animation frames for {emotion.name} from {animation_dir}: {e}")
-                self.animation_frames = [] # Clear partial load
+        try:
+            # Sort files numerically (1.png, 2.png, ..., 10.png)
+            # Filter for .png files and ensure the filename (without extension) is a digit for robust sorting
+            frame_files = sorted(
+                [f for f in os.listdir(animation_dir) if f.endswith(".png") and os.path.splitext(f)[0].isdigit()],
+                key=lambda x: int(os.path.splitext(x)[0])
+            )
+            if not frame_files: # Handles case where directory exists but contains no valid frames
+                print(f"No valid .png animation frames found in {animation_dir} for emotion {emotion.name}")
+                if emotion != Emotion.NEUTRAL:
+                    print(f"Attempting to load NEUTRAL animation as fallback.")
+                    self.load_emotion_assets(Emotion.NEUTRAL)
+                else:
+                    print(f"Critical: NEUTRAL animation frames not found in {animation_dir}. No fallback available.")
+                return
 
-        # Fallback to static image if animation failed or not found
-        static_image_path = self._get_static_emotion_image_path(emotion_name_lower)
-        # Try original jpg extension as well from xgoPictures
-        if not os.path.exists(static_image_path):
-            static_image_path_jpg = os.path.join(self.asset_base_path, "images", "static_emotions", f"{emotion_name_lower}.jpg")
-            if os.path.exists(static_image_path_jpg):
-                static_image_path = static_image_path_jpg # Use jpg if png not found
+            for frame_file in frame_files:
+                frame_path = os.path.join(animation_dir, frame_file)
+                self.animation_frames.append(Image.open(frame_path))
+            
+            if self.animation_frames:
+                print(f"Loaded {len(self.animation_frames)} frames for emotion {emotion.name} from {animation_dir}")
+            else: # Should be caught by 'if not frame_files' earlier, but as a safeguard
+                print(f"No frames loaded for {emotion.name} despite directory existing.")
+                if emotion != Emotion.NEUTRAL:
+                    self.load_emotion_assets(Emotion.NEUTRAL)
 
-        if os.path.exists(static_image_path):
-            try:
-                print(f"Loading static image as fallback: {static_image_path}")
-                self.animation_frames = [Image.open(static_image_path)]
-            except Exception as e:
-                print(f"Error loading static fallback image {static_image_path}: {e}")
-        else:
-            print(f"Warning: No animation or static image found for emotion {emotion.name}")
-            # Consider loading a default "neutral" or "unknown" image here
-            # For now, if NEUTRAL also fails, it will show nothing.
-            if emotion != Emotion.NEUTRAL: # Avoid infinite recursion if NEUTRAL fails
+        except Exception as e:
+            print(f"Error loading animation frames for {emotion.name} from {animation_dir}: {e}")
+            self.animation_frames = [] # Clear partial load
+            if emotion != Emotion.NEUTRAL:
+                print(f"Attempting to load NEUTRAL animation as fallback due to error.")
                 self.load_emotion_assets(Emotion.NEUTRAL)
+            else:
+                print(f"Critical: Error loading NEUTRAL animation frames from {animation_dir}. No fallback available.")
 
 
     def set_emotion(self, new_emotion: Emotion):
@@ -236,17 +211,6 @@ if __name__ == '__main__':
             img_sad.save(os.path.join(DUMMY_ASSET_BASE, "expressions", "sad", "1.png"))
         except Exception as e:
             print(f"Error creating dummy images: {e}")
-
-    if not os.path.exists(os.path.join(DUMMY_ASSET_BASE, "images", "static_emotions")):
-         os.makedirs(os.path.join(DUMMY_ASSET_BASE, "images", "static_emotions"))
-         try:
-            img_neutral = Image.new("RGB", (320,240), "grey")
-            draw_n = ImageDraw.Draw(img_neutral)
-            if display_utils: draw_n.text((10,10), "NEUTRAL FACE", fill="black", font=display_utils.font3)
-            img_neutral.save(os.path.join(DUMMY_ASSET_BASE, "images", "static_emotions", "neutral.png"))
-         except Exception as e:
-            print(f"Error creating dummy neutral image: {e}")
-
 
     emotion_mgr = EmotionManager(asset_base_path=DUMMY_ASSET_BASE)
 

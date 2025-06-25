@@ -30,16 +30,6 @@ The following directories and their contents need to be moved from the original 
     # Example: Assuming you are in the parent directory of dog_app and RaspberryPi-CM4-main
     mv RaspberryPi-CM4-main/demos/expression dog_app/assets/expressions
     ```
--   Move original `xgoPictures/` to `dog_app/assets/images/static_emotions/`
-    ```bash
-    # Example:
-    mv xgoPictures dog_app/assets/images/static_emotions
-    # (If static_emotions already exists with a .gitkeep, you might want to move contents into it)
-    # Or, more simply:
-    # mkdir -p dog_app/assets/images/static_emotions
-    # cp -r xgoPictures/* dog_app/assets/images/static_emotions/
-    # rm -rf xgoPictures
-    ```
 -   Move original `xgoMusic/` to `dog_app/assets/sounds/emotion_sounds/`
     ```bash
     # Example:

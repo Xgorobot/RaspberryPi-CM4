@@ -11,24 +11,13 @@ try:
     from common.display_utils import get_display_manager, get_main_draw_context, get_main_splash_image, lcd_draw_string, SPLASH_THEME_COLOR, font2, font3
     # from voice.voice_interaction_manager import VoiceInteractionManager # Import when ready
 except ImportError as e:
-    print(f"MainApp: Error importing modules. Ensure PYTHONPATH is set correctly or run from dog_app parent. Details: {e}")
-    # Fallback for direct execution from dog_app directory or if structure is slightly different
-    # This assumes dog_app is the current working directory or on PYTHONPATH
-    try:
-        print("MainApp: Attempting fallback imports assuming dog_app is project root...")
-        from dog_app.control.xgolib import init_dog, get_dog_instance
-        from dog_app.emotion.emotion_manager import EmotionManager, Emotion
-        from dog_app.remote.web_server import app as flask_app, socketio as flask_socketio
-        from dog_app.common.buttons import Button
-        from dog_app.common.display_utils import get_display_manager, get_main_draw_context, get_main_splash_image, lcd_draw_string, SPLASH_THEME_COLOR, font2, font3
-        # from dog_app.voice.voice_interaction_manager import VoiceInteractionManager
-        print("MainApp: Fallback imports successful.")
-    except ImportError as e_fallback:
-        print(f"MainApp: Fallback imports also failed. Critical error: {e_fallback}")
-        # Define dummies if essential for script to not crash immediately for structural checks
-        flask_app, flask_socketio, Button, EmotionManager, Emotion, init_dog, get_dog_instance = [None]*7
-        get_display_manager, get_main_draw_context, get_main_splash_image, lcd_draw_string = [None]*4
-        SPLASH_THEME_COLOR, font2, font3 = [None]*3
+    print(f"MainApp: Error importing modules. Ensure you are running from the 'dog_app' directory. Details: {e}")
+    # Define dummies if essential for script to not crash immediately for structural checks
+    # This helps identify if the issue is an import or something else downstream.
+    flask_app, flask_socketio, Button, EmotionManager, Emotion, init_dog, get_dog_instance = [None]*7
+    get_display_manager, get_main_draw_context, get_main_splash_image, lcd_draw_string = [None]*4
+    SPLASH_THEME_COLOR, font2, font3 = [None]*3
+    print("MainApp: CRITICAL - One or more module imports failed. Dummy objects created. Functionality will be severely limited.")
 
 
 # Global state

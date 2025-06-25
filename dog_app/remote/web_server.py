@@ -4,27 +4,17 @@ from flask_socketio import SocketIO, emit
 import time
 
 # Attempt to import DogCamera and dog control functions
+# Assuming this script is run when 'dog_app' is the current working directory.
 try:
-    from ..common.camera import DogCamera
-    from ..control.xgolib import get_dog_instance, init_dog
-except ImportError:
-    print("WebServer: Could not import common.camera or control.xgolib via relative imports.")
-    # Fallback for different execution context (e.g. if web_server.py is run directly for testing)
-    try:
-        import sys
-        CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
-        # Assuming dog_app is the project root directory containing common/, control/, remote/
-        PROJECT_ROOT_TEMP = os.path.abspath(os.path.join(CURRENT_DIR, '..', '..'))
-        if PROJECT_ROOT_TEMP not in sys.path:
-            sys.path.append(PROJECT_ROOT_TEMP)
-        from dog_app.common.camera import DogCamera
-        from dog_app.control.xgolib import get_dog_instance, init_dog
-        print("WebServer: Successfully imported camera and xgolib via sys.path modification.")
-    except ImportError as e:
-        print(f"WebServer: Critical error importing modules: {e}. Server might not function correctly.")
-        DogCamera = None
-        get_dog_instance = None
-        init_dog = None
+    from common.camera import DogCamera
+    from control.xgolib import get_dog_instance, init_dog
+except ImportError as e:
+    print(f"WebServer: Error importing DogCamera or xgolib: {e}. Server might not function correctly.")
+    # Define dummies if essential for script to not crash immediately for structural checks
+    DogCamera = None
+    get_dog_instance = None
+    init_dog = None
+    print("WebServer: CRITICAL - DogCamera or xgolib import failed. Dummy objects created. Functionality will be severely limited.")
 
 
 # Initialize Flask app and SocketIO

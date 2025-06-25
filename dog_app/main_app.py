@@ -208,4 +208,3 @@ if __name__ == "__main__":
         print(f"MainApp: Unhandled exception in main loop: {e}")
     finally:
         cleanup_systems()
-```

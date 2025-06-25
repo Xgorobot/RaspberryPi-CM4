@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>XGO Robot Control</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f4f4; color: #333; }
+        .container { display: flex; justify-content: space-around; }
+        .controls, .video-container { background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        h2 { text-align: center; color: #555; }
+        .video-stream { display: block; margin: 0 auto; border: 1px solid #ddd; max-width: 640px; }
+        .control-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 20px; }
+        .control-grid button, .actions button {
+            padding: 15px; font-size: 16px; border: none; border-radius: 5px;
+            background-color: #5cb85c; color: white; cursor: pointer; transition: background-color 0.3s;
+        }
+        .control-grid button:hover, .actions button:hover { background-color: #4cae4c; }
+        .actions { display: flex; flex-direction: column; gap: 10px; }
+        .placeholder { width: 100%; } /* For grid alignment */
+        .action-btn-stop { background-color: #d9534f; }
+        .action-btn-stop:hover { background-color: #c9302c; }
+         input[type="number"] { width: 60px; padding: 5px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="controls">
+            <h2>Movement Controls</h2>
+            <div class="control-grid">
+                <div class="placeholder"></div>
+                <button id="btn-forward">Forward</button>
+                <div class="placeholder"></div>
+                <button id="btn-left">Turn Left</button>
+                <button id="btn-stop-move">Stop Move</button>
+                <button id="btn-right">Turn Right</button>
+                <div class="placeholder"></div>
+                <button id="btn-backward">Backward</button>
+                <div class="placeholder"></div>
+            </div>
+
+            <h2>Actions</h2>
+            <div class="actions">
+                <button id="btn-action-reset">Reset Position (Action 255)</button>
+                <button id="btn-action-wave">Wave Hand (Action ID, e.g., 6)</button>
+                <button id="btn-action-stand">Stand (Action ID, e.g., 1)</button>
+                <div>
+                    Action ID: <input type="number" id="action-id-input" value="1" min="1" max="255">
+                    <button id="btn-custom-action">Perform Action ID</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="video-container">
+            <h2>Video Stream</h2>
+            <img class="video-stream" id="video-stream-img" src="{{ url_for('video_feed') }}" alt="Video Stream">
+        </div>
+    </div>
+
+    <script>
+        // Attempt to connect to the default namespace (server root)
+        const socket = io(); // Defaults to window.location
+
+        socket.on('connect', () => {
+            console.log('Connected to server via Socket.IO');
+        });
+
+        socket.on('disconnect', () => {
+            console.log('Disconnected from server');
+        });
+
+        socket.on('connect_error', (err) => {
+          console.error('Connection Error:', err);
+        });
+
+        function sendCommand(command, value = null) {
+            console.log(`Sending command: ${command}, value: ${value}`);
+            socket.emit('robot_command', { command: command, value: value });
+        }
+
+        // Movement buttons
+        document.getElementById('btn-forward').addEventListener('click', () => sendCommand('forward', 20)); // Example speed value
+        document.getElementById('btn-backward').addEventListener('click', () => sendCommand('backward', 20));
+        document.getElementById('btn-left').addEventListener('click', () => sendCommand('turn_left', 30)); // Example speed/angle
+        document.getElementById('btn-right').addEventListener('click', () => sendCommand('turn_right', 30));
+        document.getElementById('btn-stop-move').addEventListener('click', () => sendCommand('stop_move'));
+
+        // Action buttons
+        document.getElementById('btn-action-reset').addEventListener('click', () => sendCommand('action', 255));
+        document.getElementById('btn-action-wave').addEventListener('click', () => sendCommand('action', 6)); // Assuming 6 is wave
+        document.getElementById('btn-action-stand').addEventListener('click', () => sendCommand('action', 1)); // Assuming 1 is stand
+
+        document.getElementById('btn-custom-action').addEventListener('click', () => {
+            const actionId = parseInt(document.getElementById('action-id-input').value);
+            if (!isNaN(actionId) && actionId >= 1 && actionId <= 255) {
+                sendCommand('action', actionId);
+            } else {
+                alert('Please enter a valid Action ID (1-255).');
+            }
+        });
+
+        // Optional: Update video stream src if it might change or to force reload
+        // const videoStreamImg = document.getElementById('video-stream-img');
+        // videoStreamImg.src = "{{ url_for('video_feed') }}?" + new Date().getTime(); // Cache buster
+    </script>
+</body>
+</html>

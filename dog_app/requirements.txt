@@ -1,0 +1,12 @@
+Flask>=2.0
+Flask-SocketIO>=5.0
+opencv-python>=4.0
+pyserial>=3.5
+RPi.GPIO>=0.7
+Pillow>=9.0
+numpy>=1.20
+# spidev might need manual install or is often included with OS images for Pi
+# sudo apt-get install python3-spidev
+# Or pip install spidev (availability on PyPI can vary for system-level libs)
+# pygame (if used for sound in EmotionManager later)
+# pygame>=2.0

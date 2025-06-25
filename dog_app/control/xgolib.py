@@ -183,6 +183,7 @@ class XGO():
         time.sleep(1)
         pass
 
+    # --- Low-level communication ---
     def __send(self, key, index=1, len=1):
         mode = 0x00
         order = XGOorder[key][0] + index - 1
@@ -201,7 +202,7 @@ class XGO():
             print("tx_data: ", tx)
 
     def __read(self, addr, read_len=1):
-        self.ser.flushInput()
+        # self.ser.flushInput() # Flushing input here might clear responses too early
         mode = 0x02
         sum_data = (0x09 + mode + addr + read_len) % 256
         sum_data = 255 - sum_data
@@ -216,6 +217,7 @@ class XGO():
         self.ser.close()
         self.ser = serial.Serial(self.port, baud, timeout=0.5)
 
+    # --- High-level actions & movements ---
     def stop(self):
         self.move_x(0)
         self.move_y(0)
@@ -328,6 +330,7 @@ class XGO():
         else:
             self.__translation(direction, data)
 
+    # Internal helper for attitude, could be considered mid-level
     def __attitude(self, direction, data):
         index = search(direction, ['r', 'p', 'y'])
         if index == -1:
@@ -373,6 +376,7 @@ class XGO():
         self.action(255)
         time.sleep(1)
 
+    # --- Mid-level joint/leg control ---
     def leg(self, leg_id, data):
         """
         控制机器狗的单腿的三轴移动
@@ -383,31 +387,55 @@ class XGO():
             print("Error!Illegal Index!")
             return
         if len(data) != 3:
-            message = "Error!Illegal Value!"
+            # message = "Error!Illegal Value!" # Original variable was unused
+            print("Error!Illegal Value for leg data length!")
             return
         for i in range(3):
             try:
                 value[i] = conver2u8(data[i], XGOparam["LEG_LIMIT"][i])
             except:
-                print("Error!Illegal Value!")
+                print("Error!Illegal Value for leg data content!")
+                return # Important to return on error
         for i in range(3):
             index = 3 * (leg_id - 1) + i + 1
             XGOorder["LEG_POS"][index] = value[i]
             self.__send("LEG_POS", index)
 
-    def __motor(self, index, data):
-        if index < 13:
-            XGOorder["MOTOR_ANGLE"][index] = conver2u8(data, XGOparam["MOTOR_LIMIT"][(index - 1) % 3])
-        elif index == 13:
-            self.claw(conver2u8(data, XGOparam["MOTOR_LIMIT"][3]))
-            return
-        else:
-            XGOorder["MOTOR_ANGLE"][index] = conver2u8(data, XGOparam["MOTOR_LIMIT"][index - 10])
-        self.__send("MOTOR_ANGLE", index)
+    # Internal helper for motor control
+    def __motor(self, motor_index, data): # Renamed index to motor_index for clarity
+        if motor_index < 13: # Body/Leg motors
+            XGOorder["MOTOR_ANGLE"][motor_index] = conver2u8(data, XGOparam["MOTOR_LIMIT"][(motor_index - 1) % 3])
+        elif motor_index == 13: # Claw motor (often identified separately)
+            # This was MOTOR_LIMIT[3] which might be an index error if MOTOR_LIMIT is for leg pairs.
+            # Assuming MOTOR_LIMIT[3] is intended for a claw or similar single motor.
+            # The original `motor` function maps ID 51 (claw) to index 13.
+            # MOTOR_LIMIT has 6 entries for leg motors. Claw might need its own param limits.
+            # For now, keeping original logic, but it's a point of attention.
+            # The `self.claw()` method is more direct for claw control.
+            # This direct call to self.claw() from __motor seems unusual.
+            # Let's assume it means motor ID 13 is special.
+            # The claw method itself uses XGOorder["CLAW"]
+            # This line might be redundant if claw() is the preferred way.
+            # However, motor_id 51 (claw) is mapped to index 13 in self.motor()
+            # So, if self.motor(51, value) is called, it becomes self.__motor(13, value)
+            # This will then call self.claw(conver2u8(data, XGOparam["MOTOR_LIMIT"][3]))
+            # This looks like it could be simplified by having self.motor call self.claw directly if ID is 51.
+            # For now, replicate:
+            self.claw(conver2u8(data, XGOparam["MOTOR_LIMIT"][3])) # Ensure MOTOR_LIMIT[3] is sensible for claw
+            return # Important: return after handling claw via self.claw()
+        else: # Other motors (e.g., arm motors if mapped here, original had 12 motors + claw in MOTOR_ID)
+            # Original MOTOR_ID had: 11-13 (leg1), 21-23 (leg2), 31-33 (leg3), 41-43 (leg4)
+            # Then 51 (claw, index 13), 52 (arm base?, index 14), 53 (arm mid?, index 15)
+            # MOTOR_LIMIT seems to be for leg motors primarily (0-2 are hip/thigh/knee).
+            # Need to verify XGOparam["MOTOR_LIMIT"] indexing for arm motors (index-10)
+            # (14-10)=4, (15-10)=5. These are valid indices if MOTOR_LIMIT has 6 elements for legs.
+            XGOorder["MOTOR_ANGLE"][motor_index] = conver2u8(data, XGOparam["MOTOR_LIMIT"][motor_index - 10])
+        self.__send("MOTOR_ANGLE", motor_index)
+
 
     def motor(self, motor_id, data):
         """
-        控制机器狗单个舵机转动
+        控制机器狗单个舵机转动 (Controls a single servo motor of the robot dog)
         Control the rotation of a single steering gear of the robot
         """
         MOTOR_ID = [11, 12, 13, 21, 22, 23, 31, 32, 33, 41, 42, 43, 51, 52, 53]
@@ -476,6 +504,7 @@ class XGO():
         else:
             self.__periodic_rot(direction, period)
 
+    # Internal helper
     def __periodic_tran(self, direction, period):
         index = search(direction, ['x', 'y', 'z'])
         if index == -1:
@@ -512,6 +541,7 @@ class XGO():
             XGOorder["MarkTime"][1] = conver2u8(data, XGOparam["MARK_TIME_LIMIT"], min_value=1)
         self.__send("MarkTime")
 
+    # --- Configuration & Modes ---
     def pace(self, mode):
         """
         改变机器狗的踏步频率
@@ -524,26 +554,31 @@ class XGO():
         elif mode == "high":
             value = 0x02
         else:
-            print("ERROR!Illegal Value!")
+            print("ERROR!Illegal Value for pace mode!")
             return
         XGOorder["MOVE_MODE"][1] = value
         self.__send("MOVE_MODE")
 
-    def gait_type(self, mode):
-        if mode == "trot":
+    def gait_type(self, mode_str): # Renamed mode to mode_str for clarity
+        """Sets the gait type for the robot."""
+        value = None
+        if mode_str == "trot":
             value = 0x00
-        elif mode == "walk":
+        elif mode_str == "walk":
             value = 0x01
-        elif mode == "high_walk":
+        elif mode_str == "high_walk":
             value = 0x02
-        elif mode == "slow_trot":
+        elif mode_str == "slow_trot":
             value = 0x03
+        else:
+            print(f"ERROR! Illegal gait_type: {mode_str}")
+            return
         XGOorder["GAIT_TYPE"][1] = value
         self.__send("GAIT_TYPE")
 
-    def imu(self, mode):
+    def imu_mode(self, mode_val): # Renamed mode to mode_val for clarity
         """
-        开启/关闭机器狗自稳状态
+        开启/关闭机器狗自稳状态 (Turn on/off the self-stabilization state of the robot dog)
         Turn on / off the self stable state of the robot dog
         """
         if mode != 0 and mode != 1:
@@ -567,33 +602,44 @@ class XGO():
         """
         调节舵机转动速度，只在单独控制舵机的情况下有效
         Adjust the steering gear rotation speed,
-        only effective when control the steering gear separately
+        only effective when control the steering gear separately.
+        Value 0 is mapped to 1.
         """
-        if speed < 0 or speed > 255:
-            print("ERROR!Illegal Value!The speed parameter needs to be between 0 and 255!")
+        if not 0 <= speed <= 255:
+            print("ERROR! Illegal Value! Motor speed must be between 0 and 255.")
             return
-        if speed == 0:
-            speed = 1
-        XGOorder["MOTOR_SPEED"][1] = speed
+
+        effective_speed = speed if speed != 0 else 1
+        XGOorder["MOTOR_SPEED"][1] = effective_speed
         self.__send("MOTOR_SPEED")
 
-    def bt_rename(self, name):
-        if type(name) != str:
-            print("ERROR!The input value must be of string type!")
+    def bt_rename(self, name_str): # Renamed name to name_str
+        """Renames the Bluetooth device."""
+        if not isinstance(name_str, str):
+            print("ERROR! Bluetooth name must be a string.")
             return
-        len_name = len(name)
-        if len_name > 10:
-            print("ERROR!The length of the input string cannot be longer than 10!")
-            return
-        try:
-            XGOorder["BT_NAME"][1:len_name + 1] = list(name.encode('ascii'))
-            self.__send("BT_NAME", len=len_name)
-        except:
-            print("ERROR!Name only supports characters in ASCII code!")
 
+        if not 1 <= len(name_str) <= 10: # Original allowed empty string, but likely not intended for rename
+            print("ERROR! Bluetooth name length must be between 1 and 10 characters.")
+            return
+
+        try:
+            name_bytes = name_str.encode('ascii')
+            # Clear previous name data in XGOorder if necessary (or ensure it's fixed length)
+            # XGOorder["BT_NAME"] = [0x13, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] (10 zeros for name)
+            for i in range(10): # Max 10 chars for name
+                if i < len(name_bytes):
+                    XGOorder["BT_NAME"][i+1] = name_bytes[i]
+                else:
+                    XGOorder["BT_NAME"][i+1] = 0 # Pad with null bytes if name is shorter
+            self.__send("BT_NAME", len=10) # Send full 10 byte payload for BT_NAME
+        except UnicodeEncodeError:
+            print("ERROR! Bluetooth name only supports ASCII characters.")
+
+    # --- Sensor & State Reading ---
     def read_motor(self):
         """
-        读取15个舵机的角度
+        读取15个舵机的角度 (Reads the angles of the 15 servo motors)
         """
         self.__read(XGOorder["MOTOR_ANGLE"][0], 15)
         angle = []
@@ -743,9 +789,12 @@ class XGO():
         return False
 
     def set_move_mintime(self, mintime):
+        """Sets the minimum time for move_by operations."""
         self.mintime = mintime
 
+    # --- Firmware & System ---
     def upgrade(self, filename):
+        """Initiates firmware upgrade process. Use with extreme caution."""
         XGOorder["UPGRADE"][1] = 1
         self.ser.flush()
         self.__send("UPGRADE")
@@ -764,37 +813,39 @@ class XGO():
 
     def __send_bin(self, filename):
         """
-        处于测试阶段，请勿使用
+        处于测试阶段，请勿使用 (In testing phase, do not use)
+        Internal helper for firmware upgrade.
         """
         try:
             self.__change_baud(350000)
             with open(filename, 'rb') as f:
-                file = f.read()
-            print("The file size is", len(file), ' bytes.')
-            print("The expected upgrade time is", round(len(file) / 350000 * 8 * 1.3), ' s.')
-            self.ser.write(file)
+                file_content = f.read() # Renamed file to file_content
+            print("The file size is", len(file_content), ' bytes.')
+            print("The expected upgrade time is", round(len(file_content) / 350000 * 8 * 1.3), ' s.')
+            self.ser.write(file_content)
             print("Done!")
             self.__change_baud(115200)
         except Exception as e:
-            print("Send bin file error!")
-            print(e)
+            print(f"Send bin file error: {e}")
 
-    def calibration(self, state):
+    def calibration(self, state_cmd): # Renamed state to state_cmd
         """
-        用于软件标定，请谨慎使用！！！
+        用于软件标定，请谨慎使用！！！ (Used for software calibration, use with caution!!!)
         """
-        if state == 'start' or state == 1:
+        if state_cmd == 'start' or state_cmd == 1:
             XGOorder["CALIBRATION"][1] = 1
-        elif state == 'end' or state == 0:
+        elif state_cmd == 'end' or state_cmd == 0:
             XGOorder["CALIBRATION"][1] = 0
         else:
-            print("ERROR!")
+            print(f"ERROR! Invalid calibration state: {state_cmd}")
+            return
         self.__send("CALIBRATION")
-        return
+        # return # Original had return, not strictly necessary if no value returned
 
+    # --- Arm & Claw Control ---
     def arm(self, arm_x, arm_z):
         """
-        控制机器狗的机械臂的前后和上下移动
+        控制机器狗的机械臂的前后和上下移动 (Control the arm's forward/backward and up/down movement)
         Control the movement of the arm of the robot
         """
         try:
@@ -872,8 +923,10 @@ class XGO():
         XGOorder["ARM_SPEED"][1] = speed
         self.__send("ARM_SPEED")
 
+    # --- Sensor & State Reading (continued) ---
     def read_imu(self):
-        self.__read(0x65, 24)
+        """Reads comprehensive IMU data (accel, gyro, an Euler/Quaternion depending on firmware)."""
+        self.__read(0x65, 24) # Address for full IMU data block
         result = []
         if self.__unpack():
             if self.version[0] == "R":
@@ -930,7 +983,15 @@ class XGO():
         XGOorder["SET_ORIGIN"][1] = 1
         self.__send("SET_ORIGIN")
 
+    # --- High-level actions & movements (continued) ---
     def move_to(self, data, wait=True, overtime=15.0):
+        """
+        Moves the robot to a specific orientation or state?
+        The 'data' parameter is packed as a short, its exact meaning needs context.
+        Original comment for XGOorder["MOVE_TO"] was just [0x3F, 0, 0].
+        It reads a rotate_state (0x3F) to check for completion.
+        This might be "rotate to specific absolute yaw angle" or similar.
+        """
         packed_data = struct.pack('>h', data)
         XGOorder["MOVE_TO"][1] = packed_data[0]
         XGOorder["MOVE_TO"][2] = packed_data[1]
@@ -962,3 +1023,123 @@ class XGO():
         XGOorder["EX_MOTOR"][1] = high
         XGOorder["EX_MOTOR"][2] = low
         self.__send("EX_MOTOR", len=2)
+
+# --- Added from uiutils.py ---
+import os # Already imported by original xgolib? No, uiutils had it.
+
+# Global cache for XGO instance and its properties
+_default_dog_instance = None
+_dog_firmware_info = None # e.g., "MINI" or "LITE"
+_dog_version_name = None # e.g., "xgomini" or "xgolite"
+_is_permissions_set = False
+
+def init_dog(port="/dev/ttyAMA0", version_hint="xgolite", force_reinit=False):
+    """
+    Initializes and returns a global XGO instance.
+    Manages serial port permissions and caches the instance.
+
+    :param port: Serial port for the XGO.
+    :param version_hint: Hint for the XGO version ('xgomini' or 'xgolite'),
+                         used if firmware reading has issues initially.
+    :param force_reinit: If True, forces re-initialization even if an instance exists.
+    :return: Tuple of (XGO_instance, firmware_info_str, version_name_str)
+             Returns (None, None, None) on failure.
+    """
+    global _default_dog_instance, _dog_firmware_info, _dog_version_name, _is_permissions_set
+
+    if _default_dog_instance is not None and not force_reinit:
+        return _default_dog_instance, _dog_firmware_info, _dog_version_name
+
+    # Set serial port permissions (ensure this is appropriate for your system)
+    if not _is_permissions_set:
+        try:
+            # print("Attempting to set permissions for /dev/ttyAMA0...")
+            # Using os.system is a security risk if port string could be manipulated.
+            # Prefer using 'sudo' configured for specific commands or udev rules.
+            # For now, replicating original behavior.
+            if os.system(f"sudo chmod 777 -R {port}") == 0: # nosec
+                # print(f"Permissions set for {port}")
+                _is_permissions_set = True
+            else:
+                print(f"Warning: Failed to set permissions for {port}. Serial communication may fail.")
+                # Optionally, choose not to proceed if permissions are critical
+        except Exception as e:
+            print(f"Error setting permissions for {port}: {e}")
+            # return None, None, None # Or try to continue if permissions might already be okay
+
+    try:
+        # print(f"Initializing XGO on port {port} with version hint {version_hint}...")
+        dog = XGO(port=port, version=version_hint) # XGO class __init__ reads firmware
+
+        # Firmware info is read within XGO's __init__ and sets self.version (e.g. "M1.0.0")
+        # and calls changePara based on it.
+        fm_version_str = dog.version # This is like "M1.0.0" or "L1.0.0"
+
+        if fm_version_str and fm_version_str[0] == "M":
+            _dog_firmware_info = "MINI"
+            _dog_version_name = "xgomini"
+        elif fm_version_str and fm_version_str[0] == "L":
+            _dog_firmware_info = "LITE"
+            _dog_version_name = "xgolite"
+        else:
+            print(f"Warning: Could not determine dog type from firmware version: {fm_version_str}. Using hint: {version_hint}")
+            # Fallback to hint if firmware read was problematic for type deduction
+            if "mini" in version_hint.lower():
+                 _dog_firmware_info = "MINI"
+                 _dog_version_name = "xgomini"
+            else: # Default to lite
+                 _dog_firmware_info = "LITE"
+                 _dog_version_name = "xgolite"
+            # Ensure XGOparam is set correctly based on this fallback
+            changePara(_dog_version_name)
+
+
+        _default_dog_instance = dog
+        print(f"XGO Initialized: Type={_dog_firmware_info}, VersionName={_dog_version_name}, Firmware={fm_version_str}")
+        return _default_dog_instance, _dog_firmware_info, _dog_version_name
+
+    except Exception as e:
+        print(f"Error initializing XGO: {e}")
+        _default_dog_instance = None
+        _dog_firmware_info = None
+        _dog_version_name = None
+        return None, None, None
+
+def get_dog_instance():
+    """Returns the cached XGO instance, initializing if needed."""
+    if _default_dog_instance is None:
+        init_dog() # Use default parameters
+    return _default_dog_instance
+
+def get_dog_info():
+    """Returns cached dog info (instance, firmware_info, version_name). Initializes if needed."""
+    if _default_dog_instance is None:
+        init_dog()
+    return _default_dog_instance, _dog_firmware_info, _dog_version_name
+
+# Example of how to use it:
+if __name__ == '__main__':
+    print("Testing XGO initialization...")
+    # Test basic initialization
+    dog_instance, fw_info, ver_name = init_dog()
+    if dog_instance:
+        print(f"Successfully initialized: {fw_info} ({ver_name})")
+        print(f"Battery: {dog_instance.read_battery()}%")
+        dog_instance.reset()
+    else:
+        print("Failed to initialize XGO dog.")
+
+    # Test getting cached instance
+    # print("\nTesting get_dog_instance...")
+    # cached_dog = get_dog_instance()
+    # if cached_dog:
+    #     print(f"Got cached instance. Battery: {cached_dog.read_battery()}%")
+    # else:
+    #     print("Failed to get cached dog instance.")
+
+    # print("\nTesting get_dog_info...")
+    # _, info_fw, info_ver = get_dog_info()
+    # if info_fw:
+    #     print(f"Dog info: {info_fw} ({info_ver})")
+
+    print("Test complete.")

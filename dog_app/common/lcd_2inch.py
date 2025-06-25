@@ -1,6 +1,9 @@
 
 import time
-import xgoscreen.lcdconfig as lcdconfig
+try:
+    from . import lcdconfig # Relative import for when part of a package
+except ImportError:
+    import lcdconfig # Fallback for direct execution or if not found via relative
 
 class LCD_2inch(lcdconfig.RaspberryPi):
 

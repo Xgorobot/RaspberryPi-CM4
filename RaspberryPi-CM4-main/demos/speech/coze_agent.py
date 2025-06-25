@@ -6,7 +6,7 @@ import sys,ast
 此功能的API可能失效，如果失效，可以自己去coze.com注册API
 '''
 
-vosk_path = '/home/pi/.local/lib/python3.9/site-packages'
+vosk_path = '/home/jinliang/.local/lib/python3.9/site-packages'
 if vosk_path not in sys.path:
     sys.path.append(vosk_path)
 from cozepy import Coze, TokenAuth, BotPromptInfo, Message, ChatEventType, MessageContentType, \

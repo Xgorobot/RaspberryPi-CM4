@@ -21,17 +21,17 @@ color_red = (238, 55, 59)
 mic_purple = (24, 47, 223)
 
 #PIC Loading
-mic_logo = Image.open("/home/pi/RaspberryPi-CM4-main/pics/mic.png")
-mic_wave = Image.open("/home/pi/RaspberryPi-CM4-main/pics/mic_wave.png")
-offline_logo = Image.open("/home/pi/RaspberryPi-CM4-main/pics/offline.png")
-draw_logo = Image.open("/home/pi/RaspberryPi-CM4-main/pics/gpt_draw.png")
+mic_logo = Image.open("/home/jinliang/RaspberryPi-CM4-main/pics/mic.png")
+mic_wave = Image.open("/home/jinliang/RaspberryPi-CM4-main/pics/mic_wave.png")
+offline_logo = Image.open("/home/jinliang/RaspberryPi-CM4-main/pics/offline.png")
+draw_logo = Image.open("/home/jinliang/RaspberryPi-CM4-main/pics/gpt_draw.png")
 
 # Font Cache
 _font_cache = {}
 
 def get_font(size):
     if size not in _font_cache:
-        _font_cache[size] = ImageFont.truetype("/home/pi/model/msyh.ttc", size)
+        _font_cache[size] = ImageFont.truetype("/home/jinliang/model/msyh.ttc", size)
     return _font_cache[size]
 # Define Font
 font1 = get_font(15)

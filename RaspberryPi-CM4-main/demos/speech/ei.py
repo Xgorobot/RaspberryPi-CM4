@@ -13,7 +13,7 @@ from auto_platform import AudiostreamSource
 
 la=language()
 SPLASH_COLOR = (15, 21, 46)
-FONT_PATH = "/home/pi/model/msyh.ttc"
+FONT_PATH = "/home/jinliang/model/msyh.ttc"
 FONT_SIZE = 20
 DOG_PORT = '/dev/ttyAMA0'
 DOG_VERSION = "xgomini"
@@ -38,8 +38,8 @@ FORMAT = pyaudio.paInt16
 CHANNELS = 1
 RATE = 16000
 
-WIFI_OFFLINE_PATH = "/home/pi/RaspberryPi-CM4-main/pics/offline.png"
-font2 = ImageFont.truetype("/home/pi/model/msyh.ttc", 22)
+WIFI_OFFLINE_PATH = "/home/jinliang/RaspberryPi-CM4-main/pics/offline.png"
+font2 = ImageFont.truetype("/home/jinliang/model/msyh.ttc", 22)
 color_white = (255, 255, 255)
 mic_purple = (24, 47, 223)
 
@@ -80,7 +80,7 @@ class GPTCMD:
             print(f"加载图片失败: {e}")
             self.nowifi_image = Image.new("RGB", (100, 100), (255, 0, 0))  
     def visual(self, content):
-        mic_logo = Image.open("/home/pi/RaspberryPi-CM4-main/pics/mic.png")
+        mic_logo = Image.open("/home/jinliang/RaspberryPi-CM4-main/pics/mic.png")
         mic_purple = (24, 47, 223)
         splash = Image.new("RGB", (self.display.height, self.display.width), self.splash_theme_color)
         draw = ImageDraw.Draw(splash)
@@ -197,7 +197,7 @@ class GPTCMD:
                 max_lines=5,
                 clear_area=False
         ):
-            font = ImageFont.truetype("/home/pi/model/msyh.ttc", font_size)
+            font = ImageFont.truetype("/home/jinliang/model/msyh.ttc", font_size)
 
             line_height = font_size + 2
             total_height = max_lines * line_height

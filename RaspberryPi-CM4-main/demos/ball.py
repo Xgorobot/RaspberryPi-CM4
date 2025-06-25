@@ -26,7 +26,7 @@ display.Init()
 display.clear()
 splash_theme_color = (15, 21, 46)
 splash = Image.new("RGB", (display.height, display.width), splash_theme_color)
-font2 = ImageFont.truetype("/home/pi/model/msyh.ttc", 16)
+font2 = ImageFont.truetype("/home/jinliang/model/msyh.ttc", 16)
 draw = ImageDraw.Draw(splash)
 display.ShowImage(splash)
 
@@ -102,7 +102,7 @@ def lcd_draw_string(
         max_lines=5,
         clear_area=True
 ):
-    font = ImageFont.truetype("/home/pi/model/msyh.ttc", font_size)
+    font = ImageFont.truetype("/home/jinliang/model/msyh.ttc", font_size)
 
     line_height = font_size + 2
     total_height = max_lines * line_height

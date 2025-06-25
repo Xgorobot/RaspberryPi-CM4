@@ -18,11 +18,11 @@ splash_theme_color = (15, 21, 46)
 purple = (24, 47, 223)
 
 # Font
-font1 = ImageFont.truetype("/home/pi/model/msyh.ttc", 16)
-font2 = ImageFont.truetype("/home/pi/model/msyh.ttc", 18)
+font1 = ImageFont.truetype("/home/jinliang/model/msyh.ttc", 16)
+font2 = ImageFont.truetype("/home/jinliang/model/msyh.ttc", 18)
 
-lan_logo = Image.open("/home/pi/RaspberryPi-CM4-main/pics/L@2x.png")
-arrow_logo = Image.open("/home/pi/RaspberryPi-CM4-main/pics/C@2x.png")
+lan_logo = Image.open("/home/jinliang/RaspberryPi-CM4-main/pics/L@2x.png")
+arrow_logo = Image.open("/home/jinliang/RaspberryPi-CM4-main/pics/C@2x.png")
 
 def display_cjk_string(
     splash,

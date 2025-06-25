@@ -17,12 +17,12 @@ splash_theme_color = (15, 21, 46)
 purple = (24, 47, 223)
 
 #Font Loading
-font1 = ImageFont.truetype("/home/pi/model/msyh.ttc", 16)
-font2 = ImageFont.truetype("/home/pi/model/msyh.ttc", 18)
+font1 = ImageFont.truetype("/home/jinliang/model/msyh.ttc", 16)
+font2 = ImageFont.truetype("/home/jinliang/model/msyh.ttc", 18)
 
 #PiC Loading
-wifi_logo = Image.open("/home/pi/RaspberryPi-CM4-main/pics/5G@2x.png")
-arrow_logo = Image.open("/home/pi/RaspberryPi-CM4-main/pics/J@2x.png")
+wifi_logo = Image.open("/home/jinliang/RaspberryPi-CM4-main/pics/5G@2x.png")
+arrow_logo = Image.open("/home/jinliang/RaspberryPi-CM4-main/pics/J@2x.png")
 
 '''
     Display CJK String

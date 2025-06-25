@@ -6,10 +6,10 @@ import socket
 sys.path.append("..")
 button = Button()
 # Font Loading
-font1 = ImageFont.truetype("/home/pi/model/msyh.ttc", 20)
+font1 = ImageFont.truetype("/home/jinliang/model/msyh.ttc", 20)
 # Pic Loading
-fm_logo = Image.open("/home/pi/RaspberryPi-CM4-main/pics/wifi@2x.png")
-re_logo = Image.open("/home/pi/RaspberryPi-CM4-main/pics/redian@2x.png")
+fm_logo = Image.open("/home/jinliang/RaspberryPi-CM4-main/pics/wifi@2x.png")
+re_logo = Image.open("/home/jinliang/RaspberryPi-CM4-main/pics/redian@2x.png")
 
 #Color Loading
 splash_theme_color = (15, 21, 46)

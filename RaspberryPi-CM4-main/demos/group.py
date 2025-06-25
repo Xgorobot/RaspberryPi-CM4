@@ -17,7 +17,7 @@ dog.reset()
 boardcast=False
 exitmark=False
 
-pic_path = "/home/pi/RaspberryPi-CM4-main/demos/expression/"
+pic_path = "/home/jinliang/RaspberryPi-CM4-main/demos/expression/"
 _canvas_x, _canvas_y = 0, 0
 
 def display_cjk_string(splash,x, y, text, color=(255,255,255), font_size=1, scale=1, mono_space=False, auto_wrap=True, background_color=(0,0,0)):

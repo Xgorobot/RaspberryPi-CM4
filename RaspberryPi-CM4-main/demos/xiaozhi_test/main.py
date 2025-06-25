@@ -18,9 +18,9 @@ la=language()
 display = LCD_2inch.LCD_2inch()
 display.clear()
 if la=="cn":
-  background_image_path = "/home/pi/RaspberryPi-CM4-main/demos/xiaozhi_test/src/xiaozhi_cn.png"  # 替换为你的图片路径
+  background_image_path = "/home/jinliang/RaspberryPi-CM4-main/demos/xiaozhi_test/src/xiaozhi_cn.png"  # 替换为你的图片路径
 else:
-  background_image_path = "/home/pi/RaspberryPi-CM4-main/demos/xiaozhi_test/src/xiaozhi_en.png"  # 替换为你的图片路径
+  background_image_path = "/home/jinliang/RaspberryPi-CM4-main/demos/xiaozhi_test/src/xiaozhi_en.png"  # 替换为你的图片路径
 
 splash = Image.open(background_image_path)
 draw = ImageDraw.Draw(splash)
@@ -32,7 +32,7 @@ rectangle_y = 50
 rectangle_width = 200
 rectangle_height = 30
 draw.rectangle((rectangle_x, rectangle_y, rectangle_x + rectangle_width, rectangle_y + rectangle_height), fill=color)
-font2 = ImageFont.truetype("/home/pi/model/msyh.ttc", 16)
+font2 = ImageFont.truetype("/home/jinliang/model/msyh.ttc", 16)
 if la=="cn":
   draw.text((rectangle_x + 70, rectangle_y + 5), '启动中...', fill=text_color, font=font2)
 else:

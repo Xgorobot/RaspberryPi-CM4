@@ -13,7 +13,7 @@ import logging
 
 la=language()
 SPLASH_COLOR = (15, 21, 46)
-FONT_PATH = "/home/pi/model/msyh.ttc"
+FONT_PATH = "/home/jinliang/model/msyh.ttc"
 FONT_SIZE = 20
 DOG_PORT = '/dev/ttyAMA0'
 DOG_VERSION = "xgomini"
@@ -32,8 +32,8 @@ ACTION_MAP = {
     "Beg": (17, 3)
 }
 
-WIFI_OFFLINE_PATH = "/home/pi/RaspberryPi-CM4-main/pics/offline.png"
-font2 = ImageFont.truetype("/home/pi/model/msyh.ttc", 22)
+WIFI_OFFLINE_PATH = "/home/jinliang/RaspberryPi-CM4-main/pics/offline.png"
+font2 = ImageFont.truetype("/home/jinliang/model/msyh.ttc", 22)
 color_white = (255, 255, 255)
 mic_purple = (24, 47, 223)
 

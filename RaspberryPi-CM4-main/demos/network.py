@@ -12,7 +12,7 @@ def cv2AddChineseText(img, text, position, textColor=(200, 0, 200), textSize=10)
     if isinstance(img, np.ndarray):
         img = Image.fromarray(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
     draw = ImageDraw.Draw(img)
-    fontStyle = ImageFont.truetype("/home/pi/model/msyh.ttc", textSize, encoding="utf-8")
+    fontStyle = ImageFont.truetype("/home/jinliang/model/msyh.ttc", textSize, encoding="utf-8")
     draw.text(position, text, textColor, font=fontStyle)
     return cv2.cvtColor(np.asarray(img), cv2.COLOR_RGB2BGR)
 

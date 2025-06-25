@@ -25,7 +25,7 @@ _font_cache = {}
 
 def get_font(size):
     if size not in _font_cache:
-        _font_cache[size] = ImageFont.truetype("/home/pi/model/msyh.ttc", size)
+        _font_cache[size] = ImageFont.truetype("/home/jinliang/model/msyh.ttc", size)
     return _font_cache[size]
 # Define Font
 font1 = get_font(15)
@@ -33,7 +33,7 @@ font2 = get_font(22)
 font3 = get_font(30)
 font4 = get_font(40)
 
-bat = Image.open(os.path.join("/home/pi/RaspberryPi-CM4-main/", "pics", "battery.png"))
+bat = Image.open(os.path.join("/home/jinliang/RaspberryPi-CM4-main/", "pics", "battery.png"))
 class Button:
     def __init__(self):
         self.key1=24

@@ -13,11 +13,11 @@ import xgoscreen.LCD_2inch as LCD_2inch
 import logging
 from key import language
 la=language()
-mic_logo = Image.open("/home/pi/RaspberryPi-CM4-main/pics/mic.png")
-mic_wave = Image.open("/home/pi/RaspberryPi-CM4-main/pics/mic_wave.png")
+mic_logo = Image.open("/home/jinliang/RaspberryPi-CM4-main/pics/mic.png")
+mic_wave = Image.open("/home/jinliang/RaspberryPi-CM4-main/pics/mic_wave.png")
 mic_purple = (24, 47, 223)
 splash_theme_color = (15, 21, 46)
-font2=ImageFont.truetype("/home/pi/model/msyh.ttc", 16)
+font2=ImageFont.truetype("/home/jinliang/model/msyh.ttc", 16)
 quitmark = 0
 automark = True
 
@@ -52,7 +52,7 @@ def visual(content):
             max_lines=5,
             clear_area=False
     ):
-        font = ImageFont.truetype("/home/pi/model/msyh.ttc", font_size)
+        font = ImageFont.truetype("/home/jinliang/model/msyh.ttc", font_size)
         line_height = font_size + 2
         total_height = max_lines * line_height
         if clear_area:
@@ -210,11 +210,11 @@ def start_recording(p, stream_a, audio_stream, timel=3, save_file="recorded_audi
         sum_vol = 0
         start_time = None
 
-        libpath = "/home/pi/RaspberryPi-CM4-main/demos/speech/src/libnyumaya_premium.so.3.1.0"
+        libpath = "/home/jinliang/RaspberryPi-CM4-main/demos/speech/src/libnyumaya_premium.so.3.1.0"
         extractor = FeatureExtractor(libpath)
         detector = AudioRecognition(libpath)
         extactor_gain = 1.0
-        keywordIdlulu = detector.addModel("/home/pi/RaspberryPi-CM4-main/demos/speech/src/lulu_v3.1.907.premium", 0.7)
+        keywordIdlulu = detector.addModel("/home/jinliang/RaspberryPi-CM4-main/demos/speech/src/lulu_v3.1.907.premium", 0.7)
         bufsize = detector.getInputDataSize()
 
         audio_stream.start()
@@ -230,7 +230,7 @@ def start_recording(p, stream_a, audio_stream, timel=3, save_file="recorded_audi
             prediction = detector.runDetection(features)
             if prediction == keywordIdlulu:
                 logging.warning("lulu detected: " + datetime.datetime.now().strftime("%d.%b %Y %H:%M:%S"))
-                os.system("aplay /home/pi/RaspberryPi-CM4-main/demos/speech/voice/ding.wav")
+                os.system("aplay /home/jinliang/RaspberryPi-CM4-main/demos/speech/voice/ding.wav")
                 break
 
             data = stream_a.read(CHUNK, exception_on_overflow=False)

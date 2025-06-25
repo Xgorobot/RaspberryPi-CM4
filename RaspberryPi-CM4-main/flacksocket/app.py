@@ -31,11 +31,11 @@ def lcd_draw_string(splash,x, y, text, color=(255,255,255), font_size=1, scale=1
 def lcd_rect(x,y,w,h,color,thickness):
     draw.rectangle([(x,y),(w,h)],fill=color,width=thickness)
 #Load Image
-app_image = Image.open("/home/pi/RaspberryPi-CM4-main/pics/app.png") 
-unapp_image = Image.open("/home/pi/RaspberryPi-CM4-main/pics/unapp.png")
-wifiy = Image.open("/home/pi/RaspberryPi-CM4-main/pics/wifi@2x.jpg")
-wifin = Image.open("/home/pi/RaspberryPi-CM4-main/pics/wifi-un@2x.jpg")
-font2 = ImageFont.truetype("/home/pi/model/msyh.ttc", 23)
+app_image = Image.open("/home/jinliang/RaspberryPi-CM4-main/pics/app.png") 
+unapp_image = Image.open("/home/jinliang/RaspberryPi-CM4-main/pics/unapp.png")
+wifiy = Image.open("/home/jinliang/RaspberryPi-CM4-main/pics/wifi@2x.jpg")
+wifin = Image.open("/home/jinliang/RaspberryPi-CM4-main/pics/wifi-un@2x.jpg")
+font2 = ImageFont.truetype("/home/jinliang/model/msyh.ttc", 23)
 def get_ip(ifname):
     import socket,struct,fcntl
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)

@@ -14,8 +14,8 @@ font1=get_font(16)
 button=Button()
 splash_theme_color = (15, 21, 46)
 la=language()
-lianjie_image = Image.open("/home/pi/RaspberryPi-CM4-main/pics/lianjie@2x.png") 
-weilianjie_image = Image.open("/home/pi/RaspberryPi-CM4-main/pics/weilianjie@2x.png")
+lianjie_image = Image.open("/home/jinliang/RaspberryPi-CM4-main/pics/lianjie@2x.png") 
+weilianjie_image = Image.open("/home/jinliang/RaspberryPi-CM4-main/pics/weilianjie@2x.png")
 
 def clear_bottom():
     draw.rectangle([(0, 111), (320, 240)], fill=splash_theme_color)

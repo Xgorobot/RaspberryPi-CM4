@@ -22,9 +22,9 @@ def lcd_text_title(x, y, content):
     display.ShowImage(splash)
 
 #Pic Loading
-fm_logo = Image.open("/home/pi/RaspberryPi-CM4-main/pics/F@2x.png")
-py_wave = Image.open("/home/pi/RaspberryPi-CM4-main/pics/P@2x.png")
-os_logo = Image.open("/home/pi/RaspberryPi-CM4-main/pics/os@2x.png")
+fm_logo = Image.open("/home/jinliang/RaspberryPi-CM4-main/pics/F@2x.png")
+py_wave = Image.open("/home/jinliang/RaspberryPi-CM4-main/pics/P@2x.png")
+os_logo = Image.open("/home/jinliang/RaspberryPi-CM4-main/pics/os@2x.png")
 
 #Version Information
 fm1 = dog.read_firmware()

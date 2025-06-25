@@ -13,9 +13,9 @@ splash_theme_color = (15, 21, 46)
 display = LCD_2inch.LCD_2inch()
 display.clear()
 if la=="cn":
-  background_image_path = "/home/pi/RaspberryPi-CM4-main/demos/xiaozhi_test/src/xiaozhi_cn.png"  # 替换为你的图片路径
+  background_image_path = "/home/jinliang/RaspberryPi-CM4-main/demos/xiaozhi_test/src/xiaozhi_cn.png"  # 替换为你的图片路径
 else:
-  background_image_path = "/home/pi/RaspberryPi-CM4-main/demos/xiaozhi_test/src/xiaozhi_en.png"  # 替换为你的图片路径
+  background_image_path = "/home/jinliang/RaspberryPi-CM4-main/demos/xiaozhi_test/src/xiaozhi_en.png"  # 替换为你的图片路径
 
 splash = Image.open(background_image_path)
 draw = ImageDraw.Draw(splash)
@@ -33,7 +33,7 @@ def lcd_draw_string(
         max_lines=5,
         clear_area=False
 ):
-    font = ImageFont.truetype("/home/pi/model/msyh.ttc", font_size)
+    font = ImageFont.truetype("/home/jinliang/model/msyh.ttc", font_size)
 
     line_height = font_size + 2
     total_height = max_lines * line_height
@@ -263,7 +263,7 @@ class CliDisplay(BaseDisplay):
                     rectangle_width = 200
                     rectangle_height = 30
                     draw.rectangle((rectangle_x, rectangle_y, rectangle_x + rectangle_width, rectangle_y + rectangle_height), fill=color)
-                    font2 = ImageFont.truetype("/home/pi/model/msyh.ttc", 16)
+                    font2 = ImageFont.truetype("/home/jinliang/model/msyh.ttc", 16)
                     if la=="cn":
                       draw.text((rectangle_x + 70, rectangle_y + 5), '等待唤醒', fill=text_color, font=font2)
                     else:
@@ -300,7 +300,7 @@ class CliDisplay(BaseDisplay):
                     rectangle_width = 200
                     rectangle_height = 30
                     draw.rectangle((rectangle_x, rectangle_y, rectangle_x + rectangle_width, rectangle_y + rectangle_height), fill=color)
-                    font2 = ImageFont.truetype("/home/pi/model/msyh.ttc", 16)
+                    font2 = ImageFont.truetype("/home/jinliang/model/msyh.ttc", 16)
                     if la=="cn":
                       draw.text((rectangle_x + 80, rectangle_y + 5), "说话中", fill=text_color, font=font2)
                     else:
@@ -334,7 +334,7 @@ class CliDisplay(BaseDisplay):
                     rectangle_width = 200
                     rectangle_height = 30
                     draw.rectangle((rectangle_x, rectangle_y, rectangle_x + rectangle_width, rectangle_y + rectangle_height), fill=color)
-                    font2 = ImageFont.truetype("/home/pi/model/msyh.ttc", 16)
+                    font2 = ImageFont.truetype("/home/jinliang/model/msyh.ttc", 16)
                     if la=="cn":
                       draw.text((rectangle_x + 80, rectangle_y + 5), "连接中", fill=text_color, font=font2)
                     else:
@@ -371,7 +371,7 @@ class CliDisplay(BaseDisplay):
                     rectangle_width = 200
                     rectangle_height = 30
                     draw.rectangle((rectangle_x, rectangle_y, rectangle_x + rectangle_width, rectangle_y + rectangle_height), fill=color)
-                    font2 = ImageFont.truetype("/home/pi/model/msyh.ttc", 16)
+                    font2 = ImageFont.truetype("/home/jinliang/model/msyh.ttc", 16)
                     if la=="cn":
                       draw.text((rectangle_x + 80, rectangle_y + 5), "聆听中", fill=text_color, font=font2)
                     else:
@@ -472,7 +472,7 @@ class CliDisplay(BaseDisplay):
             self.current_status != self.last_status
         )
         if status_changed_status and self.current_status == '聆听中...':
-            os.system(play_command + " /home/pi/RaspberryPi-CM4-main/ding.wav")
+            os.system(play_command + " /home/jinliang/RaspberryPi-CM4-main/ding.wav")
 
 
         if status_changed:

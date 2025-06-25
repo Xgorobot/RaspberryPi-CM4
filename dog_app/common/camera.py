@@ -160,5 +160,3 @@ if __name__ == '__main__':
         camera.close()
         cv.destroyAllWindows()
         print("DogCamera test finished.")
-
-```

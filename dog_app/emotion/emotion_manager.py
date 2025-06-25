@@ -282,5 +282,3 @@ if __name__ == '__main__':
     # (Consider more robust cleanup or manual cleanup)
     # For now, this script is illustrative.
     print("EmotionManager test script finished.")
-
-```

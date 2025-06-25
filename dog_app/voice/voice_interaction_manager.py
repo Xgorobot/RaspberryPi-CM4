@@ -191,5 +191,3 @@ if __name__ == '__main__':
     vim.stop_listening()
 
     print("\nVoiceInteractionManager test script finished.")
-
-```

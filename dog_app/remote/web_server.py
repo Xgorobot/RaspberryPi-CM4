@@ -23,37 +23,73 @@ app.config['SECRET_KEY'] = 'secret_key_for_dog_app!' # Change in production
 socketio = SocketIO(app)
 
 # Global instances
-dog = None
-camera = None
+# These will be set by main_app.py if it's the entry point,
+# or by initialize_hardware() if web_server.py is run directly.
+dog_instance_ws = None # Use a distinct name to avoid confusion if run standalone
+camera_instance_ws = None
 
-def initialize_hardware():
-    global dog, camera
-    print("WebServer: Initializing hardware...")
-    if init_dog: # Check if import was successful
-        # Initialize the dog instance (this also handles chmod for serial)
-        dog_instance, _, _ = init_dog()
-        if dog_instance:
-            dog = dog_instance
-            print("WebServer: Dog instance initialized.")
-            dog.reset() # Start with a reset state
+def set_dog_instance(instance):
+    """Allows main_app.py to set the dog instance."""
+    global dog_instance_ws
+    dog_instance_ws = instance
+    print(f"WebServer: Dog instance set by external module: {type(dog_instance_ws)}")
+
+def set_camera_instance(instance):
+    """Allows main_app.py to set the camera instance if needed."""
+    global camera_instance_ws
+    camera_instance_ws = instance
+    print(f"WebServer: Camera instance set by external module: {type(camera_instance_ws)}")
+
+# Call camera initialization when module is loaded (if not already done by standalone init).
+# This ensures camera is ready for web streaming when web_server is imported.
+# The init_web_camera function itself checks if camera_instance_ws is None.
+init_web_camera()
+
+def initialize_hardware(standalone_mode=False):
+    """
+    Initializes hardware if web_server.py is run standalone
+    or if explicitly called.
+    """
+    global dog_instance_ws, camera_instance_ws
+
+    if standalone_mode:
+        print("WebServer: Initializing hardware in standalone mode...")
+        if init_dog: # Check if import was successful
+            # Initialize the dog instance (this also handles chmod for serial)
+            temp_dog, _, _ = init_dog()
+            if temp_dog:
+                dog_instance_ws = temp_dog
+                print("WebServer: Dog instance initialized (standalone).")
+                dog_instance_ws.reset() # Start with a reset state
+            else:
+                print("WebServer: Failed to initialize dog instance (standalone).")
         else:
-            print("WebServer: Failed to initialize dog instance.")
-            dog = None # Ensure dog is None if init fails
-    else:
-        print("WebServer: init_dog function not available.")
-        dog = None
+            print("WebServer: init_dog function not available (standalone).")
 
-    if DogCamera: # Check if import was successful
-        camera = DogCamera(debug=True) # Enable debug for camera init info
-        if not camera.is_opened():
-            print("WebServer: Failed to open camera.")
-            # camera object will exist but camera.is_opened() will be false
+        if DogCamera: # Check if import was successful
+            camera_instance_ws = DogCamera(debug=True) # Enable debug for camera init info
+            if not camera_instance_ws.is_opened():
+                print("WebServer: Failed to open camera (standalone).")
+            else:
+                print("WebServer: Camera initialized (standalone).")
         else:
-            print("WebServer: Camera initialized.")
+            print("WebServer: DogCamera class not available (standalone).")
     else:
-        print("WebServer: DogCamera class not available.")
-        camera = None
+        print("WebServer: Running in integrated mode. Expecting instances to be set externally.")
 
+def init_web_camera():
+    """Initializes the camera for the web server's video stream."""
+    global camera_instance_ws
+    if camera_instance_ws is None: # Only initialize if not already set (e.g. by main_app)
+        if DogCamera:
+            print("WebServer: Initializing camera for video stream...")
+            camera_instance_ws = DogCamera(debug=True)
+            if not camera_instance_ws.is_opened():
+                print("WebServer: Failed to open camera for video stream.")
+            else:
+                print("WebServer: Camera for video stream initialized.")
+        else:
+            print("WebServer: DogCamera class not available, video stream will not work.")
 
 # --- HTTP Routes ---
 @app.route('/')
@@ -63,19 +99,19 @@ def index():
 
 def gen_video_frames():
     """Generator function for video streaming."""
-    global camera
-    if not camera or not camera.is_opened():
+    global camera_instance_ws # Use the new global variable
+    if not camera_instance_ws or not camera_instance_ws.is_opened():
         print("Video stream: Camera not available or not open.")
         # Optionally, yield a placeholder image or an error message image
         # For now, just stop if no camera.
         return
 
     while True:
-        success, frame_bytes = camera.get_frame_jpeg()
+        success, frame_bytes = camera_instance_ws.get_frame_jpeg()
         if not success or not frame_bytes:
             print("Video stream: Failed to get frame or frame_bytes is None. Trying to reconnect...")
             # Attempt to reconnect camera if frame grab fails
-            if camera.reconnect():
+            if camera_instance_ws.reconnect():
                 print("Video stream: Camera reconnected.")
                 time.sleep(0.1) # Give it a moment
                 continue
@@ -106,8 +142,8 @@ def handle_disconnect():
 
 @socketio.on('robot_command')
 def handle_robot_command(json_data):
-    global dog
-    if not dog:
+    global dog_instance_ws # Use the new global variable
+    if not dog_instance_ws:
         print(f"SocketIO: Received command but dog not initialized: {json_data}")
         emit('command_response', {'status': 'Error', 'message': 'Dog not initialized.'})
         return
@@ -118,21 +154,21 @@ def handle_robot_command(json_data):
 
     try:
         if command == 'forward':
-            dog.forward(int(value) if value is not None else 15) # Default speed 15
+            dog_instance_ws.forward(int(value) if value is not None else 15) # Default speed 15
         elif command == 'backward':
-            dog.back(int(value) if value is not None else 15)
+            dog_instance_ws.back(int(value) if value is not None else 15)
         elif command == 'turn_left':
-            dog.turnleft(int(value) if value is not None else 30) # Default angle/speed 30
+            dog_instance_ws.turnleft(int(value) if value is not None else 30) # Default angle/speed 30
         elif command == 'turn_right':
-            dog.turnright(int(value) if value is not None else 30)
+            dog_instance_ws.turnright(int(value) if value is not None else 30)
         elif command == 'stop_move':
-            dog.stop()
+            dog_instance_ws.stop()
         elif command == 'action':
             if value is not None:
                 action_id = int(value)
                 if 0 <= action_id <= 255: # Action 255 is reset/stop
-                    dog.action(action_id, wait=False) # wait=False for responsiveness
-                    if action_id == 255: dog.stop() # Ensure full stop for reset action
+                    dog_instance_ws.action(action_id, wait=False) # wait=False for responsiveness
+                    if action_id == 255: dog_instance_ws.stop() # Ensure full stop for reset action
                 else:
                     raise ValueError("Action ID out of range (0-255)")
             else:
@@ -155,18 +191,18 @@ def handle_robot_command(json_data):
 
 
 if __name__ == '__main__':
-    print("Starting XGO Web Control Server...")
-    initialize_hardware()
+    print("Starting XGO Web Control Server (Standalone Mode)...")
+    initialize_hardware(standalone_mode=True) # Indicate standalone execution
 
-    print("Hardware initialization attempt complete.")
-    if dog:
-        print(f"Dog Type: {dog.version}, Battery: {dog.read_battery()}%")
+    print("Hardware initialization attempt complete (standalone).")
+    if dog_instance_ws:
+        print(f"Dog Type: {dog_instance_ws.version}, Battery: {dog_instance_ws.read_battery()}%")
     else:
-        print("Dog not available.")
-    if camera and camera.is_opened():
-        print("Camera is available.")
+        print("Dog not available (standalone).")
+    if camera_instance_ws and camera_instance_ws.is_opened():
+        print("Camera is available (standalone).")
     else:
-        print("Camera not available or not opened.")
+        print("Camera not available or not opened (standalone).")
 
     print("Starting Flask-SocketIO server on http://0.0.0.0:5000")
     # use_reloader=False is important for not running initialize_hardware twice in debug mode

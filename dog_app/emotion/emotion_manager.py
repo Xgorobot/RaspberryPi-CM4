@@ -64,15 +64,46 @@ class EmotionManager:
         emotion_name_lower = emotion.name.lower()
 
         animation_dir = self._get_expression_path(emotion_name_lower)
+        # Initialize emotion_display_name with the actual emotion name for accurate logging from the start
+        emotion_display_name = emotion.name
 
         if not os.path.exists(animation_dir) or not os.path.isdir(animation_dir):
+            # Use emotion.name here for the initial "not found" message for the *requested* emotion
             print(f"Animation directory not found for {emotion.name} at {animation_dir}")
-            if emotion != Emotion.NEUTRAL:
-                print(f"Attempting to load NEUTRAL animation as fallback.")
-                self.load_emotion_assets(Emotion.NEUTRAL) # Fallback to NEUTRAL animation
+            if emotion == Emotion.NEUTRAL:
+                fallback_options = ["lookaround", "eye"] # Order of preference
+                loaded_fallback = False
+                for fallback_name in fallback_options:
+                    fallback_dir = self._get_expression_path(fallback_name)
+                    if os.path.exists(fallback_dir) and os.path.isdir(fallback_dir):
+                        print(f"NEUTRAL not found. Attempting to load fallback '{fallback_name}' from {fallback_dir}")
+                        animation_dir = fallback_dir
+                        emotion_display_name = fallback_name.upper() # For logging purposes
+                        loaded_fallback = True
+                        break
+                if not loaded_fallback:
+                    print(f"Critical: NEUTRAL and fallbacks ({', '.join(fallback_options)}) not found. No default animation available.")
+                    self.animation_frames = []
+                    return
+            elif emotion.name != "_FALLBACK_INTERNAL_": # Avoid recursive fallback from a failed primary load
+                # This logic is for when a *specific* emotion (e.g. HAPPY) fails, it tries NEUTRAL (which then tries its own fallbacks)
+                print(f"Attempting to load NEUTRAL animation as fallback for {emotion.name}.")
+                # Use a temporary internal marker to prevent deep recursion if NEUTRAL itself fails in a specific way
+                # This is a bit complex; simpler might be to just let NEUTRAL handle its own fallbacks.
+                # For now, let's assume NEUTRAL's loading (with its fallbacks) is robust.
+                self.load_emotion_assets(Emotion.NEUTRAL)
+                return # Return because NEUTRAL load will handle frames
             else:
-                # This means NEUTRAL animation itself is missing or failed to load
-                print(f"Critical: NEUTRAL animation not found at {animation_dir}. No fallback available.")
+                # Should not happen if NEUTRAL and its fallbacks are truly missing.
+                print(f"Critical: Fallback attempt for {emotion.name} failed, and it was already a fallback process. No animation loaded.")
+                self.animation_frames = []
+                return
+
+        # If we are here, animation_dir should be valid (either original or a chosen fallback for NEUTRAL)
+        if not os.path.exists(animation_dir) or not os.path.isdir(animation_dir):
+             # This case should ideally be caught by the logic above.
+            print(f"Critical: Target animation directory {animation_dir} for {emotion_display_name} is invalid post-fallback. No animation loaded.")
+            self.animation_frames = []
             return
 
         try:
@@ -83,12 +114,14 @@ class EmotionManager:
                 key=lambda x: int(os.path.splitext(x)[0])
             )
             if not frame_files: # Handles case where directory exists but contains no valid frames
-                print(f"No valid .png animation frames found in {animation_dir} for emotion {emotion.name}")
-                if emotion != Emotion.NEUTRAL:
-                    print(f"Attempting to load NEUTRAL animation as fallback.")
+                print(f"No valid .png animation frames found in {animation_dir} for emotion {emotion_display_name}")
+                # If the original emotion (not NEUTRAL) had an empty dir, try NEUTRAL.
+                # If NEUTRAL (or its chosen fallback like 'lookaround') itself has an empty dir, this is critical.
+                if emotion != Emotion.NEUTRAL and emotion_display_name.lower() not in ["lookaround", "eye"]:
+                    print(f"Attempting to load NEUTRAL animation as fallback because {emotion_display_name} frames were missing.")
                     self.load_emotion_assets(Emotion.NEUTRAL)
-                else:
-                    print(f"Critical: NEUTRAL animation frames not found in {animation_dir}. No fallback available.")
+                else: # This means NEUTRAL or its active fallback (lookaround/eye) had no frames.
+                    print(f"Critical: {emotion_display_name} animation frames not found in {animation_dir}. No fallback available.")
                 return
 
             for frame_file in frame_files:
@@ -96,20 +129,22 @@ class EmotionManager:
                 self.animation_frames.append(Image.open(frame_path))
             
             if self.animation_frames:
-                print(f"Loaded {len(self.animation_frames)} frames for emotion {emotion.name} from {animation_dir}")
+                print(f"Loaded {len(self.animation_frames)} frames for emotion {emotion_display_name} from {animation_dir}")
             else: # Should be caught by 'if not frame_files' earlier, but as a safeguard
-                print(f"No frames loaded for {emotion.name} despite directory existing.")
-                if emotion != Emotion.NEUTRAL:
+                print(f"No frames loaded for {emotion_display_name} despite directory existing.")
+                if emotion != Emotion.NEUTRAL and emotion_display_name.lower() not in ["lookaround", "eye"]:
                     self.load_emotion_assets(Emotion.NEUTRAL)
 
         except Exception as e:
-            print(f"Error loading animation frames for {emotion.name} from {animation_dir}: {e}")
+            print(f"Error loading animation frames for {emotion_display_name} from {animation_dir}: {e}")
             self.animation_frames = [] # Clear partial load
-            if emotion != Emotion.NEUTRAL:
-                print(f"Attempting to load NEUTRAL animation as fallback due to error.")
+            # If loading a specific emotion (not NEUTRAL) fails, try NEUTRAL.
+            # If loading NEUTRAL or its chosen fallback (like 'lookaround') itself fails, this is critical.
+            if emotion != Emotion.NEUTRAL and emotion_display_name.lower() not in ["lookaround", "eye"]:
+                print(f"Attempting to load NEUTRAL animation as fallback due to error loading {emotion_display_name}.")
                 self.load_emotion_assets(Emotion.NEUTRAL)
             else:
-                print(f"Critical: Error loading NEUTRAL animation frames from {animation_dir}. No fallback available.")
+                print(f"Critical: Error loading {emotion_display_name} animation frames from {animation_dir}. No fallback available.")
 
 
     def set_emotion(self, new_emotion: Emotion):

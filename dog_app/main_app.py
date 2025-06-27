@@ -6,7 +6,7 @@ import signal # For graceful shutdown
 try:
     from control.xgolib import init_dog, get_dog_instance
     from emotion.emotion_manager import EmotionManager, Emotion
-    from remote.web_server import app as flask_app, socketio as flask_socketio
+    from remote.web_server import app as flask_app, socketio as flask_socketio, set_dog_instance as ws_set_dog_instance, set_camera_instance as ws_set_camera_instance
     from common.buttons import Button
     from common.display_utils import get_display_manager, get_main_draw_context, get_main_splash_image, lcd_draw_string, SPLASH_THEME_COLOR, font2, font3
     # from voice.voice_interaction_manager import VoiceInteractionManager # Import when ready
@@ -15,6 +15,7 @@ except ImportError as e:
     # Define dummies if essential for script to not crash immediately for structural checks
     # This helps identify if the issue is an import or something else downstream.
     flask_app, flask_socketio, Button, EmotionManager, Emotion, init_dog, get_dog_instance = [None]*7
+    ws_set_dog_instance, ws_set_camera_instance = [None]*2
     get_display_manager, get_main_draw_context, get_main_splash_image, lcd_draw_string = [None]*4
     SPLASH_THEME_COLOR, font2, font3 = [None]*3
     print("MainApp: CRITICAL - One or more module imports failed. Dummy objects created. Functionality will be severely limited.")
@@ -42,6 +43,10 @@ def initialize_systems():
         if dog_instance:
             print(f"MainApp: Dog initialized: {fw_info} ({ver_name}), Battery: {dog_instance.read_battery()}%")
             dog_instance.reset() # Ensure a known starting state
+            if ws_set_dog_instance:
+                ws_set_dog_instance(dog_instance) # Pass dog_instance to web_server module
+            else:
+                print("MainApp: Web server's set_dog_instance function not available.")
         else:
             print("MainApp: CRITICAL - Failed to initialize dog. Many functions will fail.")
     else:

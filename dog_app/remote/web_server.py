@@ -225,28 +225,58 @@ def handle_robot_command(json_data):
         elif command == 'translate_left':
             # Assuming dog_instance_ws has a method like translate('y', speed)
             # The value from joystick is speed. Negative for left, Positive for right if using a single translate y.
-            # Or, specific methods like dog_instance_ws.translate_left(speed)
-            dog_instance_ws.translate('y', -int(value) if value is not None else -15) # Example: negative y for left
-            logger.info("Executed translate_left with speed: %s", value)
+            # Or, specific methods like dog_instance_ws.left(speed)
+            dog_instance_ws.move_y(-int(value) if value is not None else -15) # Negative for left, assuming move_y takes signed speed
+            logger.info("Executed translate_left (move_y) with speed: %s", value)
         elif command == 'translate_right':
-            dog_instance_ws.translate('y', int(value) if value is not None else 15)  # Example: positive y for right
-            logger.info("Executed translate_right with speed: %s", value)
+            dog_instance_ws.move_y(int(value) if value is not None else 15)  # Positive for right
+            logger.info("Executed translate_right (move_y) with speed: %s", value)
         elif command == 'pitch_up': # Rear down / Front up
             # Assuming dog_instance_ws.attitude('p', angle_or_step)
-            dog_instance_ws.attitude('p', int(value) if value is not None else 5) # Example: positive pitch for front up
+            # Positive value for pitch up (front of dog raises)
+            dog_instance_ws.attitude('p', int(value) if value is not None else 5)
             logger.info("Executed pitch_up with value: %s", value)
         elif command == 'pitch_down': # Front down / Rear up
-            dog_instance_ws.attitude('p', -int(value) if value is not None else -5) # Example: negative pitch for front down
+            # Negative value for pitch down (front of dog lowers)
+            dog_instance_ws.attitude('p', -int(value) if value is not None else -5)
             logger.info("Executed pitch_down with value: %s", value)
-        elif command == 'roll_left': # Left down
-            dog_instance_ws.attitude('r', -int(value) if value is not None else -5) # Example: negative roll for left down
+        elif command == 'roll_left': # Left side down, right side up
+            # Negative value for roll left
+            dog_instance_ws.attitude('r', -int(value) if value is not None else -5)
             logger.info("Executed roll_left with value: %s", value)
-        elif command == 'roll_right': # Right down
-            dog_instance_ws.attitude('r', int(value) if value is not None else 5) # Example: positive roll for right down
+        elif command == 'roll_right': # Right side down, left side up
+            # Positive value for roll right
+            dog_instance_ws.attitude('r', int(value) if value is not None else 5)
             logger.info("Executed roll_right with value: %s", value)
         elif command == 'emergency_stop':
             dog_instance_ws.stop() # Or a more immediate stop if available e.g. dog_instance_ws.imu_stop(True)
             logger.info("Executed emergency_stop")
+        elif command == 'turn_left_by_angle':
+            angle = int(value) if value is not None else 30
+            dog_instance_ws.turn_by(-angle) # Negative angle for left turn
+            logger.info("Executed turn_left_by_angle with angle: %s", angle)
+        elif command == 'turn_right_by_angle':
+            angle = int(value) if value is not None else 30
+            dog_instance_ws.turn_by(angle)  # Positive angle for right turn
+            logger.info("Executed turn_right_by_angle with angle: %s", angle)
+        elif command == 'set_gait':
+            gait_name = str(value).lower() # Ensure lowercase, e.g., "walk" or "trot"
+            if hasattr(dog_instance_ws, 'gait_type'):
+                dog_instance_ws.gait_type(gait_name)
+                logger.info("Executed set_gait with type: %s", gait_name)
+                # Optionally, set pace based on gait, or allow separate pace control
+                if gait_name == "trot":
+                    if hasattr(dog_instance_ws, 'pace'):
+                        dog_instance_ws.pace("high") # Example: trot uses high pace
+                        logger.info("Set pace to high for trot.")
+                elif gait_name == "walk":
+                     if hasattr(dog_instance_ws, 'pace'):
+                        dog_instance_ws.pace("normal") # Example: walk uses normal pace
+                        logger.info("Set pace to normal for walk.")
+            else:
+                logger.warning("dog_instance_ws does not have gait_type method.")
+                emit('command_response', {'status': 'Error', 'message': 'Gait control not available.'})
+                return
         # Add more commands here:
         # e.g., specific named actions
         else:

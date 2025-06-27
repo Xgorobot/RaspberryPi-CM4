@@ -56,6 +56,7 @@
                 <button id="btn-stand-mode">Stand</button>
                 <button id="btn-rest-mode">Rest (Box)</button>
             </div>
+            <button id="btn-toggle-gait">Gait: Walk</button> <!-- Initial display, will be updated by JS -->
             <!-- Placeholder for any other left panel controls -->
         </div>
 
@@ -73,21 +74,44 @@
         <div class="right-panel">
             <h2>Attitude</h2>
             <div id="joystick-attitude-zone" class="joystick-zone"></div>
+            <div class="rotation-controls mode-switch"> <!-- Re-using mode-switch for similar styling -->
+                <button id="btn-rotate-left">Rotate Left</button>
+                <button id="btn-rotate-right">Rotate Right</button>
+            </div>
             <!-- Placeholder for any other right panel controls -->
         </div>
     </div>
 
     <div class="actions-bar">
         <h2>Actions</h2>
-        <!-- Action buttons will be dynamically added here or hardcoded if few -->
-        <button id="btn-action-reset">Reset</button>
-        <button id="btn-action-wave">Wave</button>
-        <button id="btn-action-stretch">Stretch</button>
-        <button id="btn-action-wag_tail">Wag Tail</button>
-        <button id="btn-action-squat">Squat</button>
-        <button id="btn-action-look_up">Look Up</button>
-        <button id="btn-action-look_down">Look Down</button>
-        <button id="btn-action-shake_hand">Shake Hand</button>
+        <button id="btn-action-lie_down">趴下 (1)</button>
+        <button id="btn-action-stand_up">站起 (2)</button>
+        <button id="btn-action-crawl">匍匐 (3)</button>
+        <button id="btn-action-circle">转圈 (4)</button>
+        <button id="btn-action-mark_time">踏步 (5)</button>
+        <button id="btn-action-squat">蹲起 (6)</button>
+        <button id="btn-action-roll">Roll (7)</button>
+        <button id="btn-action-pitch">Pitch (8)</button>
+        <button id="btn-action-yaw">Yaw (9)</button>
+        <button id="btn-action-3axis_rotate">三轴转 (10)</button>
+        <button id="btn-action-pee">撒尿 (11)</button>
+        <button id="btn-action-sit_down">坐下 (12)</button>
+        <button id="btn-action-wave_hands">招手 (13)</button>
+        <button id="btn-action-stretch">伸懒腰 (14)</button>
+        <button id="btn-action-wave_body">波浪 (15)</button>
+        <button id="btn-action-sway">摇摆 (16)</button>
+        <button id="btn-action-beg_food">求食 (17)</button>
+        <button id="btn-action-find_food">找食 (18)</button>
+        <button id="btn-action-shake_hands">握手 (19)</button>
+        <button id="btn-action-chicken_head">鸡头 (20)</button>
+        <button id="btn-action-push_ups">俯卧撑 (21)</button>
+        <button id="btn-action-look_around">张望 (22)</button>
+        <button id="btn-action-dance">跳舞 (23)</button>
+        <button id="btn-action-naughty">调皮 (24)</button>
+        <button id="btn-action-catch_top">上抓 (128)</button>
+        <button id="btn-action-catch_middle">中抓 (129)</button>
+        <button id="btn-action-catch_bottom">下抓 (130)</button>
+        <button id="btn-action-reset">复位 (255)</button>
         <!-- Example of custom action input, if needed -->
         <!-- <div class="custom-action-container">
             Action ID: <input type="number" id="action-id-input" value="1" min="1" max="255">
@@ -225,16 +249,51 @@
         document.getElementById('btn-stand-mode').addEventListener('click', () => sendCommand('action', 1)); // Action 1 for Stand
         document.getElementById('btn-rest-mode').addEventListener('click', () => sendCommand('action', 2)); // Assuming Action 2 for Rest/Box, update if different
 
-        // Action Bar Buttons (Example: using specific action IDs)
-        // These IDs are examples, replace with actual IDs for your dog's actions
-        document.getElementById('btn-action-reset').addEventListener('click', () => sendCommand('action', 255)); // Reset
-        document.getElementById('btn-action-wave').addEventListener('click', () => sendCommand('action', 6));   // Wave
-        document.getElementById('btn-action-stretch').addEventListener('click', () => sendCommand('action', 3)); // Example: Stretch
-        document.getElementById('btn-action-wag_tail').addEventListener('click', () => sendCommand('action', 4)); // Example: Wag Tail
-        document.getElementById('btn-action-squat').addEventListener('click', () => sendCommand('action', 5));   // Example: Squat
-        document.getElementById('btn-action-look_up').addEventListener('click', () => sendCommand('action', 11)); // Example: Look Up
-        document.getElementById('btn-action-look_down').addEventListener('click', () => sendCommand('action', 12)); // Example: Look Down
-        document.getElementById('btn-action-shake_hand').addEventListener('click', () => sendCommand('action', 10)); // Example: Shake hand
+        // Action Bar Buttons
+        document.getElementById('btn-action-lie_down').addEventListener('click', () => sendCommand('action', 1));
+        document.getElementById('btn-action-stand_up').addEventListener('click', () => sendCommand('action', 2));
+        document.getElementById('btn-action-crawl').addEventListener('click', () => sendCommand('action', 3));
+        document.getElementById('btn-action-circle').addEventListener('click', () => sendCommand('action', 4));
+        document.getElementById('btn-action-mark_time').addEventListener('click', () => sendCommand('action', 5));
+        document.getElementById('btn-action-squat').addEventListener('click', () => sendCommand('action', 6));
+        document.getElementById('btn-action-roll').addEventListener('click', () => sendCommand('action', 7));
+        document.getElementById('btn-action-pitch').addEventListener('click', () => sendCommand('action', 8));
+        document.getElementById('btn-action-yaw').addEventListener('click', () => sendCommand('action', 9));
+        document.getElementById('btn-action-3axis_rotate').addEventListener('click', () => sendCommand('action', 10));
+        document.getElementById('btn-action-pee').addEventListener('click', () => sendCommand('action', 11));
+        document.getElementById('btn-action-sit_down').addEventListener('click', () => sendCommand('action', 12));
+        document.getElementById('btn-action-wave_hands').addEventListener('click', () => sendCommand('action', 13));
+        document.getElementById('btn-action-stretch').addEventListener('click', () => sendCommand('action', 14));
+        document.getElementById('btn-action-wave_body').addEventListener('click', () => sendCommand('action', 15));
+        document.getElementById('btn-action-sway').addEventListener('click', () => sendCommand('action', 16));
+        document.getElementById('btn-action-beg_food').addEventListener('click', () => sendCommand('action', 17));
+        document.getElementById('btn-action-find_food').addEventListener('click', () => sendCommand('action', 18));
+        document.getElementById('btn-action-shake_hands').addEventListener('click', () => sendCommand('action', 19));
+        document.getElementById('btn-action-chicken_head').addEventListener('click', () => sendCommand('action', 20));
+        document.getElementById('btn-action-push_ups').addEventListener('click', () => sendCommand('action', 21));
+        document.getElementById('btn-action-look_around').addEventListener('click', () => sendCommand('action', 22));
+        document.getElementById('btn-action-dance').addEventListener('click', () => sendCommand('action', 23));
+        document.getElementById('btn-action-naughty').addEventListener('click', () => sendCommand('action', 24));
+        document.getElementById('btn-action-catch_top').addEventListener('click', () => sendCommand('action', 128));
+        document.getElementById('btn-action-catch_middle').addEventListener('click', () => sendCommand('action', 129));
+        document.getElementById('btn-action-catch_bottom').addEventListener('click', () => sendCommand('action', 130));
+        document.getElementById('btn-action-reset').addEventListener('click', () => sendCommand('action', 255));
+
+        // --- New Controls: Rotation and Gait ---
+        const ROTATION_ANGLE_STEP = 30; // Degrees for each rotation button click
+        document.getElementById('btn-rotate-left').addEventListener('click', () => sendCommand('turn_left_by_angle', ROTATION_ANGLE_STEP));
+        document.getElementById('btn-rotate-right').addEventListener('click', () => sendCommand('turn_right_by_angle', ROTATION_ANGLE_STEP));
+
+        const gaitButton = document.getElementById('btn-toggle-gait');
+        const availableGaits = ['walk', 'trot']; // Add more gaits if available and supported
+        let currentGaitIndex = 0; // Default to 'walk'
+
+        gaitButton.addEventListener('click', () => {
+            currentGaitIndex = (currentGaitIndex + 1) % availableGaits.length;
+            const nextGait = availableGaits[currentGaitIndex];
+            sendCommand('set_gait', nextGait);
+            gaitButton.textContent = `Gait: ${nextGait.charAt(0).toUpperCase() + nextGait.slice(1)}`;
+        });
 
         // --- Status Updates ---
         function updateStatus() {

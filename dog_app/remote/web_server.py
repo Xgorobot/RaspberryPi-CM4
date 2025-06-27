@@ -222,8 +222,33 @@ def handle_robot_command(json_data):
                     raise ValueError("Action ID out of range (0-255)")
             else:
                 raise ValueError("Action ID not provided")
+        elif command == 'translate_left':
+            # Assuming dog_instance_ws has a method like translate('y', speed)
+            # The value from joystick is speed. Negative for left, Positive for right if using a single translate y.
+            # Or, specific methods like dog_instance_ws.translate_left(speed)
+            dog_instance_ws.translate('y', -int(value) if value is not None else -15) # Example: negative y for left
+            logger.info("Executed translate_left with speed: %s", value)
+        elif command == 'translate_right':
+            dog_instance_ws.translate('y', int(value) if value is not None else 15)  # Example: positive y for right
+            logger.info("Executed translate_right with speed: %s", value)
+        elif command == 'pitch_up': # Rear down / Front up
+            # Assuming dog_instance_ws.attitude('p', angle_or_step)
+            dog_instance_ws.attitude('p', int(value) if value is not None else 5) # Example: positive pitch for front up
+            logger.info("Executed pitch_up with value: %s", value)
+        elif command == 'pitch_down': # Front down / Rear up
+            dog_instance_ws.attitude('p', -int(value) if value is not None else -5) # Example: negative pitch for front down
+            logger.info("Executed pitch_down with value: %s", value)
+        elif command == 'roll_left': # Left down
+            dog_instance_ws.attitude('r', -int(value) if value is not None else -5) # Example: negative roll for left down
+            logger.info("Executed roll_left with value: %s", value)
+        elif command == 'roll_right': # Right down
+            dog_instance_ws.attitude('r', int(value) if value is not None else 5) # Example: positive roll for right down
+            logger.info("Executed roll_right with value: %s", value)
+        elif command == 'emergency_stop':
+            dog_instance_ws.stop() # Or a more immediate stop if available e.g. dog_instance_ws.imu_stop(True)
+            logger.info("Executed emergency_stop")
         # Add more commands here:
-        # e.g., translation, attitude, specific named actions
+        # e.g., specific named actions
         else:
             logger.warning("SocketIO: Unknown command: %s", command)
             emit('command_response', {'status': 'Error', 'message': f'Unknown command: {command}'})
@@ -238,6 +263,83 @@ def handle_robot_command(json_data):
     except Exception as e:
         logger.error("SocketIO: General error processing command %s with value %s: %s", command, value, e, exc_info=True)
         emit('command_response', {'status': 'Error', 'message': f'Failed to execute {command}: {str(e)}'})
+
+@socketio.on('request_status')
+def handle_request_status():
+    """Handles request from client to send current status."""
+    global dog_instance_ws
+    logger.info("SocketIO: Received request_status")
+
+    battery_level = None
+    wifi_strength = None
+    dog_status = "Unknown"
+
+    if dog_instance_ws:
+        try:
+            battery_level = dog_instance_ws.read_battery()
+            # Assuming a method like dog_instance_ws.get_status() or similar might exist
+            # For now, using a generic status if specific one isn't available.
+            if hasattr(dog_instance_ws, 'get_current_mode'): # Example attribute
+                 dog_status = dog_instance_ws.get_current_mode()
+            elif hasattr(dog_instance_ws, 'is_standing'): # another example
+                 dog_status = "Standing" if dog_instance_ws.is_standing() else "Not Standing"
+            else:
+                 dog_status = "Operating" # Generic status
+            logger.info(f"Dog instance available: Battery={battery_level}, Status={dog_status}")
+        except Exception as e:
+            logger.error(f"Error querying dog instance for status: {e}")
+            dog_status = "Error"
+    else:
+        logger.warning("Dog instance not available for status query.")
+        dog_status = "Not Connected"
+
+    try:
+        # Placeholder for WiFi signal strength - this is platform specific
+        # You'll need to implement get_wifi_signal_strength() based on your OS/hardware
+        wifi_strength = get_wifi_signal_strength()
+        if wifi_strength is None:
+             wifi_strength = "N/A"
+    except NameError: # Function not defined
+        logger.warning("get_wifi_signal_strength() function is not defined. WiFi strength will be N/A.")
+        wifi_strength = "N/A"
+    except Exception as e:
+        logger.error(f"Error getting WiFi signal strength: {e}")
+        wifi_strength = "Error"
+
+    status_data = {
+        'battery': battery_level,
+        'wifi_strength': wifi_strength,
+        'dog_status': dog_status
+    }
+    logger.info(f"Sending status_update: {status_data}")
+    emit('status_update', status_data)
+
+def get_wifi_signal_strength():
+    """
+    Placeholder function to get WiFi signal strength.
+    This needs to be implemented based on the specific operating system and hardware.
+    Example for Linux using iwconfig (requires wireless-tools to be installed):
+    """
+    # import subprocess
+    # try:
+    #     output = subprocess.check_output(['iwconfig', 'wlan0'], text=True) # Replace wlan0 with your interface
+    #     for line in output.split('\n'):
+    #         if 'Signal level=' in line:
+    #             # Example: Signal level=-50 dBm
+    #             signal = line.split('Signal level=')[1].split(' ')[0]
+    #             return signal # Returns something like "-50"
+    #         elif 'Link Quality=' in line:
+    #             # Example: Link Quality=70/70
+    #             quality = line.split('Link Quality=')[1].split(' ')[0]
+    #             return quality # Returns something like "70/70"
+    # except FileNotFoundError:
+    #     logger.warning("iwconfig command not found. Cannot get WiFi signal strength.")
+    #     return None
+    # except Exception as e:
+    #     logger.error(f"Error executing iwconfig: {e}")
+    #     return None
+    logger.info("get_wifi_signal_strength: Placeholder function called. Returning None.")
+    return None # Return None if not implemented or error
 
 
 if __name__ == '__main__':

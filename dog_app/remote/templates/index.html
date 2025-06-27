@@ -7,23 +7,89 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/nipplejs/0.10.1/nipplejs.min.js"></script>
     <style>
-        body { font-family: Arial, sans-serif; margin: 0; background-color: #f0f0f0; color: #333; display: flex; flex-direction: column; height: 100vh; }
-        .main-container { display: flex; flex-grow: 1; padding: 10px; gap: 10px; }
-        .left-panel, .right-panel, .center-panel { display: flex; flex-direction: column; background-color: #fff; padding: 15px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-        .left-panel { width: 25%; }
-        .center-panel { flex-grow: 1; /* Takes remaining space */ }
-        .right-panel { width: 25%; }
-        .actions-bar { background-color: #fff; padding: 10px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); margin: 0 10px 10px 10px; display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; }
-        h2 { text-align: center; color: #555; margin-top: 0; margin-bottom: 15px; }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background-color: #f0f0f0;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden; /* Prevent body scrollbars when content overflows due to flex */
+        }
+        .main-container {
+            display: flex;
+            flex-grow: 1;
+            padding: 10px;
+            gap: 10px;
+            overflow: hidden; /* Prevent internal scrollbars if not managed by children */
+        }
+        .left-panel, .right-panel, .center-panel {
+            display: flex;
+            flex-direction: column;
+            background-color: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            overflow-y: auto; /* Allow individual panels to scroll if content overflows */
+        }
+        .left-panel { width: 25%; min-width: 220px; /* Minimum width for joysticks and buttons */ }
+        .center-panel { flex-grow: 1; display: flex; flex-direction: column; /* Ensure video area can grow */ }
+        .right-panel { width: 25%; min-width: 220px; }
+        .actions-bar {
+            background-color: #fff;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            margin: 0 10px 10px 10px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px; /* Slightly reduced gap for more buttons */
+            justify-content: center;
+            max-height: 200px; /* Max height for action bar, enable scroll if needed */
+            overflow-y: auto;
+        }
+        h2 { text-align: center; color: #555; margin-top: 0; margin-bottom: 10px; font-size: 1.2em; }
 
         /* Joystick Styles */
-        .joystick-zone { position: relative; width: 100%; height: 200px; background-color: #e0e0e0; border-radius: 8px; margin-bottom: 15px; }
+        .joystick-zone {
+            position: relative;
+            width: 100%;
+            height: 180px; /* Slightly reduced height */
+            background-color: #e0e0e0;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
 
         /* Video Stream & Status Bar */
-        .video-area { position: relative; width: 100%; flex-grow: 1; display: flex; flex-direction: column; }
-        .status-bar { display: flex; justify-content: space-around; padding: 8px; background-color: rgba(0,0,0,0.5); color: white; border-radius: 5px 5px 0 0; font-size: 0.9em; }
-        .status-bar span { flex: 1; text-align: center; }
-        .video-stream { display: block; width: 100%; height: auto; max-height: calc(100% - 30px); /* Adjust based on status bar height */ border: 1px solid #ddd; border-radius: 0 0 5px 5px; object-fit: contain; }
+        .video-area {
+            position: relative;
+            width: 100%;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 200px; /* Ensure video area has some minimum height */
+        }
+        .status-bar {
+            display: flex;
+            justify-content: space-around;
+            padding: 8px;
+            background-color: rgba(0,0,0,0.5);
+            color: white;
+            border-radius: 5px 5px 0 0;
+            font-size: 0.8em; /* Slightly smaller font for status */
+        }
+        .status-bar span { flex: 1; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .video-stream {
+            display: block;
+            width: 100%;
+            height: 100%; /* Changed from auto to fill available space */
+            max-height: calc(100% - 30px); /* Adjust based on status bar height */
+            border: 1px solid #ddd;
+            border-radius: 0 0 5px 5px;
+            object-fit: contain;
+            background-color: #333; /* Dark background for video area */
+        }
 
         /* Buttons */
         button {
@@ -35,14 +101,106 @@
         .emergency-stop-btn { background-color: #d9534f; }
         .emergency-stop-btn:hover { background-color: #c9302c; }
         .mode-switch { display: flex; justify-content: space-around; margin-bottom: 15px; }
-        .mode-switch button { flex-grow: 1; margin: 0 5px; }
+        .mode-switch button { flex-grow: 1; margin: 0 5px; font-size: 0.9em; padding: 10px 8px; }
 
-        .actions-bar button { background-color: #007bff; }
+        .actions-bar button {
+            background-color: #007bff;
+            min-width: 80px; /* Adjust min-width for smaller screens */
+            padding: 10px 8px; /* Adjust padding */
+            font-size: 0.9em;
+        }
         .actions-bar button:hover { background-color: #0056b3; }
 
         /* Input for custom action (if still needed) */
          input[type="number"] { width: 60px; padding: 5px; margin-right: 5px; }
          .custom-action-container { display: flex; align-items: center; margin-top: 10px; }
+
+        /* Responsive Design for Mobile Landscape */
+        @media screen and (max-width: 900px) and (orientation: landscape) {
+            body { height: auto; /* Allow body to adjust to content in landscape */ }
+            .main-container {
+                flex-direction: column; /* Stack main sections vertically */
+                height: 100vh; /* Attempt to use full viewport height */
+                overflow-y: auto; /* Allow scrolling for the whole container if needed */
+            }
+            .left-panel, .right-panel {
+                width: 100%; /* Take full width */
+                min-width: unset; /* Remove min-width */
+                flex-direction: row; /* Arrange items in a row */
+                align-items: center; /* Center items vertically */
+                justify-content: space-around; /* Distribute space */
+                padding: 10px;
+                order: 2; /* Move control panels below video */
+                max-height: 220px; /* Max height for control panels */
+            }
+            .left-panel > *, .right-panel > * {
+                 margin: 5px; /* Add some margin to internal elements */
+            }
+            .joystick-zone {
+                height: 150px; /* Smaller joystick for landscape */
+                width: 150px; /* Fixed width for joystick zone */
+                min-width: 150px;
+            }
+            .left-panel .mode-switch, .right-panel .mode-switch {
+                flex-direction: column; /* Stack buttons in mode switch */
+                gap: 5px;
+            }
+            .left-panel button, .right-panel button { /* Ensure buttons in panels are reasonably sized */
+                min-width: 100px;
+                padding: 8px;
+            }
+             .left-panel h2, .right-panel h2 { display: none; /* Hide titles in compact view */ }
+
+
+            .center-panel {
+                order: 1; /* Video panel comes first */
+                width: 100%;
+                height: 50vh; /* Video takes about half the screen height */
+                min-height: 200px; /* Minimum height for video */
+            }
+            .video-area {
+                height: 100%; /* Video area uses all of center panel's new height */
+            }
+            .video-stream {
+                max-height: calc(100% - 25px); /* Adjust for smaller status bar */
+            }
+            .status-bar { font-size: 0.7em; padding: 5px; }
+
+
+            .actions-bar {
+                order: 3; /* Actions bar at the bottom */
+                width: calc(100% - 20px); /* Adjust width considering main-container padding */
+                margin: 10px auto; /* Center the actions bar */
+                max-height: 150px; /* Limit height, enable scroll */
+                flex-wrap: nowrap; /* Prevent wrapping, use overflow scroll */
+                overflow-x: auto; /* Allow horizontal scrolling for actions */
+                overflow-y: hidden;
+                justify-content: flex-start; /* Align buttons to the start for scrolling */
+                padding: 8px;
+            }
+            .actions-bar button {
+                flex-shrink: 0; /* Prevent buttons from shrinking */
+                min-width: 90px; /* Ensure buttons are wide enough */
+            }
+        }
+
+        @media screen and (max-width: 480px) and (orientation: portrait) {
+            .main-container {
+                flex-direction: column;
+            }
+            .left-panel, .right-panel, .center-panel {
+                width: 100%;
+                min-width: unset;
+                margin-bottom: 10px; /* Add space between stacked panels */
+            }
+            .joystick-zone {
+                height: 160px; /* Adjust joystick size for portrait */
+            }
+            .actions-bar {
+                max-height: 180px; /* More height for actions in portrait */
+            }
+             .left-panel h2, .right-panel h2 { font-size: 1.1em; margin-bottom: 8px; }
+        }
 
     </style>
 </head>
@@ -51,12 +209,12 @@
         <div class="left-panel">
             <h2>Movement</h2>
             <div id="joystick-movement-zone" class="joystick-zone"></div>
+            <button id="btn-toggle-gait" style="margin-bottom: 10px;">Gait: Walk</button> <!-- Moved Gait button here -->
             <button id="btn-emergency-stop" class="emergency-stop-btn">Emergency Stop</button>
-            <div class="mode-switch">
+            <div class="mode-switch" style="margin-top: 10px;">
                 <button id="btn-stand-mode">Stand</button>
                 <button id="btn-rest-mode">Rest (Box)</button>
             </div>
-            <button id="btn-toggle-gait">Gait: Walk</button> <!-- Initial display, will be updated by JS -->
             <!-- Placeholder for any other left panel controls -->
         </div>
 
@@ -103,7 +261,7 @@
         <button id="btn-action-beg_food">求食 (17)</button>
         <button id="btn-action-find_food">找食 (18)</button>
         <button id="btn-action-shake_hands">握手 (19)</button>
-        <button id="btn-action-chicken_head">鸡头 (20)</button>
+        <button id="btn-action-chicken_head">展示机械臂 (20)</button>
         <button id="btn-action-push_ups">俯卧撑 (21)</button>
         <button id="btn-action-look_around">张望 (22)</button>
         <button id="btn-action-dance">跳舞 (23)</button>
@@ -183,23 +341,28 @@
             if (!data.direction) {
                 return;
             }
-            // Determine primary direction (up, down, left, right)
             let command = null;
-            let value = Math.min(Math.floor(data.distance / joystickOptions.size * 2 * 30), 30); // Max speed 30, adjust as needed
+            let value = Math.min(Math.floor(data.distance / joystickOptions.size * 2 * 30), 30); // Max speed 30
 
-            if (data.direction.y === 'up') {
-                if (data.direction.x === 'left' && data.angle.degree > 100 && data.angle.degree < 170) command = 'translate_left'; // Prioritize strafe if more horizontal
-                else if (data.direction.x === 'right' && data.angle.degree > 10 && data.angle.degree < 80) command = 'translate_right';// Prioritize strafe
-                else command = 'forward';
-            } else if (data.direction.y === 'down') {
-                 if (data.direction.x === 'left' && data.angle.degree > 190 && data.angle.degree < 260) command = 'translate_left'; // Prioritize strafe
-                else if (data.direction.x === 'right' && data.angle.degree > 280 && data.angle.degree < 350) command = 'translate_right';// Prioritize strafe
-                else command = 'backward';
-            } else if (data.direction.x === 'left') {
-                command = 'translate_left';
-            } else if (data.direction.x === 'right') {
+            // Simplified logic for stricter 4-way movement based on primary axis
+            const angle = data.angle.degree;
+            const force = data.force; // Use force for intensity
+
+            // Prioritize up/down or left/right based on angle
+            // Angle ranges: Right (0-45, 315-360), Up (45-135), Left (135-225), Down (225-315)
+            if ((angle >= 0 && angle <= 45) || (angle >= 315 && angle <= 360)) { // Predominantly RIGHT
                 command = 'translate_right';
+            } else if (angle > 45 && angle < 135) { // Predominantly UP
+                command = 'forward';
+            } else if (angle >= 135 && angle <= 225) { // Predominantly LEFT
+                command = 'translate_left';
+            } else if (angle > 225 && angle < 315) { // Predominantly DOWN
+                command = 'backward';
             }
+
+            // Use the calculated value (based on distance) for speed/intensity
+            // If you prefer to use nipple.js 'force' (0 to 1), you can scale it:
+            // let dynamicValue = Math.min(Math.floor(force * 30), 30); // Max speed 30
 
             if (command) {
                 // Clear previous interval if any, to avoid sending multiple commands if direction changes quickly

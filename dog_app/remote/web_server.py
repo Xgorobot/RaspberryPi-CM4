@@ -226,11 +226,14 @@ def handle_robot_command(json_data):
             # Assuming dog_instance_ws has a method like translate('y', speed)
             # The value from joystick is speed. Negative for left, Positive for right if using a single translate y.
             # Or, specific methods like dog_instance_ws.left(speed)
-            dog_instance_ws.move_y(-int(value) if value is not None else -15) # Negative for left, assuming move_y takes signed speed
-            logger.info("Executed translate_left (move_y) with speed: %s", value)
+            # xgolib.left() calls move_y(positive_value), xgolib.right() calls move_y(negative_value)
+            # So, for JS 'translate_left', we want dog.left(), which is move_y(positive_value)
+            dog_instance_ws.move_y(int(value) if value is not None else 15)
+            logger.info("Executed translate_left (move_y positive) with speed: %s", value)
         elif command == 'translate_right':
-            dog_instance_ws.move_y(int(value) if value is not None else 15)  # Positive for right
-            logger.info("Executed translate_right (move_y) with speed: %s", value)
+            # For JS 'translate_right', we want dog.right(), which is move_y(negative_value)
+            dog_instance_ws.move_y(-int(value) if value is not None else -15)
+            logger.info("Executed translate_right (move_y negative) with speed: %s", value)
         elif command == 'pitch_up': # Rear down / Front up
             # Assuming dog_instance_ws.attitude('p', angle_or_step)
             # Positive value for pitch up (front of dog raises)

@@ -74,15 +74,15 @@ else:
     draw = None
     print("Error: Display not initialized.")
 
-BATTERY_ICON_NAME = "battery.png"
-BATTERY_ICON_PATH = os.path.join(ASSET_BASE_PATH, "images", BATTERY_ICON_NAME)
+# BATTERY_ICON_NAME = "battery.png" # Removed
+# BATTERY_ICON_PATH = os.path.join(ASSET_BASE_PATH, "images", BATTERY_ICON_NAME) # Removed
 
-try:
-    # print(f"Attempting to load battery icon: {BATTERY_ICON_PATH}")
-    bat_icon = Image.open(BATTERY_ICON_PATH)
-except FileNotFoundError:
-    print(f"Warning: Battery icon not found at {BATTERY_ICON_PATH}")
-    bat_icon = None # Placeholder
+# try: # Removed
+    # print(f"Attempting to load battery icon: {BATTERY_ICON_PATH}") # Removed
+    # bat_icon = Image.open(BATTERY_ICON_PATH) # Removed
+# except FileNotFoundError: # Removed
+    # print(f"Warning: Battery icon not found at {BATTERY_ICON_PATH}") # Removed
+bat_icon = None # Ensure bat_icon is None if other parts of the code might still reference it defensively
 
 def lcd_draw_string(pil_draw_context, x, y, text, color=COLOR_WHITE, font_object=None):
     if font_object is None:
@@ -107,8 +107,8 @@ def show_battery_info(pil_draw_context, current_display, battery_level, dog_inst
     # Clear area for battery info
     lcd_rect(pil_draw_context, 200, 0, 320, 25, SPLASH_THEME_COLOR, -1) # x,y,w,h
 
-    if bat_icon:
-        pil_draw_context.bitmap((270, 4), bat_icon, fill=COLOR_WHITE) # Assuming icon is black/transparent
+    # if bat_icon: # Removed block for drawing battery icon
+        # pil_draw_context.bitmap((270, 4), bat_icon, fill=COLOR_WHITE) # Assuming icon is black/transparent
 
     actual_battery_level = battery_level
     if dog_instance and battery_level is None: # Fallback to reading from dog if not provided

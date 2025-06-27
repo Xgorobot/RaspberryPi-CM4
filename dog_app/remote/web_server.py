@@ -154,12 +154,12 @@ def gen_video_frames():
                 logger.warning("Video stream: Failed to get frame or frame_bytes is None. Trying to reconnect...")
                 # Attempt to reconnect camera if frame grab fails
                 if camera_instance_ws.reconnect():
-                logger.info("Video stream: Camera reconnected.")
-                time.sleep(0.1) # Give it a moment
-                continue
-            else:
-                logger.warning("Video stream: Camera reconnect failed. Stopping stream.")
-                break # Exit loop if reconnect fails
+                    logger.info("Video stream: Camera reconnected.")
+                    time.sleep(0.1) # Give it a moment
+                    continue
+                else:
+                    logger.warning("Video stream: Camera reconnect failed. Stopping stream.")
+                    break # Exit loop if reconnect fails
 
             yield (b'--frame\r\n'
                    b'Content-Type: image/jpeg\r\n\r\n' + frame_bytes + b'\r\n')

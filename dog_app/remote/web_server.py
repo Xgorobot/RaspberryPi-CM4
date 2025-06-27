@@ -40,10 +40,6 @@ def set_camera_instance(instance):
     camera_instance_ws = instance
     print(f"WebServer: Camera instance set by external module: {type(camera_instance_ws)}")
 
-# Call camera initialization when module is loaded (if not already done by standalone init).
-# This ensures camera is ready for web streaming when web_server is imported.
-# The init_web_camera function itself checks if camera_instance_ws is None.
-init_web_camera()
 
 def initialize_hardware(standalone_mode=False):
     """
@@ -90,6 +86,9 @@ def init_web_camera():
                 print("WebServer: Camera for video stream initialized.")
         else:
             print("WebServer: DogCamera class not available, video stream will not work.")
+
+# Call camera initialization now that the function is defined.
+init_web_camera()
 
 # --- HTTP Routes ---
 @app.route('/')

@@ -11,13 +11,20 @@ class DogCamera: # Renamed class for consistency
 
         print(f"DogCamera: Initializing camera with video_id={video_id}...")
         self.__video = cv.VideoCapture(self.__video_id)
+        # Match ball.py settings
+        self.__video.set(cv.CAP_PROP_FRAME_WIDTH, 320)
+        self.__video.set(cv.CAP_PROP_FRAME_HEIGHT, 240)
+        self.__video.set(cv.CAP_PROP_FOURCC, cv.VideoWriter_fourcc('M', 'J', 'P', 'G'))
 
         # Try alternative camera ID if the first one fails
         if not self.__video.isOpened():
             print(f"DogCamera: Failed to open video_id {self.__video_id}. Trying alternative.")
-            self.__video_id = (self.__video_id + 1) % 2 # Simple toggle, assumes max 2 cameras 0 and 1
-            self.__video.release() # Release previous attempt
+            self.__video_id = (self.__video_id + 1) % 2 
+            self.__video.release() 
             self.__video = cv.VideoCapture(self.__video_id)
+            self.__video.set(cv.CAP_PROP_FRAME_WIDTH, 320)
+            self.__video.set(cv.CAP_PROP_FRAME_HEIGHT, 240)
+            self.__video.set(cv.CAP_PROP_FOURCC, cv.VideoWriter_fourcc('M', 'J', 'P', 'G'))
 
         if self.__video.isOpened():
             self.__state = True
@@ -35,6 +42,32 @@ class DogCamera: # Renamed class for consistency
         if hasattr(self,'__video') and self.__video: # Ensure __video exists
              self.__video.release()
         self.__state = False
+        
+    def stop(self):
+        """Stops the camera to save power (Eco Mode)."""
+        if self.__state and self.__video.isOpened():
+             print("DogCamera: Stopping camera for Eco Mode.")
+             self.__video.release()
+        self.__state = False
+
+    def start(self):
+        """Restarts the camera (Exit Eco Mode)."""
+        if self.__state: return # Already running
+        
+        print(f"DogCamera: Restarting camera video_id={self.__video_id}...")
+        self.__video = cv.VideoCapture(self.__video_id)
+        self.__video.set(cv.CAP_PROP_FRAME_WIDTH, 320)
+        self.__video.set(cv.CAP_PROP_FRAME_HEIGHT, 240)
+        self.__video.set(cv.CAP_PROP_FOURCC, cv.VideoWriter_fourcc('M', 'J', 'P', 'G'))
+        
+        if self.__video.isOpened():
+            self.__state = True
+            self.__config_camera()
+            print("DogCamera: Restart successful.")
+            return True
+        else:
+            print("DogCamera: Restart failed.")
+            return False
 
     def __config_camera(self):
         if not self.__state or not self.__video.isOpened():
@@ -112,7 +145,7 @@ class DogCamera: # Renamed class for consistency
         if text != "": # text was a string in original, ensure it is
             cv.putText(image, str(text), (10, 25), cv.FONT_HERSHEY_SIMPLEX, 0.7, color, 2) # Slightly larger text
 
-        ret, jpeg_bytes = cv.imencode('.jpg', image)
+        ret, jpeg_bytes = cv.imencode('.jpg', image, [int(cv.IMWRITE_JPEG_QUALITY), 50])
         if not ret:
             if self.__debug:
                 print("DogCamera: Failed to encode frame to JPEG.")

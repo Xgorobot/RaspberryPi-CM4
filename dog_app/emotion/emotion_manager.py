@@ -18,13 +18,21 @@ except ImportError as e:
     print("EmotionManager: CRITICAL - display_utils import failed. Dummy objects created. Display functionality will be severely limited.")
 
 
+import threading
+import subprocess
+
 class Emotion(Enum):
-    NEUTRAL = auto()
-    HAPPY = auto()
-    SAD = auto()
-    ANGRY = auto()
-    SURPRISED = auto()
-    SLEEPY = auto()
+    NEUTRAL = 1
+    HAPPY = 2
+    SAD = 3
+    SURPRISED = 4
+    ANGRY = 5
+    FEAR = 6
+    DISGUST = 7
+    SLEEPY = 8
+    # New moods
+    CURIOUS = 9
+    EXCITED = 10
     # Add more emotions as needed
 
 class EmotionManager:
@@ -34,6 +42,7 @@ class EmotionManager:
         self.current_frame_index = 0
         self.last_frame_time = 0
         self.frame_duration = 0.1 # seconds, for animations
+        self.enabled = True # For Eco Mode
 
         if asset_base_path is None:
             # Try to guess asset_base_path relative to this file
@@ -147,18 +156,73 @@ class EmotionManager:
                 print(f"Critical: Error loading {emotion_display_name} animation frames from {animation_dir}. No fallback available.")
 
 
-    def set_emotion(self, new_emotion: Emotion):
-        if self.current_emotion != new_emotion:
-            print(f"Changing emotion from {self.current_emotion.name} to {new_emotion.name}")
-            self.current_emotion = new_emotion
-            self.load_emotion_assets(new_emotion)
-            # Immediately update display with the first frame of the new emotion
-            self.update_display(force_redraw=True)
+    def set_enabled(self, enabled):
+        self.enabled = enabled
+        if display_utils and display_utils.get_display_manager():
+             disp = display_utils.get_display_manager()
+             if not enabled:
+                 # Eco Mode ON: Clear to Black and Backlight OFF
+                 if hasattr(disp, 'clear'): disp.clear(0x00) # 0x00 is Black, 0xff is White
+                 if hasattr(disp, 'bl_control'): disp.bl_control(False)
+                 print("EmotionManager: Display disabled (Eco Mode).")
+             else:
+                 # Eco Mode OFF: Backlight ON
+                 if hasattr(disp, 'bl_control'): disp.bl_control(True)
+                 print("EmotionManager: Display enabled.")
+                 
+    def stop(self):
+        """Stops the emotion manager and clears screen."""
+        self.enabled = False
+        print("EmotionManager: Stopped.")
+
+    def set_emotion(self, emotion):
+        if not isinstance(emotion, Emotion):
+             # Try to map string to Enum
+             try:
+                 emotion = Emotion[emotion.upper()]
+             except KeyError:
+                 print(f"EmotionManager: Invalid emotion '{emotion}'. Ignoring.")
+                 return
+
+        if self.current_emotion == emotion:
+            return
+        
+        print(f"EmotionManager: Switching emotion to {emotion.name}")
+        self.current_emotion = emotion
+        self.load_emotion_assets(emotion)
+        self.play_sound_for_emotion(emotion)
+        # Immediately update display with the first frame of the new emotion
+        self.update_display(force_redraw=True)
+
+    def set_mood(self, mood_name):
+        """Sets a mood which is essentially an emotion but could be extended."""
+        self.set_emotion(mood_name)
+
+    def play_sound_for_emotion(self, emotion):
+        """Plays a sound file associated with the emotion."""
+        # sound_path = os.path.join(self.assets_dir, "music", f"{emotion.name.lower()}.wav")
+        # Assuming assets_dir is base assets. 
+        # self.assets_dir is typically ".../assets". 
+        # But in __init__ it sets self.assets_dir = .../assets/expressions (inferred from usage).
+        # Let's check __init__.
+        # in __init__: self.assets_dir = os.path.join(base_dir, "assets", "expressions")
+        
+        # So for music, we should go up one level.
+        music_dir = os.path.join(self.asset_base_path, "music")
+        sound_path = os.path.join(music_dir, f"{emotion.name.lower()}.wav")
+        
+        if os.path.exists(sound_path):
+            try:
+                # Play sound non-blocking
+                subprocess.Popen(['aplay', '-q', sound_path])
+            except Exception as e:
+                print(f"EmotionManager: Failed to play sound {sound_path}: {e}")
+        else:
+            # print(f"EmotionManager: Sound file not found: {sound_path}")
+            pass
 
     def update_display(self, force_redraw=False):
-        # --- Sound Playing (Placeholder) ---
-        # TODO: Consider if sound should be triggered once on emotion change, or looped, etc.
-        # self.play_current_emotion_sound()
+        if not self.enabled: return
 
         if not self.animation_frames:
             # print(f"No frames for emotion {self.current_emotion.name}")
@@ -167,7 +231,6 @@ class EmotionManager:
                  # Example: Clear a portion of the screen
                  # Assuming emotion is displayed in a certain rectangle e.g. (0,0, 240,240) for a 240x320 screen in portrait
                  # Or full screen if splash_image is the target.
-                 # For now, let's assume the emotion takes over the main splash image.
                 self.draw_context.rectangle([(0,0), self.splash_image.size], fill=display_utils.SPLASH_THEME_COLOR)
                 if self.display_hardware:
                     self.display_hardware.ShowImage(self.splash_image)

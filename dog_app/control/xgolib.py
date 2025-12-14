@@ -117,7 +117,7 @@ def changePara(version):
     global XGOparam
     if version == 'xgomini':
         XGOparam = {
-            "TRANSLATION_LIMIT": [35, 19.5, [75, 120]],  # X Y Z 平移范围
+            "TRANSLATION_LIMIT": [35, 19.5, [60, 120]],  # X Y Z 平移范围
             "ATTITUDE_LIMIT": [20, 22, 16],  # Roll Pitch Yaw 姿态范围
             "LEG_LIMIT": [35, 18, [75, 115]],  # 腿长范围
             "MOTOR_LIMIT": [[-73, 57], [-66, 93], [-31, 31], [-65, 65], [-85, 50], [-75, 90]],  # 下 中 上 舵机范围
@@ -433,11 +433,36 @@ class XGO():
         self.__send("MOTOR_ANGLE", motor_index)
 
 
-    def motor(self, motor_id, data):
+
+
+    def motors(self, angles):
         """
-        控制机器狗单个舵机转动 (Controls a single servo motor of the robot dog)
-        Control the rotation of a single steering gear of the robot
+        控制所有15个舵机 (Control all 15 servos)
+        angles: list of 15 floats (degrees)
         """
+        if len(angles) != 15:
+            print(f"Error: motors() requires 15 angles, got {len(angles)}")
+            return
+        
+        for i in range(15):
+            # Map index to limit index.
+            # 0-2 (Leg1): Limit 0
+            # 3-5 (Leg2): Limit 1
+            # 6-8 (Leg3): Limit 2
+            # 9-11 (Leg4): Limit 3
+            # 12-14 (Head/Arm): Limit 4? 
+            # XGOparam["MOTOR_LIMIT"] has 6 subarrays.
+            # 0: Leg1? 1: Leg2?
+            # read_motor logic: `i < 12: i%3`. `i >= 12: i-9`.
+            # i=12 (13th item) -> 12-9=3.
+            # i=13 -> 4.
+            # i=14 -> 5.
+            # Matches MOTOR_LIMIT length of 6.
+            
+            limit_idx = i % 3 if i < 12 else (i - 9)
+            XGOorder["MOTOR_ANGLE"][i+1] = conver2u8(angles[i], XGOparam["MOTOR_LIMIT"][limit_idx])
+            
+        self.__send("MOTOR_ANGLE", len=15)
         MOTOR_ID = [11, 12, 13, 21, 22, 23, 31, 32, 33, 41, 42, 43, 51, 52, 53]
 
         if isinstance(motor_id, list):

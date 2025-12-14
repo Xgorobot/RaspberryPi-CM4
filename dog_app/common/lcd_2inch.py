@@ -172,9 +172,16 @@ class LCD_2inch(lcdconfig.RaspberryPi):
             for i in range(0,len(pix),4096):
                 self.spi_writebyte(pix[i:i+4096])		
                 
-    def clear(self):
+    def bl_control(self, on=True):
+        """Control Backlight"""
+        if on:
+            self.GPIO.output(self.BL_PIN, self.GPIO.HIGH)
+        else:
+            self.GPIO.output(self.BL_PIN, self.GPIO.LOW)
+
+    def clear(self, color=0xff):
         """Clear contents of image buffer"""
-        _buffer = [0xff]*(self.width * self.height * 2)
+        _buffer = [color]*(self.width * self.height * 2)
         self.SetWindows ( 0, 0, self.height, self.width)
         self.digital_write(self.DC_PIN,self.GPIO.HIGH)
         for i in range(0,len(_buffer),4096):

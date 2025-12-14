@@ -1,0 +1,409 @@
+:root {
+    --bg-color: #0d0d0d;
+    --panel-bg: rgba(30, 30, 30, 0.8);
+    --accent-color: #00d2ff;
+    --text-primary: #ffffff;
+    --text-secondary: #b0b0b0;
+    --joystick-size: 120px;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background-color: var(--bg-color);
+    color: var(--text-primary);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    overflow: hidden;
+    /* Prevent scrolling on the main game view */
+    user-select: none;
+    touch-action: none;
+    /* Critical for joystick handling */
+    height: 100vh;
+    width: 100vw;
+}
+
+/* --- Main Layout --- */
+.game-controller {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+    position: relative;
+}
+
+/* --- Top Bar (Menu & Status) --- */
+.top-bar {
+    display: flex;
+    flex-direction: row;
+    /* Explicitly horizontal */
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 15px;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 100;
+    /* Static height, not absolute anymore to push content down if needed, 
+       but here we want it part of the column flex. */
+    height: 50px;
+    flex-shrink: 0;
+    border-bottom: 1px solid #333;
+}
+
+.status-bar-inline {
+    display: flex;
+    flex-direction: row;
+    /* Explicitly horizontal */
+    align-items: center;
+    gap: 15px;
+    font-size: 0.9rem;
+    white-space: nowrap;
+    /* Prevent wrapping */
+}
+
+.status-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.small-text {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+.logo {
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+.menu-btn {
+    font-size: 1.2rem;
+    background: none;
+    border: none;
+    color: var(--text-primary);
+    cursor: pointer;
+    padding: 5px;
+}
+
+/* Dropdown Menu for Secondary Controls */
+/* --- Bottom Action Bar (Drawer) --- */
+/* Dropdown Menu for Secondary Controls - Legacy Removed */
+
+
+.action-bar.active {
+    transform: translateY(0);
+}
+
+/* Toggle Button (Tab) */
+.action-toggle-btn {
+    position: absolute;
+    bottom: 0;
+    /* Anchored to bottom of screen */
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--accent-color);
+    /* Bright color for visibility */
+    color: #000;
+    border: none;
+    border-radius: 20px 20px 0 0;
+    /* Rounded tab */
+    padding: 10px 40px;
+    /* Large touch target */
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 201;
+    /* Higher than drawer to stay on top if needed, or moved with drawer? */
+    /* Ideally this button should move UP with the drawer? 
+       For now, let's keep it static at bottom. When drawer opens, we might hide it or change it.
+       The JS changes its text/opacity. */
+    box-shadow: 0 -4px 15px rgba(0, 210, 255, 0.4);
+    /* Glow effect */
+    transition: all 0.3s;
+}
+
+.menu-panel {
+    display: none;
+    position: absolute;
+    top: 55px;
+    right: 15px;
+    width: 280px;
+    background: rgba(30, 30, 30, 0.95);
+    backdrop-filter: blur(10px);
+    padding: 20px;
+    border-radius: 12px;
+    border: 1px solid #555;
+    z-index: 300;
+
+    /* Scroll Fix */
+    max-height: 80vh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.menu-panel.active {
+    display: block;
+}
+
+/* --- Main Gameplay Area (Center) --- */
+.main-stage {
+    flex: 1;
+    /* Takes remaining space */
+    display: flex;
+    position: relative;
+    align-items: center;
+    justify-content: center;
+    min-height: 0;
+    /* Critical for nested flex scrolling/sizing */
+    overflow: hidden;
+}
+
+/* Joystick Zones */
+.joystick-zone {
+    width: 30%;
+    height: 100%;
+    position: relative;
+}
+
+.joystick-zone.left {
+    order: 1;
+}
+
+.joystick-zone.right {
+    order: 3;
+}
+
+/* Video Container (Center) */
+.video-container {
+    order: 2;
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    height: 100%;
+    /* Fill stage */
+    overflow: hidden;
+}
+
+/* Camera Feed Image */
+.camera-feed {
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: 100%;
+    border-radius: 8px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    background: #000;
+    object-fit: contain;
+    display: none;
+    /* Hide by default until status known */
+}
+
+/* Status Overlay (Initial Loading) */
+#status-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #888;
+    font-size: 1.2rem;
+    pointer-events: none;
+    z-index: 5;
+    background: rgba(0, 0, 0, 0.5);
+    padding: 10px 20px;
+    border-radius: 8px;
+}
+
+/* Eco Mode Message Overlay */
+.eco-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #0f0;
+    text-align: center;
+    font-family: monospace;
+    width: 100%;
+    pointer-events: none;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.eco-overlay i {
+    font-size: 3rem;
+    color: #0f0;
+}
+
+.eco-subtitle {
+    font-size: 0.8em;
+    color: #888;
+}
+
+/* --- Bottom Action Bar --- */
+/* --- Bottom Action Bar (Drawer) --- */
+/* Utility to disable interaction */
+.no-interaction {
+    pointer-events: none !important;
+}
+
+/* --- UI Backdrop --- */
+.ui-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.5);
+    /* Semi-transparent dimming */
+    z-index: 150;
+    /* Above joysticks (usually <100), below menu (300) and drawer (200) */
+    display: none;
+    pointer-events: auto;
+    /* Catch all clicks/touches */
+    backdrop-filter: blur(2px);
+}
+
+.ui-backdrop.active {
+    display: block;
+}
+
+/* --- Bottom Action Bar (Drawer) --- */
+.action-bar {
+    height: auto;
+    max-height: 60vh;
+    /* Increased to allow ~3 rows on landscape */
+    background: rgba(15, 15, 15, 0.98);
+    backdrop-filter: blur(10px);
+
+    /* Grid Layout for Actions */
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    align-content: start;
+    /* Pack items at top */
+
+    overflow-y: auto;
+    /* Vertical scroll if needed */
+    padding: 15px;
+    padding-bottom: 60px;
+    /* Clear the toggle button */
+    gap: 12px;
+    z-index: 200;
+    border-top: 1px solid #555;
+
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    box-sizing: border-box;
+
+    transform: translateY(105%);
+    transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+.action-bar.active {
+    transform: translateY(0);
+    /* Slide up */
+}
+
+/* Toggle Button (Tab) */
+/* Toggle Button (Tab) */
+.action-toggle-btn {
+    position: fixed;
+    /* Fixed to viewport, ignores parent clipping */
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--accent-color);
+    color: #000;
+    border: none;
+    border-radius: 20px 20px 0 0;
+    padding: 12px 50px;
+    font-size: 1.1rem;
+    font-weight: bold;
+    cursor: pointer;
+    z-index: 9999;
+    box-shadow: 0 -4px 20px rgba(0, 210, 255, 0.6);
+    transition: all 0.3s;
+}
+
+
+.close-drawer-btn {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: none;
+    border: none;
+    color: #666;
+    font-size: 1.2rem;
+    cursor: pointer;
+    display: none;
+    /* Usually redundant with toggle, but good for mobile close */
+}
+
+/* Hide Scrollbar */
+.action-bar::-webkit-scrollbar {
+    display: none;
+}
+
+.action-btn {
+    flex: 0 0 auto;
+    min-width: 80px;
+    height: 50px;
+    background: #333;
+    color: #fff;
+    border: 1px solid #444;
+    border-radius: 8px;
+    font-size: 0.8em;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.action-btn:active {
+    background: var(--accent-color);
+    color: #000;
+    transform: scale(0.95);
+}
+
+.action-btn i {
+    font-size: 1.2em;
+    margin-bottom: 2px;
+}
+
+/* --- Forms & Inputs in Menu --- */
+.control-group {
+    margin-bottom: 15px;
+}
+
+.control-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: var(--text-secondary);
+}
+
+input[type="text"],
+input[type="range"] {
+    width: 100%;
+    padding: 8px;
+    background: #222;
+    border: 1px solid #444;
+    border-radius: 6px;
+    color: #fff;
+}
+
+button.primary {
+    width: 100%;
+    padding: 10px;
+    background: var(--accent-color);
+    border: none;
+    border-radius: 6px;
+    color: #000;
+    font-weight: bold;
+}

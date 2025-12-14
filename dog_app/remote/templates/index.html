@@ -1,487 +1,376 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>XGO Robot Control Interface</title>
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, orientation=landscape">
+    <title>XGO Controller</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v=10">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/nipplejs/0.10.1/nipplejs.min.js"></script>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            background-color: #f0f0f0;
-            color: #333;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            overflow: hidden; /* Prevent body scrollbars when content overflows due to flex */
-        }
-        .main-container {
-            display: flex;
-            flex-grow: 1;
-            padding: 10px;
-            gap: 10px;
-            overflow: hidden; /* Prevent internal scrollbars if not managed by children */
-        }
-        .left-panel, .right-panel, .center-panel {
-            display: flex;
-            flex-direction: column;
-            background-color: #fff;
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            overflow-y: auto; /* Allow individual panels to scroll if content overflows */
-        }
-        .left-panel { width: 25%; min-width: 220px; /* Minimum width for joysticks and buttons */ }
-        .center-panel { flex-grow: 1; display: flex; flex-direction: column; /* Ensure video area can grow */ }
-        .right-panel { width: 25%; min-width: 220px; }
-        .actions-bar {
-            background-color: #fff;
-            padding: 10px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            margin: 0 10px 10px 10px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px; /* Slightly reduced gap for more buttons */
-            justify-content: center;
-            max-height: 200px; /* Max height for action bar, enable scroll if needed */
-            overflow-y: auto;
-        }
-        h2 { text-align: center; color: #555; margin-top: 0; margin-bottom: 10px; font-size: 1.2em; }
-
-        /* Joystick Styles */
-        .joystick-zone {
-            position: relative;
-            width: 100%;
-            height: 180px; /* Slightly reduced height */
-            background-color: #e0e0e0;
-            border-radius: 8px;
-            margin-bottom: 10px;
-        }
-
-        /* Video Stream & Status Bar */
-        .video-area {
-            position: relative;
-            width: 100%;
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-            min-height: 200px; /* Ensure video area has some minimum height */
-        }
-        .status-bar {
-            display: flex;
-            justify-content: space-around;
-            padding: 8px;
-            background-color: rgba(0,0,0,0.5);
-            color: white;
-            border-radius: 5px 5px 0 0;
-            font-size: 0.8em; /* Slightly smaller font for status */
-        }
-        .status-bar span { flex: 1; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .video-stream {
-            display: block;
-            width: 100%;
-            height: 100%; /* Changed from auto to fill available space */
-            max-height: calc(100% - 30px); /* Adjust based on status bar height */
-            border: 1px solid #ddd;
-            border-radius: 0 0 5px 5px;
-            object-fit: contain;
-            background-color: #333; /* Dark background for video area */
-        }
-
-        /* Buttons */
-        button {
-            padding: 12px 15px; font-size: 1em; border: none; border-radius: 5px;
-            background-color: #5cb85c; color: white; cursor: pointer; transition: background-color 0.3s;
-            min-width: 100px; /* Ensure buttons have a decent width */
-        }
-        button:hover { background-color: #4cae4c; }
-        .emergency-stop-btn { background-color: #d9534f; }
-        .emergency-stop-btn:hover { background-color: #c9302c; }
-        .mode-switch { display: flex; justify-content: space-around; margin-bottom: 15px; }
-        .mode-switch button { flex-grow: 1; margin: 0 5px; font-size: 0.9em; padding: 10px 8px; }
-
-        .actions-bar button {
-            background-color: #007bff;
-            min-width: 80px; /* Adjust min-width for smaller screens */
-            padding: 10px 8px; /* Adjust padding */
-            font-size: 0.9em;
-        }
-        .actions-bar button:hover { background-color: #0056b3; }
-
-        /* Input for custom action (if still needed) */
-         input[type="number"] { width: 60px; padding: 5px; margin-right: 5px; }
-         .custom-action-container { display: flex; align-items: center; margin-top: 10px; }
-
-        /* Responsive Design for Mobile Landscape */
-        @media screen and (max-width: 900px) and (orientation: landscape) {
-            body { height: auto; /* Allow body to adjust to content in landscape */ }
-            .main-container {
-                flex-direction: column; /* Stack main sections vertically */
-                height: 100vh; /* Attempt to use full viewport height */
-                overflow-y: auto; /* Allow scrolling for the whole container if needed */
-            }
-            .left-panel, .right-panel {
-                width: 100%; /* Take full width */
-                min-width: unset; /* Remove min-width */
-                flex-direction: row; /* Arrange items in a row */
-                align-items: center; /* Center items vertically */
-                justify-content: space-around; /* Distribute space */
-                padding: 10px;
-                order: 2; /* Move control panels below video */
-                max-height: 220px; /* Max height for control panels */
-            }
-            .left-panel > *, .right-panel > * {
-                 margin: 5px; /* Add some margin to internal elements */
-            }
-            .joystick-zone {
-                height: 150px; /* Smaller joystick for landscape */
-                width: 150px; /* Fixed width for joystick zone */
-                min-width: 150px;
-            }
-            .left-panel .mode-switch, .right-panel .mode-switch {
-                flex-direction: column; /* Stack buttons in mode switch */
-                gap: 5px;
-            }
-            .left-panel button, .right-panel button { /* Ensure buttons in panels are reasonably sized */
-                min-width: 100px;
-                padding: 8px;
-            }
-             .left-panel h2, .right-panel h2 { display: none; /* Hide titles in compact view */ }
-
-
-            .center-panel {
-                order: 1; /* Video panel comes first */
-                width: 100%;
-                height: 50vh; /* Video takes about half the screen height */
-                min-height: 200px; /* Minimum height for video */
-            }
-            .video-area {
-                height: 100%; /* Video area uses all of center panel's new height */
-            }
-            .video-stream {
-                max-height: calc(100% - 25px); /* Adjust for smaller status bar */
-            }
-            .status-bar { font-size: 0.7em; padding: 5px; }
-
-
-            .actions-bar {
-                order: 3; /* Actions bar at the bottom */
-                width: calc(100% - 20px); /* Adjust width considering main-container padding */
-                margin: 10px auto; /* Center the actions bar */
-                max-height: 150px; /* Limit height, enable scroll */
-                flex-wrap: nowrap; /* Prevent wrapping, use overflow scroll */
-                overflow-x: auto; /* Allow horizontal scrolling for actions */
-                overflow-y: hidden;
-                justify-content: flex-start; /* Align buttons to the start for scrolling */
-                padding: 8px;
-            }
-            .actions-bar button {
-                flex-shrink: 0; /* Prevent buttons from shrinking */
-                min-width: 90px; /* Ensure buttons are wide enough */
-            }
-        }
-
-        @media screen and (max-width: 480px) and (orientation: portrait) {
-            .main-container {
-                flex-direction: column;
-            }
-            .left-panel, .right-panel, .center-panel {
-                width: 100%;
-                min-width: unset;
-                margin-bottom: 10px; /* Add space between stacked panels */
-            }
-            .joystick-zone {
-                height: 160px; /* Adjust joystick size for portrait */
-            }
-            .actions-bar {
-                max-height: 180px; /* More height for actions in portrait */
-            }
-             .left-panel h2, .right-panel h2 { font-size: 1.1em; margin-bottom: 8px; }
-        }
-
-    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/nipplejs/0.7.3/nipplejs.min.js"></script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
+
 <body>
-    <div class="main-container">
-        <div class="left-panel">
-            <h2>Movement</h2>
-            <div id="joystick-movement-zone" class="joystick-zone"></div>
-            <button id="btn-toggle-gait" style="margin-bottom: 10px;">Gait: Walk</button> <!-- Moved Gait button here -->
-            <button id="btn-emergency-stop" class="emergency-stop-btn">Emergency Stop</button>
-            <div class="mode-switch" style="margin-top: 10px;">
-                <button id="btn-stand-mode">Stand</button>
-                <button id="btn-rest-mode">Rest (Box)</button>
-            </div>
-            <!-- Placeholder for any other left panel controls -->
-        </div>
+    <div class="game-controller">
 
-        <div class="center-panel">
-            <div class="video-area">
-                <div class="status-bar">
-                    <span id="status-battery">Battery: --%</span>
-                    <span id="status-wifi">WiFi: --</span>
-                    <span id="status-dog">Dog: Unknown</span>
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <!-- Left: Logo -->
+            <div class="logo">🐶</div>
+
+            <!-- Center/Right: Status Items (Moved from video overlay) -->
+            <div class="status-bar-inline">
+                <div class="status-item"><i class="fas fa-battery-half"></i> <span id="s-bat">--%</span></div>
+                <div class="status-item"><i class="fas fa-face-smile"></i> <span id="s-emo">Neutral</span></div>
+                <div class="status-item small-text">
+                    R:<span id="s-roll">0</span> P:<span id="s-pitch">0</span> Y:<span id="s-yaw">0</span>
                 </div>
-                <img class="video-stream" id="video-stream-img" src="{{ url_for('video_feed') }}" alt="Video Stream">
             </div>
+
+            <!-- Right: Menu Button -->
+            <button class="menu-btn" onclick="toggleMenu()"><i class="fas fa-bars"></i></button>
         </div>
 
-        <div class="right-panel">
-            <h2>Attitude</h2>
-            <div id="joystick-attitude-zone" class="joystick-zone"></div>
-            <div class="rotation-controls mode-switch"> <!-- Re-using mode-switch for similar styling -->
-                <button id="btn-rotate-left">Rotate Left</button>
-                <button id="btn-rotate-right">Rotate Right</button>
+        <!-- Hidden Menu Panel -->
+        <div id="menu-panel" class="menu-panel">
+            <div class="control-group">
+                <h3>System</h3>
+                <div style="display:flex; gap:10px;">
+                    <button class="primary" onclick="toggleMotors(true)">⚡ Load Motors</button>
+                    <button class="action-btn danger" onclick="toggleMotors(false)">💤 Unload</button>
+                </div>
+                <!-- Eco Mode Buttons -->
+                <div style="display:flex; gap:10px; margin-top:10px;">
+                    <button id="btn-eco-on" class="action-btn" onclick="toggleEcoMode(true)" style="flex:1;">
+                        🌱 Eco ON
+                    </button>
+                    <button id="btn-eco-off" class="action-btn" onclick="toggleEcoMode(false)" style="flex:1;">
+                        ⚡ Eco OFF
+                    </button>
+                </div>
             </div>
-            <!-- Placeholder for any other right panel controls -->
+            <div class="control-group"> <!-- START NEXT GROUP -->
+                <h3>Voice Command</h3>
+                <input type="text" id="voice-input" placeholder="Type command...">
+                <button class="primary" onclick="sendVoice()" style="margin-top:5px;">Send</button>
+            </div>
+            <div class="control-group">
+                <h3>Settings</h3>
+                <label>Step Height: <span id="val-height">20</span></label>
+                <input type="range" id="slider-height" min="0" max="50" value="20">
+            </div>
+            <button class="action-btn danger" onclick="stopSkill()" style="width:100%; margin-top:10px;">🛑 Stop All
+                Skills</button>
         </div>
-    </div>
 
-    <div class="actions-bar">
-        <h2>Actions</h2>
-        <button id="btn-action-lie_down">趴下 (1)</button>
-        <button id="btn-action-stand_up">站起 (2)</button>
-        <button id="btn-action-crawl">匍匐 (3)</button>
-        <button id="btn-action-circle">转圈 (4)</button>
-        <button id="btn-action-mark_time">踏步 (5)</button>
-        <button id="btn-action-squat">蹲起 (6)</button>
-        <button id="btn-action-roll">Roll (7)</button>
-        <button id="btn-action-pitch">Pitch (8)</button>
-        <button id="btn-action-yaw">Yaw (9)</button>
-        <button id="btn-action-3axis_rotate">三轴转 (10)</button>
-        <button id="btn-action-pee">撒尿 (11)</button>
-        <button id="btn-action-sit_down">坐下 (12)</button>
-        <button id="btn-action-wave_hands">招手 (13)</button>
-        <button id="btn-action-stretch">伸懒腰 (14)</button>
-        <button id="btn-action-wave_body">波浪 (15)</button>
-        <button id="btn-action-sway">摇摆 (16)</button>
-        <button id="btn-action-beg_food">求食 (17)</button>
-        <button id="btn-action-find_food">找食 (18)</button>
-        <button id="btn-action-shake_hands">握手 (19)</button>
-        <button id="btn-action-chicken_head">展示机械臂 (20)</button>
-        <button id="btn-action-push_ups">俯卧撑 (21)</button>
-        <button id="btn-action-look_around">张望 (22)</button>
-        <button id="btn-action-dance">跳舞 (23)</button>
-        <button id="btn-action-naughty">调皮 (24)</button>
-        <button id="btn-action-catch_top">上抓 (128)</button>
-        <button id="btn-action-catch_middle">中抓 (129)</button>
-        <button id="btn-action-catch_bottom">下抓 (130)</button>
-        <button id="btn-action-reset">复位 (255)</button>
-        <!-- Example of custom action input, if needed -->
-        <!-- <div class="custom-action-container">
-            Action ID: <input type="number" id="action-id-input" value="1" min="1" max="255">
-            <button id="btn-custom-action">Do Action ID</button>
-        </div> -->
-    </div>
+        <!-- Main Stage (Joysticks + Video) -->
+        <div class="main-stage">
 
-    <script>
-        const socket = io(); // Defaults to window.location
+            <!-- Left Joystick Zone -->
+            <div id="zone_left" class="joystick-zone left"></div>
 
-        socket.on('connect', () => {
-            console.log('Connected to server via Socket.IO');
-        });
+            <!-- Video Center -->
+            <div class="video-container">
+                <!-- Video feed img with empty src initially to prevent loading if in Eco Mode -->
+                <!-- We store the URL in data-src and load it via JS if Eco Mode is OFF -->
+                <img id="video-feed" data-src="{{ url_for('video_feed') }}" src="" alt="Video Feed"
+                    style="display:none;">
+                <div id="status-overlay">Checking status...</div>
+            </div>
 
-        socket.on('disconnect', () => {
-            console.log('Disconnected from server');
-        });
+            <!-- Right Joystick Zone -->
+            <div id="zone_right" class="joystick-zone right"></div>
+        </div>
 
-        socket.on('connect_error', (err) => {
-          console.error('Connection Error:', err);
-        });
+        <!-- UI Interaction Blocker (Backdrop) -->
+        <div id="ui-backdrop" class="ui-backdrop" onclick="closeAllMenus()"></div>
 
-        function sendCommand(command, value = null) {
-            console.log(`Sending command: ${command}, value: ${value}`);
-            socket.emit('robot_command', { command: command, value: value });
-        }
+        <!-- Action Bar Toggle Button -->
+        <button id="action-toggle" class="action-toggle-btn" onclick="toggleActionBar()">
+            <i class="fas fa-chevron-up"></i> Actions
+        </button>
 
-        // Movement buttons - REMOVED as joystick will handle this
-        // document.getElementById('btn-forward').addEventListener('click', () => sendCommand('forward', 20));
-        // document.getElementById('btn-backward').addEventListener('click', () => sendCommand('backward', 20));
-        // document.getElementById('btn-left').addEventListener('click', () => sendCommand('turn_left', 30));
-        // document.getElementById('btn-right').addEventListener('click', () => sendCommand('turn_right', 30));
-        // document.getElementById('btn-stop-move').addEventListener('click', () => sendCommand('stop_move'));
+        <!-- Bottom Action Bar (Drawer Mode) -->
+        <div id="action-bar" class="action-bar">
+            <!-- Buttons directly in the grid container -->
+            <div class="action-btn" onclick="sendCustomAction('happy_dance')"><i class="fas fa-music"></i>Happy</div>
+            <div class="action-btn" onclick="sendCustomAction('shake')"><i class="fas fa-paw"></i>Shake</div>
+            <div class="action-btn" onclick="sendCustomAction('curious')"><i class="fas fa-question"></i>Curious</div>
+            <div class="action-btn" onclick="sendCustomAction('boxing')"><i class="fas fa-fist-raised"></i>Boxing</div>
+            <div class="action-btn" onclick="sendSkill('BallTracking')"><i class="fas fa-futbol"></i>Track</div>
+            <div class="action-btn" onclick="sendAction(22)">Look</div>
+            <div class="action-btn" onclick="sendAction(23)">Dance</div>
+            <div class="action-btn" onclick="sendAction(24)">Naughty</div>
 
-        // Action buttons - Will be re-wired or new ones added
-        // document.getElementById('btn-action-reset').addEventListener('click', () => sendCommand('action', 255));
-        // document.getElementById('btn-action-wave').addEventListener('click', () => sendCommand('action', 6));
-        // document.getElementById('btn-action-stand').addEventListener('click', () => sendCommand('action', 1));
+            <!-- Arm Actions -->
+            <div class="action-btn" onclick="sendAction(128)">Grab Up</div>
+            <div class="action-btn" onclick="sendAction(129)">Grab Mid</div>
+            <div class="action-btn" onclick="sendAction(130)">Grab Low</div>
+        </div>
 
-        // Custom action input - REMOVED for now, can be re-added if required by new design
-        // document.getElementById('btn-custom-action').addEventListener('click', () => {
-        //     const actionId = parseInt(document.getElementById('action-id-input').value);
-        //     if (!isNaN(actionId) && actionId >= 1 && actionId <= 255) {
-        //         sendCommand('action', actionId);
-        //     } else {
-        //         alert('Please enter a valid Action ID (1-255).');
-        //     }
-        // });
+        <script>
+            const socket = io();
 
+            // --- Status Updates ---
+            socket.on('connect', function () {
+                console.log("Connected to server");
+                // Explicitly request Eco Status to ensure UI sync
+                socket.emit('get_eco_status');
+            });
 
-        // --- Joystick Initialization ---
-        const movementJoystickZone = document.getElementById('joystick-movement-zone');
-        const attitudeJoystickZone = document.getElementById('joystick-attitude-zone');
-        let moveInterval = null; // To send continuous move commands
-        let attitudeInterval = null; // To send continuous attitude commands
+            function toggleBackdrop(show) {
+                const bd = document.getElementById('ui-backdrop');
+                const zoneL = document.getElementById('zone_left');
+                const zoneR = document.getElementById('zone_right');
 
-        const joystickOptions = {
-            mode: 'static', // 'dynamic', 'semi', 'static'
-            position: { left: '50%', top: '50%' },
-            color: 'blue',
-            size: 150,
-            threshold: 0.1, // Minimum distance to trigger 'move'
-            fadeTime: 250
-        };
-
-        // Movement Joystick (Left)
-        const movementManager = nipplejs.create({ ...joystickOptions, zone: movementJoystickZone });
-        movementManager.on('move', function (evt, data) {
-            if (!data.direction) {
-                return;
-            }
-            let command = null;
-            let value = Math.min(Math.floor(data.distance / joystickOptions.size * 2 * 30), 30); // Max speed 30
-
-            // Simplified logic for stricter 4-way movement based on primary axis
-            const angle = data.angle.degree;
-            const force = data.force; // Use force for intensity
-
-            // Prioritize up/down or left/right based on angle
-            // Angle ranges: Right (0-45, 315-360), Up (45-135), Left (135-225), Down (225-315)
-            if ((angle >= 0 && angle <= 45) || (angle >= 315 && angle <= 360)) { // Predominantly RIGHT
-                command = 'translate_right';
-            } else if (angle > 45 && angle < 135) { // Predominantly UP
-                command = 'forward';
-            } else if (angle >= 135 && angle <= 225) { // Predominantly LEFT
-                command = 'translate_left';
-            } else if (angle > 225 && angle < 315) { // Predominantly DOWN
-                command = 'backward';
+                if (show) {
+                    bd.classList.add('active');
+                    // Disable joysticks to prevent bleed-through
+                    zoneL.classList.add('no-interaction');
+                    zoneR.classList.add('no-interaction');
+                } else {
+                    bd.classList.remove('active');
+                    zoneL.classList.remove('no-interaction');
+                    zoneR.classList.remove('no-interaction');
+                }
             }
 
-            // Use the calculated value (based on distance) for speed/intensity
-            // If you prefer to use nipple.js 'force' (0 to 1), you can scale it:
-            // let dynamicValue = Math.min(Math.floor(force * 30), 30); // Max speed 30
+            function closeAllMenus() {
+                document.getElementById('menu-panel').classList.remove('active');
 
-            if (command) {
-                // Clear previous interval if any, to avoid sending multiple commands if direction changes quickly
-                if (moveInterval) clearInterval(moveInterval);
-                // Send command immediately
-                sendCommand(command, value);
-                // Then send repeatedly while joystick is held
-                moveInterval = setInterval(() => sendCommand(command, value), 200); // Send every 200ms
+                const bar = document.getElementById('action-bar');
+                if (bar.classList.contains('active')) toggleActionBar(); // Use toggle to reset button state
+
+                toggleBackdrop(false);
             }
-        });
-        movementManager.on('end', function () {
-            if (moveInterval) clearInterval(moveInterval);
-            moveInterval = null;
-            sendCommand('stop_move');
-        });
 
-        // Attitude Joystick (Right)
-        const attitudeManager = nipplejs.create({ ...joystickOptions, zone: attitudeJoystickZone, color: 'green' });
-        attitudeManager.on('move', function (evt, data) {
-            if (!data.direction) {
-                return;
+            function toggleActionBar() {
+                const bar = document.getElementById('action-bar');
+                const btn = document.getElementById('action-toggle');
+                bar.classList.toggle('active');
+
+                toggleBackdrop(bar.classList.contains('active'));
+
+                if (bar.classList.contains('active')) {
+                    btn.innerHTML = '<i class="fas fa-chevron-down"></i> Hide';
+                    btn.style.opacity = '0.7';
+                    // Close Menu if open
+                    document.getElementById('menu-panel').classList.remove('active');
+                } else {
+                    btn.innerHTML = '<i class="fas fa-chevron-up"></i> Actions';
+                    btn.style.opacity = '1';
+                }
             }
-            let command = null;
-            // Value can represent intensity or step, adjust as needed
-            let value = Math.min(Math.floor(data.distance / joystickOptions.size * 2 * 10), 10); // Max value 10 for attitude steps
 
-            if (data.direction.y === 'up') command = 'pitch_down'; // Front down
-            else if (data.direction.y === 'down') command = 'pitch_up'; // Rear down (or front up)
-            else if (data.direction.x === 'left') command = 'roll_left'; // Left down
-            else if (data.direction.x === 'right') command = 'roll_right'; // Right down
+            // --- Status Updates ---
+            // --- Status Updates ---
+            socket.on('status_update', (data) => {
+                console.log("Status received:", data); // Debug log in console
+                if (data.battery !== undefined) document.getElementById('s-bat').innerText = data.battery + "%";
+                if (data.emotion !== undefined) document.getElementById('s-emo').innerText = data.emotion;
+                if (data.roll !== undefined) document.getElementById('s-roll').innerText = data.roll + "°";
+                if (data.pitch !== undefined) document.getElementById('s-pitch').innerText = data.pitch + "°";
+                if (data.yaw !== undefined) document.getElementById('s-yaw').innerText = data.yaw + "°";
+            });
 
-            if (command) {
-                if (attitudeInterval) clearInterval(attitudeInterval);
-                sendCommand(command, value);
-                attitudeInterval = setInterval(() => sendCommand(command, value), 300); // Slower interval for attitude
+            // --- Menu Toggle ---
+            // --- Menu Toggle ---
+            function toggleMenu() {
+                const menu = document.getElementById('menu-panel');
+                menu.classList.toggle('active');
+                toggleBackdrop(menu.classList.contains('active'));
+
+                // Close Action Bar if open to prevent overlap confusion
+                if (menu.classList.contains('active')) {
+                    const bar = document.getElementById('action-bar');
+                    if (bar.classList.contains('active')) toggleActionBar();
+                }
             }
-        });
-        attitudeManager.on('end', function () {
-            if (attitudeInterval) clearInterval(attitudeInterval);
-            attitudeInterval = null;
-            // Optionally send a command to stabilize or stop attitude change if needed
-            // sendCommand('attitude_stop'); // Example, if backend supports this
-        });
 
-        // --- Button Event Listeners ---
-        document.getElementById('btn-emergency-stop').addEventListener('click', () => sendCommand('emergency_stop'));
-        document.getElementById('btn-stand-mode').addEventListener('click', () => sendCommand('action', 1)); // Action 1 for Stand
-        document.getElementById('btn-rest-mode').addEventListener('click', () => sendCommand('action', 2)); // Assuming Action 2 for Rest/Box, update if different
+            // --- Joysticks ---
+            // Left: Movement (Static, Bottom-Left corner relative to zone)
+            const joyLeft = nipplejs.create({
+                zone: document.getElementById('zone_left'),
+                mode: 'static',
+                position: { left: '50%', top: '50%' },
+                color: 'cyan',
+                size: 100
+            });
 
-        // Action Bar Buttons
-        document.getElementById('btn-action-lie_down').addEventListener('click', () => sendCommand('action', 1));
-        document.getElementById('btn-action-stand_up').addEventListener('click', () => sendCommand('action', 2));
-        document.getElementById('btn-action-crawl').addEventListener('click', () => sendCommand('action', 3));
-        document.getElementById('btn-action-circle').addEventListener('click', () => sendCommand('action', 4));
-        document.getElementById('btn-action-mark_time').addEventListener('click', () => sendCommand('action', 5));
-        document.getElementById('btn-action-squat').addEventListener('click', () => sendCommand('action', 6));
-        document.getElementById('btn-action-roll').addEventListener('click', () => sendCommand('action', 7));
-        document.getElementById('btn-action-pitch').addEventListener('click', () => sendCommand('action', 8));
-        document.getElementById('btn-action-yaw').addEventListener('click', () => sendCommand('action', 9));
-        document.getElementById('btn-action-3axis_rotate').addEventListener('click', () => sendCommand('action', 10));
-        document.getElementById('btn-action-pee').addEventListener('click', () => sendCommand('action', 11));
-        document.getElementById('btn-action-sit_down').addEventListener('click', () => sendCommand('action', 12));
-        document.getElementById('btn-action-wave_hands').addEventListener('click', () => sendCommand('action', 13));
-        document.getElementById('btn-action-stretch').addEventListener('click', () => sendCommand('action', 14));
-        document.getElementById('btn-action-wave_body').addEventListener('click', () => sendCommand('action', 15));
-        document.getElementById('btn-action-sway').addEventListener('click', () => sendCommand('action', 16));
-        document.getElementById('btn-action-beg_food').addEventListener('click', () => sendCommand('action', 17));
-        document.getElementById('btn-action-find_food').addEventListener('click', () => sendCommand('action', 18));
-        document.getElementById('btn-action-shake_hands').addEventListener('click', () => sendCommand('action', 19));
-        document.getElementById('btn-action-chicken_head').addEventListener('click', () => sendCommand('action', 20));
-        document.getElementById('btn-action-push_ups').addEventListener('click', () => sendCommand('action', 21));
-        document.getElementById('btn-action-look_around').addEventListener('click', () => sendCommand('action', 22));
-        document.getElementById('btn-action-dance').addEventListener('click', () => sendCommand('action', 23));
-        document.getElementById('btn-action-naughty').addEventListener('click', () => sendCommand('action', 24));
-        document.getElementById('btn-action-catch_top').addEventListener('click', () => sendCommand('action', 128));
-        document.getElementById('btn-action-catch_middle').addEventListener('click', () => sendCommand('action', 129));
-        document.getElementById('btn-action-catch_bottom').addEventListener('click', () => sendCommand('action', 130));
-        document.getElementById('btn-action-reset').addEventListener('click', () => sendCommand('action', 255));
+            joyLeft.on('move', (evt, data) => {
+                if (data && data.angle) {
+                    const angle = data.angle.degree;
+                    const force = Math.min(data.force, 2.0) / 2.0;
 
-        // --- New Controls: Rotation and Gait ---
-        const ROTATION_ANGLE_STEP = 30; // Degrees for each rotation button click
-        document.getElementById('btn-rotate-left').addEventListener('click', () => sendCommand('turn_left_by_angle', ROTATION_ANGLE_STEP));
-        document.getElementById('btn-rotate-right').addEventListener('click', () => sendCommand('turn_right_by_angle', ROTATION_ANGLE_STEP));
+                    const rad = angle * (Math.PI / 180);
+                    const x_joy = Math.cos(rad) * force;
+                    const y_joy = Math.sin(rad) * force;
 
-        const gaitButton = document.getElementById('btn-toggle-gait');
-        const availableGaits = ['walk', 'trot']; // Add more gaits if available and supported
-        let currentGaitIndex = 0; // Default to 'walk'
+                    let cmd_x = y_joy * 25;
+                    let cmd_y = -x_joy * 15;
 
-        gaitButton.addEventListener('click', () => {
-            currentGaitIndex = (currentGaitIndex + 1) % availableGaits.length;
-            const nextGait = availableGaits[currentGaitIndex];
-            sendCommand('set_gait', nextGait);
-            gaitButton.textContent = `Gait: ${nextGait.charAt(0).toUpperCase() + nextGait.slice(1)}`;
-        });
-
-        // --- Status Updates ---
-        function updateStatus() {
-            // Request status from server via SocketIO
-            socket.emit('request_status');
-        }
-
-        socket.on('status_update', function(data) {
-            console.log("Received status update:", data);
-            document.getElementById('status-battery').textContent = `Battery: ${data.battery || '--'}%`;
-            document.getElementById('status-wifi').textContent = `WiFi: ${data.wifi_strength || '--'}`;
-            document.getElementById('status-dog').textContent = `Dog: ${data.dog_status || 'Unknown'}`;
-        });
-
-        // Update status periodically and on connect
-        socket.on('connect', () => {
-            console.log('Connected to server via Socket.IO for status updates.');
-            updateStatus(); // Initial update on connect
-        });
-        setInterval(updateStatus, 5000); // Update every 5 seconds
+                    socket.emit('move_command', { x: cmd_x, y: cmd_y, turn: 0 });
+                }
+            });
+            joyLeft.on('end', () => socket.emit('move_command', { x: 0, y: 0, turn: 0 }));
 
 
-        // Optional: Update video stream src if it might change or to force reload
-        // const videoStreamImg = document.getElementById('video-stream-img');
-        // videoStreamImg.src = "{{ url_for('video_feed') }}?" + new Date().getTime(); // Cache buster
-    </script>
+            // Right: Heading/Turn (Static)
+            const joyRight = nipplejs.create({
+                zone: document.getElementById('zone_right'),
+                mode: 'static',
+                position: { left: '50%', top: '50%' },
+                color: 'magenta',
+                size: 100
+            });
+
+            let lastRightEmit = 0;
+            joyRight.on('move', (evt, data) => {
+                const now = Date.now();
+                if (now - lastRightEmit < 100) return; // Throttle to 100ms
+                lastRightEmit = now;
+
+                // Log raw data presence for debugging
+                // socket.emit('client_log', { msg: `RightRaw: ${data ? 'OK' : 'Null'} Angle: ${data && data.angle ? 'Yes' : 'No'}` });
+
+                if (data && data.angle) {
+                    const angle = data.angle.degree;
+                    const force = Math.min(data.force, 2.0) / 2.0;
+
+                    const rad = angle * (Math.PI / 180);
+                    const x = Math.cos(rad) * force;
+                    const y = Math.sin(rad) * force;
+
+                    socket.emit('client_log', { msg: `RightStick: x=${x.toFixed(2)}, y=${y.toFixed(2)}` });
+
+                    // Yaw (Turn) - x ranges -1 to 1. 
+                    // x=1 (Right) -> Turn Right (Negative speed in xgolib) -> speed -60
+                    socket.emit('turn_command', { speed: x * -60 });
+
+                    // Pitch - y ranges -1 to 1.
+                    // y=1 (Up) -> Pitch Up (Positive value) -> value 15
+                    socket.emit('pitch_command', { value: y * 15 });
+                }
+            });
+            joyRight.on('end', () => {
+                socket.emit('turn_command', { speed: 0 });
+                socket.emit('client_log', { msg: 'RightStick: Release' });
+            });
+
+
+            // --- Actions ---
+            function sendAction(id) { socket.emit('robot_command', { command: 'action', value: id }); }
+            function sendCustomAction(name) { socket.emit('custom_action', { command: 'custom_action', value: name }); }
+            function sendSkill(name) { socket.emit('skill_command', { command: 'skill_command', value: name, action: 'start' }); }
+            function stopSkill() { socket.emit('skill_command', { command: 'skill_command', value: '', action: 'stop' }); }
+
+            // --- Voice Command ---
+            function sendVoice() {
+                const input = document.getElementById('voice-input');
+                if (input && input.value) {
+                    socket.emit('voice_command', { text: input.value });
+                    input.value = '';
+                    toggleMenu();
+                }
+            }
+
+            // --- Action Command ---
+            function performAction(name) {
+                socket.emit('action_command', { action: name });
+                toggleMenu();
+            }
+
+            // Height Slider
+            const slider = document.getElementById('slider-height');
+            slider.oninput = () => {
+                document.getElementById('val-height').innerText = slider.value;
+                socket.emit('robot_command', { command: 'height', value: slider.value });
+            };
+
+            function toggleMotors(load) {
+                console.log("ToggleMotors called:", load);
+                const action = load ? 'load' : 'unload';
+                socket.emit('client_log', { msg: `User Request: ${action}` });
+                socket.emit('motor_command', { action: action });
+                // Close menu after selection
+                toggleMenu();
+            }
+
+            // --- Eco Mode (Fast Charge) ---
+            let ecoMode = false;
+            function toggleEcoMode(enable) {
+                ecoMode = enable;
+                socket.emit('eco_mode', { enable: ecoMode });
+                // Optimistic UI update
+                updateEcoUI(ecoMode);
+                toggleMenu();
+            }
+
+            socket.on('eco_mode_response', function (data) {
+                ecoMode = data.enabled;
+                updateEcoUI(ecoMode);
+            });
+
+            function updateEcoUI(enabled) {
+                const btnOn = document.getElementById('btn-eco-on');
+                const btnOff = document.getElementById('btn-eco-off');
+                const video = document.getElementById('video-feed');
+                const overlay = document.getElementById('status-overlay');
+                const container = document.querySelector('.video-container'); // Get container
+
+                // Always hide status overlay when we get a definitive state
+                if (overlay) overlay.style.display = 'none';
+
+                if (enabled) {
+                    if (btnOn) btnOn.style.background = 'var(--correct-green)';
+                    if (btnOff) btnOff.style.background = ''; // reset
+
+                    // Disable video feed: HIDE the image entirely
+                    if (video) {
+                        video.src = "";
+                        video.style.display = 'none'; // Completely hide image/alt text
+                    }
+                    if (container) {
+                        container.style.backgroundColor = '#000'; // Ensure container is black
+
+                        // Insert text placeholder if not present
+                        let p = document.getElementById('eco-msg');
+                        if (!p) {
+                            p = document.createElement('div');
+                            p.id = 'eco-msg';
+                            p.className = 'eco-overlay'; // Use CSS class
+                            p.innerHTML = '<i class="fas fa-bolt"></i><div>Fast Charge Mode</div>';
+                            container.appendChild(p);
+                        }
+                        p.style.display = 'flex'; // Ensure flex display for column layout
+                    }
+
+                } else {
+                    if (btnOn) btnOn.style.background = '';
+                    if (btnOff) btnOff.style.background = '#444'; // default
+
+                    // Restore video
+                    if (container) {
+                        container.style.backgroundColor = ''; // Reset
+                        const p = document.getElementById('eco-msg');
+                        if (p) p.style.display = 'none';
+                    }
+
+                    if (video) {
+                        const dataSrc = video.getAttribute('data-src');
+                        if (dataSrc) {
+                            if (video.src.indexOf(dataSrc) === -1) video.src = dataSrc;
+                        }
+                        // Restore image visibility
+                        video.style.display = 'block';
+                        video.style.opacity = '1';
+                    }
+                }
+            }
+        </script>
 </body>
+
 </html>

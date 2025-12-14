@@ -8,59 +8,58 @@ GPIO.setmode(GPIO.BCM)
 
 class Button:
     def __init__(self):
-        self.key1=24 # Lower Right
-        self.key2=23 # Lower Left
-        self.key3=17 # Upper Left
-        self.key4=22 # Upper Right
-        GPIO.setup(self.key1,GPIO.IN,GPIO.PUD_UP)
-        GPIO.setup(self.key2,GPIO.IN,GPIO.PUD_UP)
-        GPIO.setup(self.key3,GPIO.IN,GPIO.PUD_UP)
-        GPIO.setup(self.key4,GPIO.IN,GPIO.PUD_UP)
+        self.key1 = 24 # Lower Right
+        self.key2 = 23 # Lower Left
+        self.key3 = 17 # Upper Left
+        self.key4 = 22 # Upper Right
 
-    #Lower Right Button - Original press_a
+        # State flags
+        self.adc_flag1 = False
+        self.adc_flag2 = False
+        self.adc_flag3 = False
+        self.adc_flag4 = False
+
+        GPIO.setup(self.key1, GPIO.IN, GPIO.PUD_UP)
+        GPIO.setup(self.key2, GPIO.IN, GPIO.PUD_UP)
+        GPIO.setup(self.key3, GPIO.IN, GPIO.PUD_UP)
+        GPIO.setup(self.key4, GPIO.IN, GPIO.PUD_UP)
+
+        # Add event detect with debounce
+        GPIO.add_event_detect(self.key1, GPIO.FALLING, callback=self.callback_key1, bouncetime=200)
+        GPIO.add_event_detect(self.key2, GPIO.FALLING, callback=self.callback_key2, bouncetime=200)
+        GPIO.add_event_detect(self.key3, GPIO.FALLING, callback=self.callback_key3, bouncetime=200)
+        GPIO.add_event_detect(self.key4, GPIO.FALLING, callback=self.callback_key4, bouncetime=200)
+
+    # Callbacks
+    def callback_key1(self, channel): self.adc_flag1 = True
+    def callback_key2(self, channel): self.adc_flag2 = True
+    def callback_key3(self, channel): self.adc_flag3 = True
+    def callback_key4(self, channel): self.adc_flag4 = True
+
+    # Polling methods (Non-blocking, checks latch)
     def press_lower_right(self):
-        last_state=GPIO.input(self.key1)
-        if last_state:
-            return False
-        else:
-            # Wait for release
-            while not GPIO.input(self.key1):
-                time.sleep(0.02)
+        if self.adc_flag1:
+            self.adc_flag1 = False
             return True
+        return False
 
-    #Lower Left Button - Original press_b
     def press_lower_left(self):
-        last_state=GPIO.input(self.key2)
-        if last_state:
-            return False
-        else:
-            # Wait for release
-            while not GPIO.input(self.key2):
-                time.sleep(0.02)
-            # os.system('pkill mplayer') # This was specific, might be handled by caller
+        if self.adc_flag2:
+            self.adc_flag2 = False
             return True
+        return False
 
-    #Upper left Button - Original press_c
     def press_upper_left(self):
-        last_state=GPIO.input(self.key3)
-        if last_state:
-            return False
-        else:
-            # Wait for release
-            while not GPIO.input(self.key3):
-                time.sleep(0.02)
+        if self.adc_flag3:
+            self.adc_flag3 = False
             return True
+        return False
 
-    #Upper Right Button - Original press_d
     def press_upper_right(self):
-        last_state=GPIO.input(self.key4)
-        if last_state:
-            return False
-        else:
-            # Wait for release
-            while not GPIO.input(self.key4):
-                time.sleep(0.02)
+        if self.adc_flag4:
+            self.adc_flag4 = False
             return True
+        return False
 
 if __name__ == '__main__':
     # Example usage:

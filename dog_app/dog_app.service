@@ -1,0 +1,17 @@
+[Unit]
+Description=XGO Dog Host Application
+After=network.target network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/home/jinliang/dog_app
+ExecStart=/usr/bin/python3 -u /home/jinliang/dog_app/main_app.py
+Restart=always
+RestartSec=5
+StandardOutput=append:/home/jinliang/dog_app/startup.log
+StandardError=append:/home/jinliang/dog_app/startup.log
+
+[Install]
+WantedBy=multi-user.target

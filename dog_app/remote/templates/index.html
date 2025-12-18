@@ -59,6 +59,9 @@
             </div>
             <div class="control-group">
                 <h3>Settings</h3>
+                <label>System Volume: <span id="val-volume">80</span>%</label>
+                <input type="range" id="slider-volume" min="0" max="100" value="80">
+                <br>
                 <label>Step Height: <span id="val-height">20</span></label>
                 <input type="range" id="slider-height" min="0" max="50" value="20">
             </div>
@@ -289,6 +292,18 @@
                 document.getElementById('val-height').innerText = slider.value;
                 socket.emit('robot_command', { command: 'height', value: slider.value });
             };
+
+            // Volume Slider
+            const volSlider = document.getElementById('slider-volume');
+            if (volSlider) {
+                volSlider.oninput = () => {
+                    document.getElementById('val-volume').innerText = volSlider.value;
+                    // Debounce could be good, but direct emit is fine for low frequency
+                    socket.emit('volume_command', { value: volSlider.value });
+                };
+                // Set initial
+                socket.emit('volume_command', { value: volSlider.value });
+            }
 
             function toggleMotors(load) {
                 console.log("ToggleMotors called:", load);

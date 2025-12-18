@@ -66,6 +66,7 @@ except ImportError as e:
 try:
     from skills.manager import SkillsManager
     from skills.ball_tracking import BallTrackingSkill
+    from skills.voice_skill import VoiceConversationSkill
 except ImportError as e:
     print(f"MainApp: Import Error (Skills): {e}")
     SkillsManager = None
@@ -174,9 +175,14 @@ def initialize_systems():
     if SkillsManager and dog_instance:
         skills_mgr = SkillsManager(dog_instance, display_mgr, camera_instance)
         skills_mgr.register_skill(BallTrackingSkill)
+        skills_mgr.register_skill(VoiceConversationSkill)
         print("MainApp: SkillsManager initialized.")
         if ws_set_skills_manager:
             ws_set_skills_manager(skills_mgr)
+        
+        # UTILITY: Auto-start Voice Chat for testing
+        print("MainApp: Auto-starting VoiceChat skill for testing...")
+        skills_mgr.start_skill("VoiceChat")
 
 
     # Initialize Voice Manager

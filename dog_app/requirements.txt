@@ -10,3 +10,11 @@ numpy>=1.20
 # Or pip install spidev (availability on PyPI can vary for system-level libs)
 # pygame (if used for sound in EmotionManager later)
 # pygame>=2.0
+
+# Voice / Mock Server
+fastapi>=0.68.0
+uvicorn>=0.15.0
+websockets>=10.0
+websocket-client>=1.3.0
+pyaudio>=0.2.11
+zeroconf>=0.38.0

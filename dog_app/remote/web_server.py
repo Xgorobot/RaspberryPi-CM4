@@ -751,6 +751,29 @@ if __name__ == '__main__':
     else:
         logger.warning("Camera not available or not opened (standalone).")
 
-    logger.info("Starting Flask-SocketIO server on http://0.0.0.0:5000")
     # use_reloader=False is important for not running initialize_hardware twice in debug mode
     socketio.run(app, host='0.0.0.0', port=5000, debug=True, use_reloader=False, allow_unsafe_werkzeug=True)
+
+import subprocess
+
+@socketio.on('volume_command')
+def handle_volume_command(json_data):
+    """Handles system volume control."""
+    update_interaction_time()
+    try:
+        volume = int(json_data.get('value', 50))
+        # Clamp between 0 and 100
+        volume = max(0, min(100, volume))
+        
+        logger.info(f"Setting System Volume to {volume}%")
+        
+        # Using amixer to set Master volume
+        # 'amixer set Master 50%' works on most ALSA setups
+        subprocess.run(['amixer', 'set', 'Master', f'{volume}%'], check=False)
+        
+        # Some systems might use 'PCM' or 'Headphone' if Master doesn't exist
+        # We can try setting PCM as well just in case
+        subprocess.run(['amixer', 'set', 'PCM', f'{volume}%'], check=False)
+        
+    except Exception as e:
+        logger.error(f"Error setting volume: {e}")
